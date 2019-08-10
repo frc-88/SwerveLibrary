@@ -1,0 +1,27 @@
+plugins {
+    // Support for the java library
+    id 'java-library'
+    id "edu.wpi.first.GradleRIO" version "2019.4.1"
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.3'
+}
+
+repositories {
+    // Use Maven for resolving dependencies
+    mavenCentral()
+}
+
+dependencies {
+    // WPILib
+    api wpi.deps.wpilib()
+
+    // Use JUnit Jupiter API for testing.
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+
+    // Use JUnit Jupiter Engine for testing.
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+}
+
+test {
+    // Use junit platform for unit tests
+    useJUnitPlatform()
+}
