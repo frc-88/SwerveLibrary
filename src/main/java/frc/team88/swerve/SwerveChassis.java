@@ -20,7 +20,7 @@ public class SwerveChassis {
 
     private long lastUpdateTime;
 
-    protected SwerveChassis() {
+    public SwerveChassis() {
         desiredState = VelocitySwerveState.ZERO_STATE;
         lastUpdateTime = RobotController.getFPGATime();
     }
