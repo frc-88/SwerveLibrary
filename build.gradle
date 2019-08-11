@@ -1,8 +1,23 @@
+buildscript {
+    repositories {
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+    if (rootProject == project) {
+        dependencies {
+            classpath "edu.wpi.first:GradleRIO:2019.4.1"
+        }
+    }
+}
+
 plugins {
     // Support for the java library
     id 'java-library'
-    id "edu.wpi.first.GradleRIO" version "2019.4.1"
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.3'
+}
+
+if (rootProject == project) {
+    apply plugin: 'edu.wpi.first.GradleRIO'
 }
 
 repositories {
@@ -11,8 +26,9 @@ repositories {
 }
 
 dependencies {
-    // WPILib
-    api wpi.deps.wpilib()
+    if (rootProject == project) {
+        api wpi.deps.wpilib()
+    }
 
     // Use JUnit Jupiter API for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
@@ -24,4 +40,12 @@ dependencies {
 test {
     // Use junit platform for unit tests
     useJUnitPlatform()
+}
+
+// Only add a wrapper block if we are the root project
+if (rootProject == project) {
+    wrapper {
+        distributionType = Wrapper.DistributionType.ALL
+        gradleVersion = '5.1'
+    }
 }
