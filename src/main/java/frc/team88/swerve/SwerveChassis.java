@@ -11,7 +11,7 @@ import frc.team88.swerve.SwerveTelemetry;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.SwerveUtils;
 
-public abstract class SwerveChassis {
+public class SwerveChassis {
 
     // Robot centric
     private SwerveState desiredState;
