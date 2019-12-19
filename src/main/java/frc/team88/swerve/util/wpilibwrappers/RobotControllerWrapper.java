@@ -16,7 +16,7 @@ public class RobotControllerWrapper {
     /**
      * Private constructor. Does nothing.
      */
-    private RobotControllerWrapper() {
+    public RobotControllerWrapper() {
         // Do nothing
     }
 
@@ -29,6 +29,13 @@ public class RobotControllerWrapper {
             instance = new RobotControllerWrapper();
         }
         return instance;
+    }
+
+    /**
+     * Sets the singleton instance. Used only for testing.
+     */
+    public static void setInstance(RobotControllerWrapper instance) {
+        RobotControllerWrapper.instance = instance;
     }
 
     /**
