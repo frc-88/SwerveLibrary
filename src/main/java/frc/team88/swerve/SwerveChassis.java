@@ -1,7 +1,6 @@
 package frc.team88.swerve;
 
 import edu.wpi.first.wpilibj.RobotController;
-import frc.team88.swerve.Constants;
 import frc.team88.swerve.state.AbsoluteHeadingSwerveState;
 import frc.team88.swerve.state.FullSwerveState;
 import frc.team88.swerve.state.SwerveState;
@@ -55,9 +54,9 @@ public class SwerveChassis {
             VelocitySwerveState commanded = desired;
             FullSwerveState current = SwerveTelemetry.getInstance().getRobotCentricState();
             
-            SwerveUtils.limitAccelerations(current, desired, Constants.linearAccelLimit, 
-                Constants.translationAngularAccelLimit, Constants.headingAngularAccelLimit, 
-                RobotController.getFPGATime() - lastUpdateTime);
+            // SwerveUtils.limitAccelerations(current, desired, Constants.linearAccelLimit, 
+            //     Constants.translationAngularAccelLimit, Constants.headingAngularAccelLimit, 
+            //     RobotController.getFPGATime() - lastUpdateTime);
 
             // TODO Convert to module commands
 

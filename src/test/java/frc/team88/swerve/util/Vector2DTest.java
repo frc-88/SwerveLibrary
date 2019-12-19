@@ -1,6 +1,8 @@
 package frc.team88.swerve.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,8 @@ public class Vector2DTest {
     private Vector2D left1;
     private Vector2D down3;
     private Vector2D rightHalf;
+    private Vector2D upRight;
+    private Vector2D downLeft;
     private Vector2D deg30;
     private Vector2D deg135;
     private Vector2D degNeg60;
@@ -24,6 +28,8 @@ public class Vector2DTest {
         left1 = Vector2D.createCartesianCoordinates(-1, 0);
         down3 = Vector2D.createCartesianCoordinates(0, -3);
         rightHalf = Vector2D.createCartesianCoordinates(0.5, 0);
+        upRight = Vector2D.createCartesianCoordinates(1, 3);
+        downLeft = Vector2D.createCartesianCoordinates(-2, -1);
         deg30 = Vector2D.createPolarCoordinates(1, 30);
         deg135 = Vector2D.createPolarCoordinates(1, 135);
         degNeg60 = Vector2D.createPolarCoordinates(1, -60);
@@ -113,6 +119,72 @@ public class Vector2DTest {
     @Test
     public void testGetAngleQ4() {
         assertEquals(-60, degNeg60.getAngle(), 0.001);
+    }
+
+    @Test
+    public void testPlusCardinals() {
+        assertTrue(Vector2D.createCartesianCoordinates(-1, 2)
+                .approximatelyEquals(up2.plus(left1)));
+    }
+
+    @Test
+    public void testPlusDiagonals() {
+        assertTrue(Vector2D.createCartesianCoordinates(-1, 2) 
+                .approximatelyEquals(upRight.plus(downLeft)));
+    }
+
+    @Test
+    public void testTimesCardinal() {
+        assertTrue(Vector2D.createCartesianCoordinates(0, 3)
+                .approximatelyEquals(up2.times(1.5)));
+    }
+
+    @Test
+    public void testTimesDiagonal() {
+        assertTrue(Vector2D.createCartesianCoordinates(-2, -6) 
+                .approximatelyEquals(upRight.times(-2)));
+    }
+
+    @Test
+    public void rotatePositive() {
+        assertTrue(Vector2D.createPolarCoordinates(1, 50)
+                .approximatelyEquals(deg30.rotate(20)));
+    }
+
+    @Test
+    public void rotateNegative() {
+        assertTrue(Vector2D.createPolarCoordinates(1, -15)
+                .approximatelyEquals(deg30.rotate(-45)));
+    }
+
+    @Test
+    public void rotateLarge() {
+        assertTrue(Vector2D.createPolarCoordinates(1, 40)
+                .approximatelyEquals(deg30.rotate(730)));
+    }
+
+    @Test
+    public void approximatelyEqualsTrue() {
+        assertTrue(up2.approximatelyEquals(
+                Vector2D.createPolarCoordinates(2, 0)));
+    }
+
+    @Test
+    public void approximatelyEqualsTrueZero() {
+        assertTrue(Vector2D.ORIGIN.approximatelyEquals(
+                Vector2D.createPolarCoordinates(0., 0.)));
+    }
+
+    @Test
+    public void approximatelyEqualsXMismatch() {
+        assertFalse(up2.approximatelyEquals(
+                Vector2D.createCartesianCoordinates(0, 2.001)));
+    }
+
+    @Test
+    public void approximatelyEqualsYMismatch() {
+        assertFalse(up2.approximatelyEquals(
+                Vector2D.createCartesianCoordinates(0.001, 2)));
     }
 
 }

@@ -1,7 +1,6 @@
 package frc.team88.swerve.swervemodule;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import frc.team88.swerve.Constants;
 import frc.team88.swerve.util.MathUtils;
 import frc.team88.swerve.util.SyncPIDController;
 import frc.team88.swerve.wrappers.SwerveAzimuthSensor;
@@ -39,18 +38,18 @@ public class StandardSwerveModule implements SwerveModule {
         this.azimuthSensor = azimuthSensor;
 
         // Set up PIDs
-        wheelSpeedPID = new SyncPIDController(
-            Constants.mk2WheelKP,
-            Constants.mk2WheelKI,
-            Constants.mk2WheelKD,
-            Constants.mk2WheelKF,
-            Constants.mk2WheelIZone,
-            Constants.mk2WheelIMax);
+        // wheelSpeedPID = new SyncPIDController(
+        //     Constants.mk2WheelKP,
+        //     Constants.mk2WheelKI,
+        //     Constants.mk2WheelKD,
+        //     Constants.mk2WheelKF,
+        //     Constants.mk2WheelIZone,
+        //     Constants.mk2WheelIMax);
 
-        azimuthPID = new SyncPIDController(
-            Constants.mk2AzimuthKP,
-            Constants.mk2AzimuthKI,
-            Constants.mk2AzimuthKD);
+        // azimuthPID = new SyncPIDController(
+        //     Constants.mk2AzimuthKP,
+        //     Constants.mk2AzimuthKI,
+        //     Constants.mk2AzimuthKD);
     }
 
     /**
