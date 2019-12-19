@@ -1,6 +1,5 @@
 package frc.team88.swerve.swervemodule;
 
-import frc.team88.swerve.Constants;
 import frc.team88.swerve.util.MathUtils;
 import frc.team88.swerve.util.SyncPIDController;
 import frc.team88.swerve.wrappers.SwerveAzimuthSensor;

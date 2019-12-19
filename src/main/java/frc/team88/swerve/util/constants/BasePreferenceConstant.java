@@ -3,8 +3,6 @@ package frc.team88.swerve.util.constants;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import edu.wpi.first.wpilibj.Preferences;
-
 /**
  * Base class of the PreferenceConstant interface.
  */
