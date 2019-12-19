@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.RobotController;
 public class RobotControllerWrapper {
 
     // The singleton instance
-    private RobotControllerWrapper instance;
+    private static RobotControllerWrapper instance;
 
     /**
      * Private constructor. Does nothing.
@@ -24,7 +24,7 @@ public class RobotControllerWrapper {
      * Get the singleton instance
      * @return The singleton instance
      */
-    public RobotControllerWrapper getInstance() {
+    public static RobotControllerWrapper getInstance() {
         if (Objects.isNull(instance)) {
             instance = new RobotControllerWrapper();
         }

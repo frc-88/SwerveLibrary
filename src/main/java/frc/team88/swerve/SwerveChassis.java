@@ -1,6 +1,5 @@
 package frc.team88.swerve;
 
-import edu.wpi.first.wpilibj.RobotController;
 import frc.team88.swerve.state.AbsoluteHeadingSwerveState;
 import frc.team88.swerve.state.FullSwerveState;
 import frc.team88.swerve.state.SwerveState;
@@ -8,6 +7,7 @@ import frc.team88.swerve.state.SwerveStateVisitor;
 import frc.team88.swerve.state.VelocitySwerveState;
 import frc.team88.swerve.SwerveTelemetry;
 import frc.team88.swerve.util.Vector2D;
+import frc.team88.swerve.util.wpilibwrappers.RobotControllerWrapper;
 import frc.team88.swerve.util.SwerveUtils;
 
 public class SwerveChassis {
@@ -21,7 +21,7 @@ public class SwerveChassis {
 
     public SwerveChassis() {
         desiredState = VelocitySwerveState.ZERO_STATE;
-        lastUpdateTime = RobotController.getFPGATime();
+        lastUpdateTime = RobotControllerWrapper.getInstance().getFPGATime();
     }
 
     public void setRobotCentricVelocityTargets(double xVelocity, 
@@ -43,7 +43,7 @@ public class SwerveChassis {
 
     public void update() {
         this.desiredState.accept(this.motionController);
-        lastUpdateTime = RobotController.getFPGATime();
+        lastUpdateTime = RobotControllerWrapper.getInstance().getFPGATime();
     }
 
     private class MotionController implements SwerveStateVisitor<Void> {
@@ -56,7 +56,7 @@ public class SwerveChassis {
             
             // SwerveUtils.limitAccelerations(current, desired, Constants.linearAccelLimit, 
             //     Constants.translationAngularAccelLimit, Constants.headingAngularAccelLimit, 
-            //     RobotController.getFPGATime() - lastUpdateTime);
+            //     RobotControllerWrapper.getInstance().getFPGATime() - lastUpdateTime);
 
             // TODO Convert to module commands
 

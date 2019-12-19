@@ -2,9 +2,9 @@ package frc.team88.swerve;
 
 import java.util.Objects;
 
-import edu.wpi.first.wpilibj.RobotController;
 import frc.team88.swerve.state.FullSwerveState;
 import frc.team88.swerve.util.Vector2D;
+import frc.team88.swerve.util.wpilibwrappers.RobotControllerWrapper;
 import frc.team88.swerve.wrappers.SwerveGyro;
 
 public class SwerveTelemetry {
@@ -29,7 +29,7 @@ public class SwerveTelemetry {
         this.gyroOffset = 0;
         this.currentState = FullSwerveState.ZERO_STATE;
         this.setHeading(0);
-        lastTime = RobotController.getFPGATime();
+        lastTime = RobotControllerWrapper.getInstance().getFPGATime();
     }
 
     public static SwerveTelemetry getInstance() {
@@ -105,7 +105,7 @@ public class SwerveTelemetry {
         //         backLeftVelocity,
         //         backRightVelocity
         //     });
-        //     positionChange = velocity.times((RobotController.getFPGATime() - lastTime) / 1_000_000);
+        //     positionChange = velocity.times((RobotControllerWrapper.getInstance().getFPGATime() - lastTime) / 1_000_000);
         // } else {
         //     positionChange = Vector2D.ORIGIN;
         // }
