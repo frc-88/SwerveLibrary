@@ -1,6 +1,6 @@
 package frc.team88.swerve.util;
 
-import edu.wpi.first.wpilibj.RobotController;
+import frc.team88.swerve.util.wpilibwrappers.RobotControllerWrapper;
 
 /**
  * Class that performs the math of a PID controller, converting a setpoint and 
@@ -264,7 +264,7 @@ public class SyncPIDController {
      */
     protected double calculateD(double error) {
 
-        long curTime = RobotController.getFPGATime();
+        long curTime = RobotControllerWrapper.getInstance().getFPGATime();
 
         double ret = kD * (error - m_prevError) 
                 / ((curTime - m_lastLoopTime) / 1e6);
