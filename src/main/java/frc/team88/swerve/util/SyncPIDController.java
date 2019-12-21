@@ -46,8 +46,8 @@ public class SyncPIDController {
         this.iMax = iMax;
         this.tolerance = tolerance;
 
-        this.enableIZone = true;
-        this.enableIMax = true;
+        this.enableIZone = iZone > 0.000001;
+        this.enableIMax = iMax > 0.000001;
     }
 
     /**

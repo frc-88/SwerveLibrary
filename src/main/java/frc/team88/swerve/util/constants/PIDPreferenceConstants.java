@@ -31,7 +31,7 @@ public class PIDPreferenceConstants {
      * @param tolerance The minimim error absolute value where an output will 
      * be applied
      */
-    protected PIDPreferenceConstants(String name, double kP, double kI, 
+    public PIDPreferenceConstants(String name, double kP, double kI, 
             double kD, double kF, double iZone, double iMax, 
             double tolerance) {
         Objects.requireNonNull(name);
