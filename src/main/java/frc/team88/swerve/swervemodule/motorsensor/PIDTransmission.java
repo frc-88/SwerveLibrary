@@ -10,7 +10,7 @@ public class PIDTransmission implements PIDMotor {
     // The motor driving the transmission
     private PIDMotor inputMotor;
 
-    // The gear ratio; outputSpeed = baseMotorSpeed * gearRatio
+    // The gear ratio; outputSpeed = baseMotorSpeed / gearRatio
     private double gearRatio;
 
     public PIDTransmission(PIDMotor inputMotor, double gearRatio) {
@@ -47,7 +47,7 @@ public class PIDTransmission implements PIDMotor {
      * @return The output value
      */
     private double applyForwardGearRatio(double value) {
-        return value * gearRatio;
+        return value / gearRatio;
     }
 
     /**
@@ -56,7 +56,7 @@ public class PIDTransmission implements PIDMotor {
      * @return The input value
      */
     private double applyReverseGearRatio(double value) {
-        return value / gearRatio;
+        return value * gearRatio;
     }
 
 }
