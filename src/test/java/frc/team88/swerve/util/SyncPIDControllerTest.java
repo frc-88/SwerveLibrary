@@ -30,7 +30,7 @@ public class SyncPIDControllerTest {
 
     @BeforeEach
     public void setup() {
-        controller = new SyncPIDController(kP, kI, kD, kF, iZone, iMax);
+        controller = new SyncPIDController(kP, kI, kD, kF, iZone, iMax, tolerance);
 
         MockitoAnnotations.initMocks(this);
         
@@ -91,8 +91,8 @@ public class SyncPIDControllerTest {
 
     @Test
     public void testSetTolerance() {
-        controller.setTolerance(tolerance);
-        assertEquals(tolerance, controller.getTolerance(), 0.0001);
+        controller.setTolerance(2*tolerance);
+        assertEquals(2*tolerance, controller.getTolerance(), 0.0001);
     }
 
     @Test
@@ -175,11 +175,10 @@ public class SyncPIDControllerTest {
         when(robotController.getFPGATime())
                 .thenReturn(1_000_000l).thenReturn(2_000_000l)
                 .thenReturn(3_000_000l);
-        controller.setTolerance(1);
         assertNotEquals(0, controller.calculateOutput(-5, 0));
         assertNotEquals(0, controller.calculateOutput(5, 0));
-        assertEquals(0, controller.calculateOutput(0.5, 0));
-        assertEquals(0, controller.calculateOutput(-0.5, 0));
+        assertEquals(0, controller.calculateOutput(1, 0));
+        assertEquals(0, controller.calculateOutput(1, 0));
     }
 
 }
