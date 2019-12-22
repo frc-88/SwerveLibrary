@@ -1,7 +1,7 @@
 package frc.team88.swerve.util;
 
 import frc.team88.swerve.util.constants.PIDPreferenceConstants;
-import frc.team88.swerve.util.wpilibwrappers.RobotControllerWrapper;
+import frc.team88.swerve.wrappers.RobotControllerWrapper;
 
 /**
  * Class that performs the math of a PID controller, converting a setpoint and

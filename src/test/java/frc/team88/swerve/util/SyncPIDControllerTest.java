@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import frc.team88.swerve.util.wpilibwrappers.RobotControllerWrapper;
+import frc.team88.swerve.wrappers.RobotControllerWrapper;
 
 public class SyncPIDControllerTest {
 
