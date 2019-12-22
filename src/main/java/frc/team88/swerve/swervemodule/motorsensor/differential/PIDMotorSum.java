@@ -6,8 +6,8 @@ import frc.team88.swerve.swervemodule.motorsensor.PIDMotor;
 
 /**
  * Controls and senses the sum of 2 motors in a differential mechanism. Handles
- * all operations that can be done without coordinating with the difference 
- * "motor", such as sensor reading, and delegates the rest to the differential 
+ * all operations that can be done without coordinating with the difference
+ * "motor", such as sensor reading, and delegates the rest to the differential
  * mechanism.
  */
 public class PIDMotorSum implements PIDMotor {
@@ -20,6 +20,7 @@ public class PIDMotorSum implements PIDMotor {
 
     /**
      * Constructor.
+     * 
      * @param differential The differential mechanism this derives from
      */
     public PIDMotorSum(DifferentialMechanism differential) {
@@ -28,15 +29,14 @@ public class PIDMotorSum implements PIDMotor {
 
     @Override
     public double getPosition() {
-        return (this.differential.getPositiveMotor().getPosition()
-                + this.differential.getNegativeMotor().getPosition()) / 2.
-                + this.offset;
+        return (this.differential.getPositiveMotor().getPosition() + this.differential.getNegativeMotor().getPosition())
+                / 2. + this.offset;
     }
 
     @Override
     public double getVelocity() {
-        return (this.differential.getPositiveMotor().getVelocity()
-                + this.differential.getNegativeMotor().getVelocity()) / 2.;
+        return (this.differential.getPositiveMotor().getVelocity() + this.differential.getNegativeMotor().getVelocity())
+                / 2.;
     }
 
     @Override

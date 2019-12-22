@@ -7,17 +7,17 @@ import edu.wpi.first.wpilibj.Preferences;
 /**
  * Preferences constant for double values
  */
-public final class DoublePreferenceConstant 
-        extends BasePreferenceConstant<Double> {
+public final class DoublePreferenceConstant extends BasePreferenceConstant<Double> {
 
     String name;
     double defaultValue;
 
     /**
      * Constructor. Will call update() once.
-     * @param name The name to be used as a key in WPILib preferences
+     * 
+     * @param name         The name to be used as a key in WPILib preferences
      * @param defaultValue The value that will be set as default if the value
-     * doesn't exist in WPILib preferences
+     *                     doesn't exist in WPILib preferences
      */
     public DoublePreferenceConstant(String name, double defaultValue) {
         this.name = Objects.requireNonNull(name);
@@ -40,4 +40,3 @@ public final class DoublePreferenceConstant
     }
 
 }
-

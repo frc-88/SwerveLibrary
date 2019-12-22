@@ -5,9 +5,9 @@ package frc.team88.swerve.util;
  * our reference frame convention, which is as follows:
  * 
  * "An angle of 0 degrees is defined as pointing in the direction of the
- * positive y-axis, increasing positively in the counter-clockwise direction
- * and negatively in the clockwise direction. The positive x-axis is at 
- * -90 degrees."
+ * positive y-axis, increasing positively in the counter-clockwise direction and
+ * negatively in the clockwise direction. The positive x-axis is at -90
+ * degrees."
  */
 public class Vector2D {
 
@@ -20,6 +20,7 @@ public class Vector2D {
 
     /**
      * Private constructor using cartesian coordinates.
+     * 
      * @param x
      * @param y
      */
@@ -30,6 +31,7 @@ public class Vector2D {
 
     /**
      * Get the x component of this vector.
+     * 
      * @return The x component
      */
     public double getX() {
@@ -38,6 +40,7 @@ public class Vector2D {
 
     /**
      * Get the y component of this vector.
+     * 
      * @return The y component
      */
     public double getY() {
@@ -46,6 +49,7 @@ public class Vector2D {
 
     /**
      * Get the magnitude of this vector.
+     * 
      * @return The magnitude
      */
     public double getMagnitude() {
@@ -54,6 +58,7 @@ public class Vector2D {
 
     /**
      * Get the angle of this vector.
+     * 
      * @return The angle, in degrees
      */
     public double getAngle() {
@@ -62,6 +67,7 @@ public class Vector2D {
 
     /**
      * Creates a Vector2D using the given cartesian coordinates.
+     * 
      * @param x The x component
      * @param y The y component
      * @return The created vector
@@ -72,18 +78,19 @@ public class Vector2D {
 
     /**
      * Creates a vector2D using the given polar coordinates.
+     * 
      * @param magnitude The magnitude
-     * @param angle The angle, in degrees
+     * @param angle     The angle, in degrees
      * @return The created vector
      */
     public static Vector2D createPolarCoordinates(double magnitude, double angle) {
         angle = Math.toRadians(angle);
-        return createCartesianCoordinates(
-            magnitude * -Math.sin(angle), magnitude * Math.cos(angle));
+        return createCartesianCoordinates(magnitude * -Math.sin(angle), magnitude * Math.cos(angle));
     }
 
     /**
      * Returns this vector added to the given vector.
+     * 
      * @param that The vector the add to this vector
      * @return The sum
      */
@@ -93,6 +100,7 @@ public class Vector2D {
 
     /**
      * Returns this vector multiplied by the given scalar.
+     * 
      * @param scalar The scalar multiplicand
      * @return The product
      */
@@ -102,6 +110,7 @@ public class Vector2D {
 
     /**
      * Returns this vector rotated by the given angle
+     * 
      * @param angle The angle offset
      * @return The rotated vector
      */
@@ -110,15 +119,14 @@ public class Vector2D {
     }
 
     /**
-     * Determines if this vector is equal to the given vector except for a
-     * floating point error
+     * Determines if this vector is equal to the given vector except for a floating
+     * point error
+     * 
      * @param that The vector to compare this to
      * @return True if the 2 vectors are approximately equal, false otherwise
      */
     public boolean approximatelyEquals(Vector2D that) {
-        return MathUtils.doubleEquals(this.getX(), that.getX())
-                && MathUtils.doubleEquals(this.getY(), that.getY());
+        return MathUtils.doubleEquals(this.getX(), that.getX()) && MathUtils.doubleEquals(this.getY(), that.getY());
     }
-
 
 }

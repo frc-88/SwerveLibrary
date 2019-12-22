@@ -15,7 +15,7 @@ public class PIDTransmission implements PIDMotor {
 
     public PIDTransmission(PIDMotor inputMotor, double gearRatio) {
         this.inputMotor = Objects.requireNonNull(inputMotor);
-        if (gearRatio <= 0 ) {
+        if (gearRatio <= 0) {
             throw new IllegalArgumentException("Gear ratio must be positive.");
         }
         this.gearRatio = gearRatio;
@@ -43,6 +43,7 @@ public class PIDTransmission implements PIDMotor {
 
     /**
      * Applies the gear ratio to get from an input value to an output value.
+     * 
      * @param value The input value
      * @return The output value
      */
@@ -52,6 +53,7 @@ public class PIDTransmission implements PIDMotor {
 
     /**
      * Applies the gear ratio to get from an output value to an input value.
+     * 
      * @param value The output value
      * @return The input value
      */

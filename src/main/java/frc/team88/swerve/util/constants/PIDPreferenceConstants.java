@@ -20,19 +20,19 @@ public class PIDPreferenceConstants {
     /**
      * Constructor. All values given are defaults that will be overriden if a
      * preference for them already exists.
-     * @param name The name to pre-pend to all preference names
-     * @param kP The proportional gain
-     * @param kI The integral gain
-     * @param kD The differential gain
-     * @param kF The feedforward gain
-     * @param iZone The error range in which the integral accumulates
-     * @param iMax The max error absolute value that the integral will 
-     * acumulate
-     * @param tolerance The minimim error absolute value where an output will 
-     * be applied
+     * 
+     * @param name      The name to pre-pend to all preference names
+     * @param kP        The proportional gain
+     * @param kI        The integral gain
+     * @param kD        The differential gain
+     * @param kF        The feedforward gain
+     * @param iZone     The error range in which the integral accumulates
+     * @param iMax      The max error absolute value that the integral will
+     *                  acumulate
+     * @param tolerance The minimim error absolute value where an output will be
+     *                  applied
      */
-    public PIDPreferenceConstants(String name, double kP, double kI, 
-            double kD, double kF, double iZone, double iMax, 
+    public PIDPreferenceConstants(String name, double kP, double kI, double kD, double kF, double iZone, double iMax,
             double tolerance) {
         Objects.requireNonNull(name);
         this.kP = new DoublePreferenceConstant(name + " kP", kP);
@@ -41,8 +41,7 @@ public class PIDPreferenceConstants {
         this.kF = new DoublePreferenceConstant(name + " kF", kF);
         this.iZone = new DoublePreferenceConstant(name + " iZone", iZone);
         this.iMax = new DoublePreferenceConstant(name + " iMax", iMax);
-        this.tolerance = new DoublePreferenceConstant(name + " tolerance", 
-                tolerance);
+        this.tolerance = new DoublePreferenceConstant(name + " tolerance", tolerance);
     }
 
     /**
@@ -60,6 +59,7 @@ public class PIDPreferenceConstants {
 
     /**
      * Get the kP preference constant.
+     * 
      * @return The kP preference constant
      */
     public DoublePreferenceConstant getKP() {
@@ -68,6 +68,7 @@ public class PIDPreferenceConstants {
 
     /**
      * Get the kI preference constant.
+     * 
      * @return The kI preference constant
      */
     public DoublePreferenceConstant getKI() {
@@ -76,6 +77,7 @@ public class PIDPreferenceConstants {
 
     /**
      * Get the kD preference constant.
+     * 
      * @return The kD preference constant
      */
     public DoublePreferenceConstant getKD() {
@@ -84,6 +86,7 @@ public class PIDPreferenceConstants {
 
     /**
      * Get the kF preference constant.
+     * 
      * @return The kF preference constant
      */
     public DoublePreferenceConstant getKF() {
@@ -92,15 +95,16 @@ public class PIDPreferenceConstants {
 
     /**
      * Get the iZone preference constant.
+     * 
      * @return The iZone preference constant
      */
     public DoublePreferenceConstant getIZone() {
         return iZone;
     }
 
-
     /**
      * Get the iMax preference constant.
+     * 
      * @return The iMax preference constant
      */
     public DoublePreferenceConstant getIMax() {
@@ -109,6 +113,7 @@ public class PIDPreferenceConstants {
 
     /**
      * Get the tolerance preference constant.
+     * 
      * @return The tolerance preference constant
      */
     public DoublePreferenceConstant getTolerance() {

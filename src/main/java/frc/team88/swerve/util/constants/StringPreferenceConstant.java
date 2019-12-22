@@ -7,17 +7,17 @@ import edu.wpi.first.wpilibj.Preferences;
 /**
  * Preferences constant for string values.
  */
-public final class StringPreferenceConstant 
-        extends BasePreferenceConstant<String> {
+public final class StringPreferenceConstant extends BasePreferenceConstant<String> {
 
     String name;
     String defaultValue;
 
     /**
      * Constructor. Will call update() once.
-     * @param name The name to be used as a key in WPILib preferences
+     * 
+     * @param name         The name to be used as a key in WPILib preferences
      * @param defaultValue The value that will be set as default if the value
-     * doesn't exist in WPILib preferences
+     *                     doesn't exist in WPILib preferences
      */
     public StringPreferenceConstant(String name, String defaultValue) {
         this.name = Objects.requireNonNull(name);

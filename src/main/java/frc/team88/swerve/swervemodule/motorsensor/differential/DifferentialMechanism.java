@@ -32,11 +32,11 @@ public class DifferentialMechanism {
 
     /**
      * Constructor.
+     * 
      * @param positiveMotor The motor that is subtracted from in the difference
      * @param negativeMotor The motor that is subtracted in the difference
      */
-    public DifferentialMechanism(PIDMotor positiveMotor, 
-            PIDMotor negativeMotor) {
+    public DifferentialMechanism(PIDMotor positiveMotor, PIDMotor negativeMotor) {
         this.positiveMotor = Objects.requireNonNull(positiveMotor);
         this.negativeMotor = Objects.requireNonNull(negativeMotor);
 
@@ -46,6 +46,7 @@ public class DifferentialMechanism {
 
     /**
      * Gets the positive motor in this differential mechanism.
+     * 
      * @return The motor that is subtracted from in the difference
      */
     public PIDMotor getPositiveMotor() {
@@ -54,6 +55,7 @@ public class DifferentialMechanism {
 
     /**
      * Gets the negative motor in this differential mechanism.
+     * 
      * @return The motor that is subtracted in the difference
      */
     public PIDMotor getNegativeMotor() {
@@ -63,6 +65,7 @@ public class DifferentialMechanism {
     /**
      * Gets the PIDMotor representation of the difference in this differential
      * mechanism.
+     * 
      * @return The difference "motor"
      */
     public PIDMotorDifference getDifferenceMotor() {
@@ -70,8 +73,8 @@ public class DifferentialMechanism {
     }
 
     /**
-     * Gets the PIDMotor representation of the sum in this differential
-     * mechanism.
+     * Gets the PIDMotor representation of the sum in this differential mechanism.
+     * 
      * @return The sum "motor"
      */
     public PIDMotorSum getSumMotor() {
@@ -80,6 +83,7 @@ public class DifferentialMechanism {
 
     /**
      * Sets the velocity of the difference.
+     * 
      * @param velocity The difference velocity
      */
     public void setDifferenceVelocity(double velocity) {
@@ -87,9 +91,9 @@ public class DifferentialMechanism {
         this.updateVelocityController();
     }
 
-    
     /**
      * Sets the velocity of the sum.
+     * 
      * @param velocity The sum velocity
      */
     public void setSumVelocity(double velocity) {
@@ -98,8 +102,7 @@ public class DifferentialMechanism {
     }
 
     /**
-     * Updates the velocity control to use the most recently set velocity
-     * values.
+     * Updates the velocity control to use the most recently set velocity values.
      */
     public void updateVelocityController() {
         this.getPositiveMotor().setVelocity(sumVelocity + differenceVelocity);

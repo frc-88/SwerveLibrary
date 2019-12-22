@@ -22,6 +22,7 @@ public class RobotControllerWrapper {
 
     /**
      * Get the singleton instance
+     * 
      * @return The singleton instance
      */
     public static RobotControllerWrapper getInstance() {

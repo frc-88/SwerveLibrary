@@ -8,8 +8,7 @@ import java.util.function.Consumer;
 /**
  * Base class of the PreferenceConstant interface.
  */
-public abstract class BasePreferenceConstant<T> 
-        implements PreferenceConstant<T> {
+public abstract class BasePreferenceConstant<T> implements PreferenceConstant<T> {
 
     private T value;
     private List<Consumer<T>> changeHandlers;
@@ -21,12 +20,14 @@ public abstract class BasePreferenceConstant<T>
 
     /**
      * Get the value of this constant from WPILib Preferences.
+     * 
      * @return The value from Preferences
      */
     protected abstract T getFromPreferences();
 
     /**
      * Set the value of this constant in WPILib Preferences.
+     * 
      * @param value The value to set
      */
     protected abstract void setInPreferences(T value);

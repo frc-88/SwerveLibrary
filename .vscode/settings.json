@@ -9,5 +9,6 @@
     "bin/": true,
     ".classpath": true,
     ".project": true
-  }
+  },
+  "java.format.settings.url": "eclipse-formatter.xml"
 }

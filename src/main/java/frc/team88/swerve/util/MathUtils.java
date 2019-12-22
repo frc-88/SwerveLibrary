@@ -6,8 +6,9 @@ package frc.team88.swerve.util;
 public class MathUtils {
 
     /**
-     * Determines if 2 double values are equal to with a reasonable floating
-     * point error
+     * Determines if 2 double values are equal to with a reasonable floating point
+     * error
+     * 
      * @param a The expected value
      * @param b The actual value
      * @return If the 2 values are approximately equal
@@ -25,7 +26,8 @@ public class MathUtils {
 
     public static double getReferenceAngle(double angle) {
         angle = (angle + 180) % 360;
-        if (angle < 0) angle += 360;
+        if (angle < 0)
+            angle += 360;
         angle -= 180;
         return angle;
     }

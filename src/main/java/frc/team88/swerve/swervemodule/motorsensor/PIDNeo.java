@@ -6,8 +6,8 @@ import com.revrobotics.ControlType;
 import frc.team88.swerve.util.constants.PIDPreferenceConstants;
 
 /**
- * PIDMotor implementation for the NEO. Uses the built-in encoder and PID on
- * the Spark Max.
+ * PIDMotor implementation for the NEO. Uses the built-in encoder and PID on the
+ * Spark Max.
  */
 public class PIDNeo extends CANSparkMax implements PIDMotor {
 
@@ -19,16 +19,17 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
     /**
      * Constructor. Sets up the default configuration for a SparkMax.
-     * @param canID The canID for the SparkMax
-     * @param pidConstants All of the PID constants for velocity control. Uses
-     * all constants except tolerance
+     * 
+     * @param canID        The canID for the SparkMax
+     * @param pidConstants All of the PID constants for velocity control. Uses all
+     *                     constants except tolerance
      */
     public PIDNeo(int canID, PIDPreferenceConstants pidConstants) {
         super(canID, MotorType.kBrushless);
 
         this.restoreFactoryDefaults();
         this.setIdleMode(IdleMode.kBrake);
-        
+
         this.pidConstants = pidConstants;
         pidConstants.getKP().addChangeHandler(this::setKP);
         pidConstants.getKI().addChangeHandler(this::setKI);
@@ -46,6 +47,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
     /**
      * {@inheritDoc}
+     * 
      * @return The motor shaft position in rotations
      */
     @Override
@@ -55,6 +57,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
     /**
      * {@inheritDoc}
+     * 
      * @return The motor shaft position in rotations per second
      */
     @Override
@@ -64,6 +67,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
     /**
      * {@inheritDoc}
+     * 
      * @return The position to set, in rotations
      */
     @Override
@@ -73,16 +77,17 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
     /**
      * {@inheritDoc}
+     * 
      * @return The velocity to set, in rotations per second
      */
     @Override
     public void setVelocity(double velocity) {
-        this.getPIDController().setReference(velocity * 60., 
-                ControlType.kVelocity, 0);
+        this.getPIDController().setReference(velocity * 60., ControlType.kVelocity, 0);
     }
 
     /**
      * Set the kP constant for the Spark Max velocity control.
+     * 
      * @param kP The proportional gain
      */
     private void setKP(double kP) {
@@ -91,6 +96,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
     /**
      * Set the kI constant for the Spark Max velocity control.
+     * 
      * @param kI The integral gain
      */
     private void setKI(double kI) {
@@ -99,6 +105,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
     /**
      * Set the kD constant for the Spark Max velocity control.
+     * 
      * @param kD The differential gain
      */
     private void setKD(double kD) {
@@ -107,6 +114,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
     /**
      * Set the kF constant for the Spark Max velocity control.
+     * 
      * @param kF The feedforward gain
      */
     private void setKF(double kF) {
@@ -115,6 +123,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
     /**
      * Set the iZone constant for the Spark Max velocity control.
+     * 
      * @param iZone The max error which will accumulate in the integral
      */
     private void setIZone(double iZone) {
@@ -123,6 +132,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
     /**
      * Set the iMax constant for the Spark Max velocity control.
+     * 
      * @param iMax The max accumulated error for the integral
      */
     private void setIMax(double iMax) {

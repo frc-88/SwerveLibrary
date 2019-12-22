@@ -9,14 +9,14 @@ import java.util.Objects;
  */
 public class Constants {
 
-    /** 
+    /**
      * Updates all UpdatableConstants.
      */
     public static void update() {
         if (Objects.isNull(updatableConstants)) {
             return;
         }
-        
+
         for (UpdatableConstant constant : updatableConstants) {
             constant.update();
         }
@@ -27,6 +27,7 @@ public class Constants {
 
     /**
      * Registers an updatable constant to be updated.
+     * 
      * @param constant The constant to be registered
      */
     protected static void addUpdatableConstant(UpdatableConstant constant) {
