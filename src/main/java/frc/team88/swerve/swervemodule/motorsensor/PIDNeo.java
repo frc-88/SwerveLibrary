@@ -20,24 +20,28 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
     /**
      * Constructor. Sets up the default configuration for a SparkMax.
      * @param canID The canID for the SparkMax
-     * @param pidConstants All of the PID constants for velocity control. Note:
-     * only uses kP, kI, kD, and kF
+     * @param pidConstants All of the PID constants for velocity control. Uses
+     * all constants except tolerance
      */
     public PIDNeo(int canID, PIDPreferenceConstants pidConstants) {
         super(canID, MotorType.kBrushless);
-        
-        this.pidConstants = pidConstants;
-        pidConstants.getKP().assignChangeHandler(this::setKP);
-        pidConstants.getKI().assignChangeHandler(this::setKI);
-        pidConstants.getKD().assignChangeHandler(this::setKD);
-        pidConstants.getKF().assignChangeHandler(this::setKF);
-        this.setKP(pidConstants.getKP().getValue());
-        this.setKI(pidConstants.getKP().getValue());
-        this.setKD(pidConstants.getKP().getValue());
-        this.setKF(pidConstants.getKP().getValue());
 
         this.restoreFactoryDefaults();
         this.setIdleMode(IdleMode.kBrake);
+        
+        this.pidConstants = pidConstants;
+        pidConstants.getKP().addChangeHandler(this::setKP);
+        pidConstants.getKI().addChangeHandler(this::setKI);
+        pidConstants.getKD().addChangeHandler(this::setKD);
+        pidConstants.getKF().addChangeHandler(this::setKF);
+        pidConstants.getIZone().addChangeHandler(this::setIZone);
+        pidConstants.getIMax().addChangeHandler(this::setIMax);
+        this.setKP(pidConstants.getKP().getValue());
+        this.setKI(pidConstants.getKI().getValue());
+        this.setKD(pidConstants.getKD().getValue());
+        this.setKF(pidConstants.getKF().getValue());
+        this.setIZone(pidConstants.getIZone().getValue());
+        this.setIMax(pidConstants.getIMax().getValue());
     }
 
     /**
@@ -73,8 +77,8 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
      */
     @Override
     public void setVelocity(double velocity) {
-        this.getPIDController().setReference(velocity * 60, 
-                ControlType.kVelocity);
+        this.getPIDController().setReference(velocity * 60., 
+                ControlType.kVelocity, 0);
     }
 
     /**
@@ -107,6 +111,22 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
      */
     private void setKF(double kF) {
         this.getPIDController().setFF(kF);
+    }
+
+    /**
+     * Set the iZone constant for the Spark Max velocity control.
+     * @param iZone The max error which will accumulate in the integral
+     */
+    private void setIZone(double iZone) {
+        this.getPIDController().setIZone(iZone);
+    }
+
+    /**
+     * Set the iMax constant for the Spark Max velocity control.
+     * @param iMax The max accumulated error for the integral
+     */
+    private void setIMax(double iMax) {
+        this.getPIDController().setIMaxAccum(iMax, 0);
     }
 
 }

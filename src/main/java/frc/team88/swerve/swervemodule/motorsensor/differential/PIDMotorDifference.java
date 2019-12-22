@@ -28,20 +28,20 @@ public class PIDMotorDifference implements PIDMotor {
 
     @Override
     public double getPosition() {
-        return this.differential.getPositiveMotor().getPosition() 
-                - this.differential.getNegativeMotor().getPosition() 
+        return (this.differential.getPositiveMotor().getPosition()
+                - this.differential.getNegativeMotor().getPosition()) / 2.
                 + this.offset;
     }
 
     @Override
     public double getVelocity() {
-        return this.differential.getPositiveMotor().getVelocity() 
-                - this.differential.getNegativeMotor().getVelocity();
+        return (this.differential.getPositiveMotor().getVelocity() 
+                - this.differential.getNegativeMotor().getVelocity()) / 2.;
     }
 
     @Override
     public void calibratePosition(double position) {
-        this.offset = position - this.getPosition();
+        this.offset = position - this.getPosition() + this.offset;
     }
 
     @Override

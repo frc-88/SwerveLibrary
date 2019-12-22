@@ -77,13 +77,13 @@ public class SyncPIDController {
                 constants.getIMax().getValue(),
                 constants.getTolerance().getValue());
         
-        constants.getKP().assignChangeHandler(this::setKP);
-        constants.getKI().assignChangeHandler(this::setKI);
-        constants.getKD().assignChangeHandler(this::setKD);
-        constants.getKF().assignChangeHandler(this::setKF);
-        constants.getIZone().assignChangeHandler(this::setIZone);
-        constants.getIMax().assignChangeHandler(this::setIMax);
-        constants.getTolerance().assignChangeHandler(this::setTolerance);
+        constants.getKP().addChangeHandler(this::setKP);
+        constants.getKI().addChangeHandler(this::setKI);
+        constants.getKD().addChangeHandler(this::setKD);
+        constants.getKF().addChangeHandler(this::setKF);
+        constants.getIZone().addChangeHandler(this::setIZone);
+        constants.getIMax().addChangeHandler(this::setIMax);
+        constants.getTolerance().addChangeHandler(this::setTolerance);
     }
     
     /**

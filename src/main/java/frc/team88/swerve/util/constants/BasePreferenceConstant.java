@@ -1,5 +1,7 @@
 package frc.team88.swerve.util.constants;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -10,7 +12,12 @@ public abstract class BasePreferenceConstant<T>
         implements PreferenceConstant<T> {
 
     private T value;
-    private Consumer<T> changeHandler;
+    private List<Consumer<T>> changeHandlers;
+
+    public BasePreferenceConstant() {
+        Constants.addUpdatableConstant(this);
+        changeHandlers = new LinkedList<>();
+    }
 
     /**
      * Get the value of this constant from WPILib Preferences.
@@ -29,8 +36,10 @@ public abstract class BasePreferenceConstant<T>
         T newValue = this.getFromPreferences();
         boolean changed = !newValue.equals(this.value);
         this.value = newValue;
-        if (Objects.nonNull(this.changeHandler) && changed) {
-            this.changeHandler.accept(newValue);
+        if (changed) {
+            for (Consumer<T> handler : this.changeHandlers) {
+                handler.accept(newValue);
+            }
         }
     }
 
@@ -40,8 +49,8 @@ public abstract class BasePreferenceConstant<T>
     }
 
     @Override
-    public final void assignChangeHandler(Consumer<T> handler) {
-        this.changeHandler = handler;
+    public final void addChangeHandler(Consumer<T> handler) {
+        this.changeHandlers.add(handler);
     }
 
     @Override
