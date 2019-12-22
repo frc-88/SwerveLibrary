@@ -1,4 +1,4 @@
-package frc.team88.swerve.util.wpilibwrappers;
+package frc.team88.swerve.wrappers;
 
 import java.util.Objects;
 
