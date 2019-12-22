@@ -133,7 +133,13 @@ public class SwerveModule {
         return azimuth;
     }
 
+    /**
+     * Gets the curerent biasTo360 to use for determing how to get to the next
+     * angle, depending on the current wheel speed.
+     * @return The bias to use
+     */
     private double getAzimuthWrapBias() {
+        // TODO: This should be fully paramaterizable when we have configurations
         double currentSpeed = getWheelSpeed();
         if (currentSpeed < 2.5) {
             return 90;
