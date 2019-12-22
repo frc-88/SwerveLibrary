@@ -72,6 +72,20 @@ public class Vector2DTest {
     }
 
     @Test
+    public void testCreatePolarOrigin() {
+        Vector2D v = Vector2D.createPolarCoordinates(0, new WrappedAngle(90));
+        assertEquals(0, v.getX(), 0.001);
+        assertEquals(0, v.getY(), 0.001);
+    }
+
+    @Test
+    public void testCreatePolarNegativeMagnitude() {
+        Vector2D v = Vector2D.createPolarCoordinates(-2, new WrappedAngle(90));
+        assertEquals(2, v.getX(), 0.001);
+        assertEquals(0, v.getY(), 0.001);
+    }
+
+    @Test
     public void testGetMagnitudeCardinal() {
         assertEquals(2., up2.getMagnitude(), 0.001);
     }

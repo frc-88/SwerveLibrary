@@ -68,8 +68,10 @@ public class Vector2D {
     /**
      * Creates a Vector2D using the given cartesian coordinates.
      * 
-     * @param x The x component
-     * @param y The y component
+     * @param x
+     *              The x component
+     * @param y
+     *              The y component
      * @return The created vector
      */
     public static Vector2D createCartesianCoordinates(double x, double y) {
@@ -79,11 +81,16 @@ public class Vector2D {
     /**
      * Creates a vector2D using the given polar coordinates.
      * 
-     * @param magnitude The magnitude
-     * @param angle     The angle, in degrees
+     * @param magnitude
+     *                      The magnitude
+     * @param angle
+     *                      The angle, in degrees
      * @return The created vector
      */
     public static Vector2D createPolarCoordinates(double magnitude, WrappedAngle angle) {
+        if (magnitude == 0.) {
+            return Vector2D.ORIGIN;
+        }
         double angleRad = Math.toRadians(angle.asDouble());
         return createCartesianCoordinates(magnitude * -Math.sin(angleRad), magnitude * Math.cos(angleRad));
     }
@@ -91,7 +98,8 @@ public class Vector2D {
     /**
      * Returns this vector added to the given vector.
      * 
-     * @param that The vector the add to this vector
+     * @param that
+     *                 The vector the add to this vector
      * @return The sum
      */
     public Vector2D plus(Vector2D that) {
@@ -101,7 +109,8 @@ public class Vector2D {
     /**
      * Returns this vector multiplied by the given scalar.
      * 
-     * @param scalar The scalar multiplicand
+     * @param scalar
+     *                   The scalar multiplicand
      * @return The product
      */
     public Vector2D times(double scalar) {
@@ -111,7 +120,8 @@ public class Vector2D {
     /**
      * Returns this vector rotated by the given angle
      * 
-     * @param angle The angle offset
+     * @param angle
+     *                  The angle offset
      * @return The rotated vector
      */
     public Vector2D rotate(double angle) {
@@ -122,7 +132,8 @@ public class Vector2D {
      * Determines if this vector is equal to the given vector except for a floating
      * point error
      * 
-     * @param that The vector to compare this to
+     * @param that
+     *                 The vector to compare this to
      * @return True if the 2 vectors are approximately equal, false otherwise
      */
     public boolean approximatelyEquals(Vector2D that) {
