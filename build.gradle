@@ -28,6 +28,9 @@ dependencies {
 
     api wpi.deps.vendor.java()
 
+    // Tuples library
+    api "org.javatuples:javatuples:1.2"
+
     // Use JUnit Jupiter API for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
 
