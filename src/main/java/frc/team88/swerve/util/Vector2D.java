@@ -59,10 +59,10 @@ public class Vector2D {
     /**
      * Get the angle of this vector.
      * 
-     * @return The angle, in degrees
+     * @return The angle
      */
-    public double getAngle() {
-        return Math.toDegrees(Math.atan2(-x, y));
+    public WrappedAngle getAngle() {
+        return new WrappedAngle(Math.toDegrees(Math.atan2(-x, y)));
     }
 
     /**
@@ -83,9 +83,9 @@ public class Vector2D {
      * @param angle     The angle, in degrees
      * @return The created vector
      */
-    public static Vector2D createPolarCoordinates(double magnitude, double angle) {
-        angle = Math.toRadians(angle);
-        return createCartesianCoordinates(magnitude * -Math.sin(angle), magnitude * Math.cos(angle));
+    public static Vector2D createPolarCoordinates(double magnitude, WrappedAngle angle) {
+        double angleRad = Math.toRadians(angle.asDouble());
+        return createCartesianCoordinates(magnitude * -Math.sin(angleRad), magnitude * Math.cos(angleRad));
     }
 
     /**
@@ -115,7 +115,7 @@ public class Vector2D {
      * @return The rotated vector
      */
     public Vector2D rotate(double angle) {
-        return createPolarCoordinates(this.getMagnitude(), this.getAngle() + angle);
+        return createPolarCoordinates(this.getMagnitude(), this.getAngle().plus(angle));
     }
 
     /**

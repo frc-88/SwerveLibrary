@@ -97,91 +97,91 @@ public class WrappedAngleTest {
             for (WrappedAngle targetAngle : this.allAngles) {
                 // Test smallest distance
                 double distanceNoHalf = currentAngle.getSmallestDifferenceWith(targetAngle);
-                assertEquals(targetAngle.getAngle(), currentAngle.plus(distanceNoHalf).getAngle(), 0.000001,
-                        distanceNoHalf + " is not a valid distance from " + currentAngle.getAngle() + " to "
-                                + targetAngle.getAngle());
+                assertEquals(targetAngle.asDouble(), currentAngle.plus(distanceNoHalf).asDouble(), 0.000001,
+                        distanceNoHalf + " is not a valid distance from " + currentAngle.asDouble() + " to "
+                                + targetAngle.asDouble());
                 assertTrue(distanceNoHalf >= -180. && distanceNoHalf < 180.,
-                        distanceNoHalf + " is not the shortest distance from " + currentAngle.getAngle() + " to "
-                                + targetAngle.getAngle());
+                        distanceNoHalf + " is not the shortest distance from " + currentAngle.asDouble() + " to "
+                                + targetAngle.asDouble());
 
                 // Test smallest distance to half angle with a bias of 180
                 Pair<Double, Boolean> distanceBias180 = currentAngle.getSmallestDifferenceWithHalfAngle(targetAngle,
                         180);
                 assertEquals(distanceNoHalf, distanceBias180.getValue0(), 0.000001, distanceBias180.getValue0()
                         + " with bias 180 does not match shortest distance with no half-angle, " + distanceNoHalf
-                        + ", from " + currentAngle.getAngle() + " to " + targetAngle.getAngle());
+                        + ", from " + currentAngle.asDouble() + " to " + targetAngle.asDouble());
                 assertFalse(distanceBias180.getValue1(), "The half angle should not be used when the bias is 180 from "
-                        + currentAngle.getAngle() + " to " + targetAngle.getAngle());
+                        + currentAngle.asDouble() + " to " + targetAngle.asDouble());
 
                 // Test smallest distance to half angle with a bias of 0
                 Pair<Double, Boolean> distanceBias0 = currentAngle.getSmallestDifferenceWithHalfAngle(targetAngle, 0);
                 assertEquals(WrappedAngle.wrapAngle(distanceNoHalf + 180), distanceBias0.getValue0(), 0.000001,
                         distanceBias0.getValue0() + " with bias 0 does not match shortest distance with no half-angle, "
-                                + distanceNoHalf + ", + 180 from " + currentAngle.getAngle() + " to "
-                                + targetAngle.getAngle());
+                                + distanceNoHalf + ", + 180 from " + currentAngle.asDouble() + " to "
+                                + targetAngle.asDouble());
                 assertTrue(distanceBias0.getValue1(), "The half angle should always be used when the bias is 0 from "
-                        + currentAngle.getAngle() + " to " + targetAngle.getAngle());
+                        + currentAngle.asDouble() + " to " + targetAngle.asDouble());
 
                 // Test smallest distance to half angle with a bias of 90
                 Pair<Double, Boolean> distanceBias90 = currentAngle.getSmallestDifferenceWithHalfAngle(targetAngle, 90);
                 if (distanceBias90.getValue1()) {
-                    assertEquals(targetAngle.plus(180.).getAngle(),
-                            currentAngle.plus(distanceBias90.getValue0()).getAngle(), 0.000001,
+                    assertEquals(targetAngle.plus(180.).asDouble(),
+                            currentAngle.plus(distanceBias90.getValue0()).asDouble(), 0.000001,
                             distanceBias90.getValue0()
                                     + " with bias 90 is supposed to be a half-angle, but is not a valid distance from "
-                                    + currentAngle.getAngle() + " to " + targetAngle.getAngle() + " + 180");
+                                    + currentAngle.asDouble() + " to " + targetAngle.asDouble() + " + 180");
                 } else {
                     assertEquals(distanceNoHalf, distanceBias90.getValue0(), 0.000001, distanceBias90.getValue0()
                             + " with bias 90 is not half-angle, but does not match shortest distance with no half-angle, "
-                            + distanceNoHalf + ", from " + currentAngle.getAngle() + " to " + targetAngle.getAngle());
+                            + distanceNoHalf + ", from " + currentAngle.asDouble() + " to " + targetAngle.asDouble());
                 }
                 assertTrue(Math.abs(distanceBias90.getValue0()) <= 90,
                         distanceBias90.getValue0() + " with bias 90 is not the shortest distance from "
-                                + currentAngle.getAngle() + " to " + targetAngle.getAngle() + " or it's half-angle");
+                                + currentAngle.asDouble() + " to " + targetAngle.asDouble() + " or it's half-angle");
 
                 // Test smallest distance to half angle with a bias of 135
                 Pair<Double, Boolean> distanceBias135 = currentAngle.getSmallestDifferenceWithHalfAngle(targetAngle,
                         135);
                 if (distanceBias135.getValue1()) {
-                    assertEquals(targetAngle.plus(180.).getAngle(),
-                            currentAngle.plus(distanceBias135.getValue0()).getAngle(), 0.000001,
+                    assertEquals(targetAngle.plus(180.).asDouble(),
+                            currentAngle.plus(distanceBias135.getValue0()).asDouble(), 0.000001,
                             distanceBias135.getValue0()
                                     + " with bias 135 is supposed to be a half-angle, but is not a valid distance from "
-                                    + currentAngle.getAngle() + " to " + targetAngle.getAngle() + " + 180");
+                                    + currentAngle.asDouble() + " to " + targetAngle.asDouble() + " + 180");
                     assertTrue(Math.abs(distanceBias135.getValue0()) <= 45,
                             distanceBias135.getValue0()
                                     + " with bias 135 should not have gone to the half-angle to go from "
-                                    + currentAngle.getAngle() + " to " + targetAngle.getAngle());
+                                    + currentAngle.asDouble() + " to " + targetAngle.asDouble());
                 } else {
                     assertEquals(distanceNoHalf, distanceBias135.getValue0(), 0.000001, distanceBias135.getValue0()
                             + " with bias 135 is not half-angle, but does not match shortest distance with no half-angle, "
-                            + distanceNoHalf + ", from " + currentAngle.getAngle() + " to " + targetAngle.getAngle());
+                            + distanceNoHalf + ", from " + currentAngle.asDouble() + " to " + targetAngle.asDouble());
                     assertTrue(Math.abs(distanceBias135.getValue0()) <= 135,
                             distanceBias135.getValue0()
                                     + " with bias 135 should not have gone to the full-angle to go from "
-                                    + currentAngle.getAngle() + " to " + targetAngle.getAngle());
+                                    + currentAngle.asDouble() + " to " + targetAngle.asDouble());
                 }
 
                 // Test smallest distance to half angle with a bias of 45
                 Pair<Double, Boolean> distanceBias45 = currentAngle.getSmallestDifferenceWithHalfAngle(targetAngle, 45);
                 if (distanceBias45.getValue1()) {
-                    assertEquals(targetAngle.plus(180.).getAngle(),
-                            currentAngle.plus(distanceBias45.getValue0()).getAngle(), 0.000001,
+                    assertEquals(targetAngle.plus(180.).asDouble(),
+                            currentAngle.plus(distanceBias45.getValue0()).asDouble(), 0.000001,
                             distanceBias45.getValue0()
                                     + " with bias 45 is supposed to be a half-angle, but is not a valid distance from "
-                                    + currentAngle.getAngle() + " to " + targetAngle.getAngle() + " + 180");
+                                    + currentAngle.asDouble() + " to " + targetAngle.asDouble() + " + 180");
                     assertTrue(Math.abs(distanceBias45.getValue0()) <= 135,
                             distanceBias45.getValue0()
                                     + " with bias 45 should not have gone to the half-angle to go from "
-                                    + currentAngle.getAngle() + " to " + targetAngle.getAngle());
+                                    + currentAngle.asDouble() + " to " + targetAngle.asDouble());
                 } else {
                     assertEquals(distanceNoHalf, distanceBias45.getValue0(), 0.000001, distanceBias45.getValue0()
                             + " with bias 45 is not half-angle, but does not match shortest distance with no half-angle, "
-                            + distanceNoHalf + ", from " + currentAngle.getAngle() + " to " + targetAngle.getAngle());
+                            + distanceNoHalf + ", from " + currentAngle.asDouble() + " to " + targetAngle.asDouble());
                     assertTrue(Math.abs(distanceBias45.getValue0()) <= 45,
                             distanceBias45.getValue0()
                                     + " with bias 45 should not have gone to the full-angle to go from "
-                                    + currentAngle.getAngle() + " to " + targetAngle.getAngle());
+                                    + currentAngle.asDouble() + " to " + targetAngle.asDouble());
                 }
             }
         }
