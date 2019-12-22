@@ -13,6 +13,10 @@ public class Constants {
      * Updates all UpdatableConstants.
      */
     public static void update() {
+        if (Objects.isNull(updatableConstants)) {
+            return;
+        }
+        
         for (UpdatableConstant constant : updatableConstants) {
             constant.update();
         }

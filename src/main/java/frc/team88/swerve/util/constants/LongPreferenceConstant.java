@@ -22,7 +22,11 @@ public final class LongPreferenceConstant
     public LongPreferenceConstant(String name, long defaultValue) {
         this.name = Objects.requireNonNull(name);
         this.defaultValue = Objects.requireNonNull(defaultValue);
-        this.update();
+        if (!Preferences.getInstance().containsKey(name)) {
+            this.setValue(defaultValue);
+        } else {
+            update();
+        }
     }
 
     @Override

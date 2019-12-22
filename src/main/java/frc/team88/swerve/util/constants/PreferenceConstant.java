@@ -21,7 +21,7 @@ public interface PreferenceConstant<T> extends UpdatableConstant {
      * Assigns a change handler for this constant that will get called 
      * whenever the value changes.
      */
-    public void assignChangeHandler(Consumer<T> handler);
+    public void addChangeHandler(Consumer<T> handler);
 
     /**
      * Sets the value of this constant, update WPILib preferences and calling

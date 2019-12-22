@@ -1,5 +1,6 @@
 package frc.team88.swerve.util;
 
+import frc.team88.swerve.util.constants.PIDPreferenceConstants;
 import frc.team88.swerve.util.wpilibwrappers.RobotControllerWrapper;
 
 /**
@@ -35,7 +36,7 @@ public class SyncPIDController {
      * accumulate
      */
     public SyncPIDController(double kP, double kI, double kD, double kF, 
-            double iZone, double iMax) {
+            double iZone, double iMax, double tolerance) {
 
         this.kP = kP;
         this.kI = kI;
@@ -43,10 +44,10 @@ public class SyncPIDController {
         this.kF = kF;
         this.iZone = iZone;
         this.iMax = iMax;
-        this.tolerance = 0;
+        this.tolerance = tolerance;
 
-        this.enableIZone = true;
-        this.enableIMax = true;
+        this.enableIZone = iZone > 0.000001;
+        this.enableIMax = iMax > 0.000001;
     }
 
     /**
@@ -56,10 +57,33 @@ public class SyncPIDController {
      * @param kD The differential gain
      */
     public SyncPIDController(double kP, double kI, double kD) {
-        this(kP, kI, kD, 0, 0, 0);
+        this(kP, kI, kD, 0, 0, 0, 0);
 
         this.enableIZone = false;
         this.enableIMax = false;
+    }
+
+    /**
+     * Constructor that uses a PIDPreferencesConstant object.
+     * @param constants Contains all of the PID constants for
+     * this PID controller
+     */
+    public SyncPIDController(PIDPreferenceConstants constants) {
+        this(constants.getKP().getValue(), 
+                constants.getKI().getValue(),
+                constants.getKD().getValue(), 
+                constants.getKF().getValue(),
+                constants.getIZone().getValue(), 
+                constants.getIMax().getValue(),
+                constants.getTolerance().getValue());
+        
+        constants.getKP().addChangeHandler(this::setKP);
+        constants.getKI().addChangeHandler(this::setKI);
+        constants.getKD().addChangeHandler(this::setKD);
+        constants.getKF().addChangeHandler(this::setKF);
+        constants.getIZone().addChangeHandler(this::setIZone);
+        constants.getIMax().addChangeHandler(this::setIMax);
+        constants.getTolerance().addChangeHandler(this::setTolerance);
     }
     
     /**

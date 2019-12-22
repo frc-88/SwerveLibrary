@@ -22,7 +22,11 @@ public final class IntPreferenceConstant
     public IntPreferenceConstant(String name, int defaultValue) {
         this.name = Objects.requireNonNull(name);
         this.defaultValue = Objects.requireNonNull(defaultValue);
-        this.update();
+        if (!Preferences.getInstance().containsKey(name)) {
+            this.setValue(defaultValue);
+        } else {
+            update();
+        }
     }
 
     @Override
