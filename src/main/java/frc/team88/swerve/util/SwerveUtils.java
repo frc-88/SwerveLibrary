@@ -7,7 +7,6 @@ import frc.team88.swerve.util.MathUtils;
 
 public class SwerveUtils {
 
-<<<<<<< HEAD
   /**
    * Calculate module wheel and azimuth velocities based on desired robot frame
    * velocity. Adapted from Ether's Derivation of Inverse Kinematics for Swerve.
@@ -64,8 +63,5 @@ public class SwerveUtils {
         limitedHeadingAngularSpeed);
 
   }
-=======
-    public static ModuleState
->>>>>>> d7e5f28... Remove ModuleState
 
 }
