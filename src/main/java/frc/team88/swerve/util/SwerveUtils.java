@@ -5,6 +5,6 @@ package frc.team88.swerve.util;
  */
 public class SwerveUtils {
 
-    public static 
+    public static ModuleState
 
 }
