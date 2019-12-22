@@ -72,7 +72,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
      */
     @Override
     public void calibratePosition(double position) {
-        this.offset = position - this.getPosition();
+        this.offset = position - this.getPosition() + this.offset;
     }
 
     /**
