@@ -2,9 +2,13 @@ package frc.team88.swerve.swervemodule;
 
 import java.util.Objects;
 
+import org.javatuples.Pair;
+
 import frc.team88.swerve.swervemodule.motorsensor.PIDMotor;
 import frc.team88.swerve.swervemodule.motorsensor.PositionVelocitySensor;
 import frc.team88.swerve.util.SyncPIDController;
+import frc.team88.swerve.util.WrappedAngle;
+import frc.team88.swerve.util.constants.DoublePreferenceConstant;
 import frc.team88.swerve.util.constants.PIDPreferenceConstants;
 
 /**
@@ -26,17 +30,25 @@ public class SwerveModule {
     // PID controller for azimuth position
     private SyncPIDController azimuthPositionPID;
 
+    // True if the wheel is currently reversed, false otherwise
+    private boolean isWheelReversed = false;
+
     /**
      * Constructor.
      * 
-     * @param wheelControl                The PIDMotor which controls the wheel
-     *                                    velocity, in feet per second
-     * @param azimuthControl              The PIDMotor which controls azimuth
-     *                                    velocity, in degrees per second
-     * @param absoluteAzimuthSensor       The sensor for absolute azimuth angle, in
-     *                                    degrees
-     * @param azimuthPositionPIDConstants The PID constants for the azimuth position
-     *                                    pid control. All PID gains are used
+     * @param wheelControl
+     *                                        The PIDMotor which controls the wheel
+     *                                        velocity, in feet per second
+     * @param azimuthControl
+     *                                        The PIDMotor which controls azimuth
+     *                                        velocity, in degrees per second
+     * @param absoluteAzimuthSensor
+     *                                        The sensor for absolute azimuth angle,
+     *                                        in degrees
+     * @param azimuthPositionPIDConstants
+     *                                        The PID constants for the azimuth
+     *                                        position pid control. All PID gains
+     *                                        are used
      */
     public SwerveModule(PIDMotor wheelControl, PIDMotor azimuthControl, PositionVelocitySensor absoluteAzimuthSensor,
             PIDPreferenceConstants azimuthPositionPIDConstants) {
@@ -47,12 +59,19 @@ public class SwerveModule {
     }
 
     /**
-     * Sets the wheel to the given velocity.
+     * Sets the wheel to the given speed.
      * 
-     * @param velocity The velocity to set, in feet per second
+     * @param speed
+     *                  The speed to set, in feet per second
      */
-    public void setWheelVelocity(double velocity) {
-        this.wheelControl.setVelocity(velocity);
+    public void setWheelSpeed(double speed) {
+        if (speed < 0) {
+            throw new IllegalAccessError("Wheel speed cannot be negative");
+        }
+        if (isWheelReversed) {
+            speed *= -1;
+        }
+        this.wheelControl.setVelocity(speed);
     }
 
     /**
@@ -60,14 +79,15 @@ public class SwerveModule {
      * 
      * @return The current wheel velocity, in feet per second
      */
-    public double getWheelVelocity() {
-        return this.wheelControl.getVelocity();
+    public double getWheelSpeed() {
+        return Math.abs(this.wheelControl.getVelocity());
     }
 
     /**
      * Sets the azimuth to the given velocity.
      * 
-     * @param velocity The velocity to set, in degrees per second
+     * @param velocity
+     *                     The velocity to set, in degrees per second
      */
     public void setAzimuthVelocity(double velocity) {
         this.azimuthControl.setVelocity(velocity);
@@ -85,10 +105,19 @@ public class SwerveModule {
     /**
      * Sets the azimuth to the given position.
      * 
-     * @param velocity The position to set, in degrees
+     * @param position
+     *                     The position to set, in degrees
      */
-    public void setAzimuthPosition(double position) {
-        this.setAzimuthVelocity(azimuthPositionPID.calculateOutput(this.absoluteAzimuthSensor.getPosition(), position));
+    public void setAzimuthPosition(WrappedAngle position) {
+        Pair<Double, Boolean> distanceAndFlip = this.getAzimuthPosition().getSmallestDifferenceWithHalfAngle(position,
+                this.getAzimuthWrapBias());
+        if (distanceAndFlip.getValue1()) {
+            this.isWheelReversed = !this.isWheelReversed;
+            this.setWheelSpeed(this.getWheelSpeed());
+        }
+        double unwrappedAngle = this.absoluteAzimuthSensor.getPosition() + distanceAndFlip.getValue0();
+        this.setAzimuthVelocity(
+                azimuthPositionPID.calculateOutput(this.absoluteAzimuthSensor.getPosition(), unwrappedAngle));
     }
 
     /**
@@ -96,8 +125,23 @@ public class SwerveModule {
      * 
      * @return The current azimuth position, in degrees
      */
-    public double getAzimuthPosition() {
-        return this.absoluteAzimuthSensor.getPosition();
+    public WrappedAngle getAzimuthPosition() {
+        WrappedAngle azimuth = new WrappedAngle(this.absoluteAzimuthSensor.getPosition());
+        if (isWheelReversed) {
+            azimuth = azimuth.plus(180.);
+        }
+        return azimuth;
+    }
+
+    private double getAzimuthWrapBias() {
+        double currentSpeed = getWheelSpeed();
+        if (currentSpeed < 2.5) {
+            return 90;
+        } else if (currentSpeed < 5.5) {
+            return 135;
+        } else {
+            return 180;
+        }
     }
 
 }
