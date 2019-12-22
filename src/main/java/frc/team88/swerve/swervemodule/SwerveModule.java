@@ -7,6 +7,7 @@ import org.javatuples.Pair;
 import frc.team88.swerve.swervemodule.motorsensor.PIDMotor;
 import frc.team88.swerve.swervemodule.motorsensor.PositionVelocitySensor;
 import frc.team88.swerve.util.SyncPIDController;
+import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
 import frc.team88.swerve.util.constants.DoublePreferenceConstant;
 import frc.team88.swerve.util.constants.PIDPreferenceConstants;
@@ -29,6 +30,9 @@ public class SwerveModule {
 
     // PID controller for azimuth position
     private SyncPIDController azimuthPositionPID;
+
+    // The location of this module relative to the robot's origin
+    private Vector2D location;
 
     // True if the wheel is currently reversed, false otherwise
     private boolean isWheelReversed = false;
@@ -134,8 +138,30 @@ public class SwerveModule {
     }
 
     /**
+     * Sets the location of this module.
+     * 
+     * @param location
+     *                     A position vector from the robot's origin to the location
+     *                     of this module
+     */
+    public void setLocation(Vector2D location) {
+        this.location = location;
+    }
+
+    /**
+     * Gets the location of this module.
+     * 
+     * @param return A position vector from the robot's origin to the location
+     *                     of this module
+     */
+    public Vector2D getLocation() {
+        return Objects.requireNonNull(this.location);
+    }
+
+    /**
      * Gets the curerent biasTo360 to use for determing how to get to the next
      * angle, depending on the current wheel speed.
+     * 
      * @return The bias to use
      */
     private double getAzimuthWrapBias() {

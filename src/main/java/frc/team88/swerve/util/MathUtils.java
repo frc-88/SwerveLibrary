@@ -23,12 +23,4 @@ public class MathUtils {
         // Use percent error
         return Math.abs((a - b) / a) < PERCENT_ERROR_MAX;
     }
-
-    public static double limitChange(double current, double desired, double maxChange) {
-        if (desired > current) {
-            return Math.min(desired, current + maxChange);
-        } else {
-            return Math.max(desired, current - maxChange);
-        }
-    }
 }

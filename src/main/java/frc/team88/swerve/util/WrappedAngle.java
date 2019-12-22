@@ -28,7 +28,7 @@ public class WrappedAngle {
      * 
      * @return The angle in degrees
      */
-    public double getAngle() {
+    public double asDouble() {
         return angle;
     }
 
@@ -51,7 +51,7 @@ public class WrappedAngle {
      * @return The sum
      */
     public WrappedAngle plus(WrappedAngle addend) {
-        return this.plus(addend.getAngle());
+        return this.plus(addend.asDouble());
     }
 
     /**
@@ -65,7 +65,7 @@ public class WrappedAngle {
      */
     public double getSmallestDifferenceWith(WrappedAngle that) {
         Objects.requireNonNull(that);
-        double difference = that.getAngle() - this.getAngle();
+        double difference = that.asDouble() - this.asDouble();
         if (difference >= -180 && difference < 180) {
             return difference;
         } else if (difference < -180) {
@@ -101,7 +101,7 @@ public class WrappedAngle {
         }
         double differenceToFullAngle = getSmallestDifferenceWith(that);
         if (Math.abs(differenceToFullAngle) > biasTo360 || biasTo360 < 0.01) {
-            return new Pair<Double, Boolean>(getSmallestDifferenceWith(new WrappedAngle(that.getAngle() + 180)), true);
+            return new Pair<Double, Boolean>(getSmallestDifferenceWith(new WrappedAngle(that.asDouble() + 180)), true);
         } else {
             return new Pair<Double, Boolean>(differenceToFullAngle, false);
         }

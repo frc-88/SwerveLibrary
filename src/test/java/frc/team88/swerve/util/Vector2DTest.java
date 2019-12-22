@@ -30,10 +30,10 @@ public class Vector2DTest {
         rightHalf = Vector2D.createCartesianCoordinates(0.5, 0);
         upRight = Vector2D.createCartesianCoordinates(1, 3);
         downLeft = Vector2D.createCartesianCoordinates(-2, -1);
-        deg30 = Vector2D.createPolarCoordinates(1, 30);
-        deg135 = Vector2D.createPolarCoordinates(1, 135);
-        degNeg60 = Vector2D.createPolarCoordinates(1, -60);
-        degNeg135 = Vector2D.createPolarCoordinates(2, -135);
+        deg30 = Vector2D.createPolarCoordinates(1, new WrappedAngle(30));
+        deg135 = Vector2D.createPolarCoordinates(1, new WrappedAngle(135));
+        degNeg60 = Vector2D.createPolarCoordinates(1, new WrappedAngle(-60));
+        degNeg135 = Vector2D.createPolarCoordinates(2, new WrappedAngle(-135));
     }
 
     @Test
@@ -45,30 +45,44 @@ public class Vector2DTest {
 
     @Test
     public void testCreatePolarQ1() {
-        Vector2D v = Vector2D.createPolarCoordinates(2, 30);
+        Vector2D v = Vector2D.createPolarCoordinates(2, new WrappedAngle(30));
         assertEquals(-1., v.getX(), 0.001);
         assertEquals(Math.sqrt(3.), v.getY(), 0.001);
     }
 
     @Test
     public void testCreatePolarQ2() {
-        Vector2D v = Vector2D.createPolarCoordinates(2, 120);
+        Vector2D v = Vector2D.createPolarCoordinates(2, new WrappedAngle(120));
         assertEquals(-Math.sqrt(3), v.getX(), 0.001);
         assertEquals(-1, v.getY(), 0.001);
     }
 
     @Test
     public void testCreatePolarQ3() {
-        Vector2D v = Vector2D.createPolarCoordinates(2, -60);
+        Vector2D v = Vector2D.createPolarCoordinates(2, new WrappedAngle(-60));
         assertEquals(Math.sqrt(3), v.getX(), 0.001);
         assertEquals(1, v.getY(), 0.001);
     }
 
     @Test
     public void testCreatePolarQ4() {
-        Vector2D v = Vector2D.createPolarCoordinates(2, -150);
+        Vector2D v = Vector2D.createPolarCoordinates(2, new WrappedAngle(-150));
         assertEquals(1, v.getX(), 0.001);
         assertEquals(-Math.sqrt(3), v.getY(), 0.001);
+    }
+
+    @Test
+    public void testCreatePolarOrigin() {
+        Vector2D v = Vector2D.createPolarCoordinates(0, new WrappedAngle(90));
+        assertEquals(0, v.getX(), 0.001);
+        assertEquals(0, v.getY(), 0.001);
+    }
+
+    @Test
+    public void testCreatePolarNegativeMagnitude() {
+        Vector2D v = Vector2D.createPolarCoordinates(-2, new WrappedAngle(90));
+        assertEquals(2, v.getX(), 0.001);
+        assertEquals(0, v.getY(), 0.001);
     }
 
     @Test
@@ -83,42 +97,42 @@ public class Vector2DTest {
 
     @Test
     public void testGetAngleUp() {
-        assertEquals(0., up2.getAngle(), 0.001);
+        assertEquals(0., up2.getAngle().asDouble(), 0.001);
     }
 
     @Test
     public void testGetAngleLeft() {
-        assertEquals(90., left1.getAngle(), 0.001);
+        assertEquals(90., left1.getAngle().asDouble(), 0.001);
     }
 
     @Test
     public void testGetAngleRight() {
-        assertEquals(-180, down3.getAngle(), 0.001);
+        assertEquals(-180, down3.getAngle().asDouble(), 0.001);
     }
 
     @Test
     public void testGetAngleDown() {
-        assertEquals(-90, rightHalf.getAngle(), 0.001);
+        assertEquals(-90, rightHalf.getAngle().asDouble(), 0.001);
     }
 
     @Test
     public void testGetAngleQ1() {
-        assertEquals(30, deg30.getAngle(), 0.001);
+        assertEquals(30, deg30.getAngle().asDouble(), 0.001);
     }
 
     @Test
     public void testGetAngleQ2() {
-        assertEquals(135, deg135.getAngle(), 0.001);
+        assertEquals(135, deg135.getAngle().asDouble(), 0.001);
     }
 
     @Test
     public void testGetAngleQ3() {
-        assertEquals(-135, degNeg135.getAngle(), 0.001);
+        assertEquals(-135, degNeg135.getAngle().asDouble(), 0.001);
     }
 
     @Test
     public void testGetAngleQ4() {
-        assertEquals(-60, degNeg60.getAngle(), 0.001);
+        assertEquals(-60, degNeg60.getAngle().asDouble(), 0.001);
     }
 
     @Test
@@ -147,32 +161,32 @@ public class Vector2DTest {
 
     @Test
     public void rotatePositive() {
-        assertTrue(Vector2D.createPolarCoordinates(1, 50)
+        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(50))
                 .approximatelyEquals(deg30.rotate(20)));
     }
 
     @Test
     public void rotateNegative() {
-        assertTrue(Vector2D.createPolarCoordinates(1, -15)
+        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(-15))
                 .approximatelyEquals(deg30.rotate(-45)));
     }
 
     @Test
     public void rotateLarge() {
-        assertTrue(Vector2D.createPolarCoordinates(1, 40)
+        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(40))
                 .approximatelyEquals(deg30.rotate(730)));
     }
 
     @Test
     public void approximatelyEqualsTrue() {
         assertTrue(up2.approximatelyEquals(
-                Vector2D.createPolarCoordinates(2, 0)));
+                Vector2D.createPolarCoordinates(2, new WrappedAngle(0))));
     }
 
     @Test
     public void approximatelyEqualsTrueZero() {
         assertTrue(Vector2D.ORIGIN.approximatelyEquals(
-                Vector2D.createPolarCoordinates(0., 0.)));
+                Vector2D.createPolarCoordinates(0., new WrappedAngle(0.))));
     }
 
     @Test
