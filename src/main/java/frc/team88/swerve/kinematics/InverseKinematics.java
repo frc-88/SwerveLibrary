@@ -30,26 +30,26 @@ public class InverseKinematics {
     private double maxModuleSpeed = Double.POSITIVE_INFINITY;
 
     // The modules being controlled.
-    private List<SwerveModule> modules;
+    private SwerveModule[] modules;
 
     // The last azimuth target for each module that wasn't accompanied by 0 
     // wheel speed.
-    private List<WrappedAngle> lastGoodAzimuths;
+    private WrappedAngle[] lastGoodAzimuths;
 
     /**
-     * Constructor. Just does some small initialization work.
+     * Constructor.
+     * @param modules The modules to be controlled. Minimumn 2.
      */
-    public InverseKinematics() {
-        modules = new LinkedList<>();
-        lastGoodAzimuths = new ArrayList<>();
-    }
-
-    /**
-     * Registers the given swerve module to be controlled by inverse kinematics.
-     */
-    public void addSwerveModule(SwerveModule module) {
-        this.modules.add(module);
-        this.lastGoodAzimuths.add(new WrappedAngle(0));
+    public InverseKinematics(SwerveModule... modules) {
+        if (modules.length < 2) {
+            throw new IllegalArgumentException("Cannot do inverse kinematics with less than 2 modules");
+        }
+        this.modules = modules;
+        this.lastGoodAzimuths = new WrappedAngle[modules.length];
+        for (int idx = 0; idx < modules.length; ++idx) {
+            Objects.requireNonNull(modules[idx]);
+            lastGoodAzimuths[idx] = new WrappedAngle(0);
+        }
     }
 
     /**
@@ -143,16 +143,16 @@ public class InverseKinematics {
      */
     public void update() {
         // Get the translation and rotation vectors
-        Vector2D[] translationVectors = new Vector2D[modules.size()];
-        Vector2D[] rotationVectors = new Vector2D[modules.size()];
-        for (int idx = 0; idx < modules.size(); ++idx) {
+        Vector2D[] translationVectors = new Vector2D[modules.length];
+        Vector2D[] rotationVectors = new Vector2D[modules.length];
+        for (int idx = 0; idx < modules.length; ++idx) {
             translationVectors[idx] = calculateModuleTranslationVector();
-            rotationVectors[idx] = calculateModuleRotationVectors(modules.get(idx));
+            rotationVectors[idx] = calculateModuleRotationVectors(modules[idx]);
         }
 
         // Add the vectors
-        Vector2D[] unscaledVectors = new Vector2D[modules.size()];
-        for (int idx = 0; idx < modules.size(); ++idx) {
+        Vector2D[] unscaledVectors = new Vector2D[modules.length];
+        for (int idx = 0; idx < modules.length; ++idx) {
             unscaledVectors[idx] = translationVectors[idx].plus(rotationVectors[idx]);
         }
 
@@ -160,13 +160,13 @@ public class InverseKinematics {
         Vector2D[] moduleVectors = scaleIntoRange(unscaledVectors);
 
         // Apply to modules
-        for (int idx = 0; idx < modules.size(); ++idx) {
-            modules.get(idx).setWheelSpeed(moduleVectors[idx].getMagnitude());
+        for (int idx = 0; idx < modules.length; ++idx) {
+            modules[idx].setWheelSpeed(moduleVectors[idx].getMagnitude());
             if(moduleVectors[idx].getMagnitude() == 0.) {
-                modules.get(idx).setAzimuthPosition(lastGoodAzimuths.get(idx));
+                modules[idx].setAzimuthPosition(lastGoodAzimuths[idx]);
             } else {
-                modules.get(idx).setAzimuthPosition(moduleVectors[idx].getAngle());
-                lastGoodAzimuths.set(idx, moduleVectors[idx].getAngle());
+                modules[idx].setAzimuthPosition(moduleVectors[idx].getAngle());
+                lastGoodAzimuths[idx] = moduleVectors[idx].getAngle();
             }
         }
     }

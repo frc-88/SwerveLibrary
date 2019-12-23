@@ -11,9 +11,6 @@ import frc.team88.swerve.util.constants.PIDPreferenceConstants;
  */
 public class PIDNeo extends CANSparkMax implements PIDMotor {
 
-    // All of the PID gains
-    private PIDPreferenceConstants pidConstants;
-
     // The offset to add to position values, in rotations.
     private double offset = 0;
 
@@ -29,8 +26,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
 
         this.restoreFactoryDefaults();
         this.setIdleMode(IdleMode.kBrake);
-
-        this.pidConstants = pidConstants;
+        
         pidConstants.getKP().addChangeHandler(this::setKP);
         pidConstants.getKI().addChangeHandler(this::setKI);
         pidConstants.getKD().addChangeHandler(this::setKD);
