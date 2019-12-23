@@ -7,7 +7,9 @@ import java.util.Objects;
 
 import frc.team88.swerve.kinematics.InverseKinematics;
 import frc.team88.swerve.swervemodule.SwerveModule;
+import frc.team88.swerve.util.MathUtils;
 import frc.team88.swerve.util.Vector2D;
+import frc.team88.swerve.util.constants.DoublePreferenceConstant;
 import frc.team88.swerve.wrappers.gyro.Gyro;
 
 /**
@@ -15,6 +17,14 @@ import frc.team88.swerve.wrappers.gyro.Gyro;
  * controlling it.
  */
 public class SwerveChassis {
+
+    // Preference constants for the translation acceleration limit, in
+    // feet per second^2
+    private DoublePreferenceConstant translationAccelerationLimit;
+
+    // Preference constant for the rotation acceleration limit, in
+    // rotations per second^2
+    private DoublePreferenceConstant rotationAccelerationLimit;
 
     // The swerve modules on this chassis.
     private List<SwerveModule> modules;
@@ -26,11 +36,17 @@ public class SwerveChassis {
     private InverseKinematics inverseKinematics;
 
     // The target translation velocity, as a velocity vector in feet per
-    // second. Sperate from inverseKinematics to apply field-centricity.
+    // second.
     private Vector2D translationVelocity = Vector2D.ORIGIN;
+
+    // The target rotation velocity, in degrees per second.
+    private double rotationVelocity = 0;
 
     // True if in field-centric mode, false if in robot-centric mode
     private boolean inFieldCentric = true;
+
+    // The expected rate at which update will be called, in Hz
+    private double expectedUpdateRate = 50.;
 
     /**
      * Construct.
@@ -52,22 +68,55 @@ public class SwerveChassis {
         this.modules = Arrays.asList(modules);
 
         this.inverseKinematics = new InverseKinematics(modules);
+
+        translationAccelerationLimit = new DoublePreferenceConstant("Translation Accel Limit", 25);
+        rotationAccelerationLimit = new DoublePreferenceConstant("Rotation Accel Limit", 720);
     }
 
     /**
-     * Updates all periodic processes in the swerve chassis, such as
-     * setting module controls.
+     * Updates all periodic processes in the swerve chassis, such as setting module
+     * controls.
      */
     public void update() {
-        // Apply field-centric if necessary
+        // Apply field-centric to translation if necessary
+        Vector2D gyroAdjustedTranslation;
         if (this.inFieldCentric()) {
-            this.inverseKinematics.setTranslationVelocity(this.translationVelocity.rotate(-gyro.getYaw()));
+            gyroAdjustedTranslation = this.translationVelocity.rotate(-gyro.getYaw());
         } else {
-            this.inverseKinematics.setTranslationVelocity(this.translationVelocity);
+            gyroAdjustedTranslation = this.translationVelocity;
         }
+        // Calculate the change limit for translation
+        double translationChangeLimit = this.translationAccelerationLimit.getValue() / this.expectedUpdateRate;
+        // Calculate the acceleration limited translation
+        Vector2D changeLimitedTranslation = this.inverseKinematics.getTranslationVelocity()
+                .limitChange(gyroAdjustedTranslation, translationChangeLimit);
+        // Apply the translation velocity
+        this.inverseKinematics.setTranslationVelocity(changeLimitedTranslation);
+
+        // Calculate the change limit for rotation
+        double rotationChangeLimit = this.rotationAccelerationLimit.getValue() / this.expectedUpdateRate;
+        // Calculate the acceleration limited rotation
+        double changeLimitedRotation = MathUtils.limitChange(inverseKinematics.getRotationVelocity(),
+                this.rotationVelocity, rotationChangeLimit);
+        // Apply the rotation velocity
+        this.inverseKinematics.setRotationVelocity(changeLimitedRotation);
 
         // Update the inverse kinematics
         this.inverseKinematics.update();
+    }
+
+    /**
+     * Set the rate at which update should be called, in seconds. Used to calculate
+     * the acceleration limit.
+     * 
+     * @param rate
+     *                 The update rate, in Hz
+     */
+    public void setExpectedUpdateRate(double rate) {
+        if (rate <= 0) {
+            throw new IllegalArgumentException("Update rate must be positive");
+        }
+        this.expectedUpdateRate = rate;
     }
 
     /**
@@ -99,7 +148,7 @@ public class SwerveChassis {
      *                     The rotation velocity, in degrees per second
      */
     public void setRotationVelocity(double velocity) {
-        this.inverseKinematics.setRotationVelocity(velocity);
+        this.rotationVelocity = velocity;
     }
 
     /**
@@ -108,7 +157,7 @@ public class SwerveChassis {
      * @return The rotation velocity, in degrees per second
      */
     public double getRotationVelocity() {
-        return this.inverseKinematics.getRotationVelocity();
+        return this.rotationVelocity;
     }
 
     /**
@@ -135,7 +184,8 @@ public class SwerveChassis {
     /**
      * Sets the max wheel speed.
      * 
-     * @param speed The maximum wheel speed, in feet per second
+     * @param speed
+     *                  The maximum wheel speed, in feet per second
      */
     public void setMaxWheelSpeed(double speed) {
         this.inverseKinematics.setMaxSpeed(speed);
