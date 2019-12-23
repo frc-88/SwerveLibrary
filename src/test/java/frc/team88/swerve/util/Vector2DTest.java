@@ -137,68 +137,90 @@ public class Vector2DTest {
 
     @Test
     public void testPlusCardinals() {
-        assertTrue(Vector2D.createCartesianCoordinates(-1, 2)
-                .approximatelyEquals(up2.plus(left1)));
+        assertTrue(Vector2D.createCartesianCoordinates(-1, 2).approximatelyEquals(up2.plus(left1)));
     }
 
     @Test
     public void testPlusDiagonals() {
-        assertTrue(Vector2D.createCartesianCoordinates(-1, 2) 
-                .approximatelyEquals(upRight.plus(downLeft)));
+        assertTrue(Vector2D.createCartesianCoordinates(-1, 2).approximatelyEquals(upRight.plus(downLeft)));
     }
 
     @Test
     public void testTimesCardinal() {
-        assertTrue(Vector2D.createCartesianCoordinates(0, 3)
-                .approximatelyEquals(up2.times(1.5)));
+        assertTrue(Vector2D.createCartesianCoordinates(0, 3).approximatelyEquals(up2.times(1.5)));
     }
 
     @Test
     public void testTimesDiagonal() {
-        assertTrue(Vector2D.createCartesianCoordinates(-2, -6) 
-                .approximatelyEquals(upRight.times(-2)));
+        assertTrue(Vector2D.createCartesianCoordinates(-2, -6).approximatelyEquals(upRight.times(-2)));
     }
 
     @Test
-    public void rotatePositive() {
-        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(50))
-                .approximatelyEquals(deg30.rotate(20)));
+    public void testRotatePositive() {
+        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(50)).approximatelyEquals(deg30.rotate(20)));
     }
 
     @Test
-    public void rotateNegative() {
-        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(-15))
-                .approximatelyEquals(deg30.rotate(-45)));
+    public void testRotateNegative() {
+        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(-15)).approximatelyEquals(deg30.rotate(-45)));
     }
 
     @Test
-    public void rotateLarge() {
-        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(40))
-                .approximatelyEquals(deg30.rotate(730)));
+    public void testRotateLarge() {
+        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(40)).approximatelyEquals(deg30.rotate(730)));
     }
 
     @Test
-    public void approximatelyEqualsTrue() {
-        assertTrue(up2.approximatelyEquals(
-                Vector2D.createPolarCoordinates(2, new WrappedAngle(0))));
+    public void testApproximatelyEqualsTrue() {
+        assertTrue(up2.approximatelyEquals(Vector2D.createPolarCoordinates(2, new WrappedAngle(0))));
     }
 
     @Test
-    public void approximatelyEqualsTrueZero() {
-        assertTrue(Vector2D.ORIGIN.approximatelyEquals(
-                Vector2D.createPolarCoordinates(0., new WrappedAngle(0.))));
+    public void testApproximatelyEqualsTrueZero() {
+        assertTrue(Vector2D.ORIGIN.approximatelyEquals(Vector2D.createPolarCoordinates(0., new WrappedAngle(0.))));
     }
 
     @Test
-    public void approximatelyEqualsXMismatch() {
-        assertFalse(up2.approximatelyEquals(
-                Vector2D.createCartesianCoordinates(0, 2.001)));
+    public void testApproximatelyEqualsXMismatch() {
+        assertFalse(up2.approximatelyEquals(Vector2D.createCartesianCoordinates(0, 2.001)));
     }
 
     @Test
-    public void approximatelyEqualsYMismatch() {
-        assertFalse(up2.approximatelyEquals(
-                Vector2D.createCartesianCoordinates(0.001, 2)));
+    public void testApproximatelyEqualsYMismatch() {
+        assertFalse(up2.approximatelyEquals(Vector2D.createCartesianCoordinates(0.001, 2)));
+    }
+
+    @Test
+    public void testLimitChangeUnrestricted() {
+        assertTrue(up2.approximatelyEquals(left1.limitChange(up2, 3)));
+    }
+
+    @Test
+    public void testLimitChangeRestrictedDown() {
+        Vector2D current = Vector2D.createCartesianCoordinates(2, 3);
+        Vector2D target = Vector2D.createCartesianCoordinates(2, -3);
+        assertTrue(Vector2D.createCartesianCoordinates(2, 0).approximatelyEquals(current.limitChange(target, 3)));
+    }
+
+    @Test
+    public void testLimitChangeRestrictedUp() {
+        Vector2D current = Vector2D.createCartesianCoordinates(2, -3);
+        Vector2D target = Vector2D.createCartesianCoordinates(2, 3);
+        assertTrue(Vector2D.createCartesianCoordinates(2, 0).approximatelyEquals(current.limitChange(target, 3)));
+    }
+
+    @Test
+    public void testLimitChangeRestrictedSameAngle() {
+        Vector2D current = Vector2D.createPolarCoordinates(5, new WrappedAngle(50));
+        Vector2D target = Vector2D.createPolarCoordinates(2, new WrappedAngle(50));
+        assertTrue(Vector2D.createPolarCoordinates(4, new WrappedAngle(50)).approximatelyEquals(current.limitChange(target, 1)));
+    }
+
+    @Test
+    public void testLimitChangeRestrictedOppositveAngle() {
+        Vector2D current = Vector2D.createPolarCoordinates(2, new WrappedAngle(60));
+        Vector2D target = Vector2D.createPolarCoordinates(5, new WrappedAngle(-120));
+        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(-120)).approximatelyEquals(current.limitChange(target, 3)));
     }
 
 }
