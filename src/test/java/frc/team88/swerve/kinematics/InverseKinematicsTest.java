@@ -18,14 +18,16 @@ public class InverseKinematicsTest {
     private InverseKinematics ik;
 
     @Mock
-    private SwerveModule module;
+    private SwerveModule module1;
+
+    @Mock
+    private SwerveModule module2;
 
     @BeforeEach
     public void setup() {
-        ik = new InverseKinematics();
-
-
         MockitoAnnotations.initMocks(this);
+        
+        ik = new InverseKinematics(module1, module2);
     }
 
     @Test
@@ -39,11 +41,10 @@ public class InverseKinematicsTest {
     @Test
     public void testCalculateModuleRotationVectorPositive() {
         Vector2D location = Vector2D.createCartesianCoordinates(3, 2);
-        when(module.getLocation()).thenReturn(location);
-        ik.addSwerveModule(module);
+        when(module1.getLocation()).thenReturn(location);
         ik.setRotationVelocity(180);
         ik.setCenterOfRotation(Vector2D.createCartesianCoordinates(1, 0));
-        Vector2D result = ik.calculateModuleRotationVectors(module);
+        Vector2D result = ik.calculateModuleRotationVectors(module1);
 
         assertEquals(180. * Math.sqrt(8.) * (2. * Math.PI) / 360., result.getMagnitude(), 0.000001);
         assertEquals(45., result.getAngle().asDouble(), 0.000001);
@@ -52,11 +53,10 @@ public class InverseKinematicsTest {
     @Test
     public void testCalculateModuleRotationVectorNegative() {
         Vector2D location = Vector2D.createCartesianCoordinates(1, -2);
-        when(module.getLocation()).thenReturn(location);
-        ik.addSwerveModule(module);
+        when(module1.getLocation()).thenReturn(location);
         ik.setRotationVelocity(-90);
         ik.setCenterOfRotation(Vector2D.createCartesianCoordinates(0, 0));
-        Vector2D result = ik.calculateModuleRotationVectors(module);
+        Vector2D result = ik.calculateModuleRotationVectors(module1);
 
         assertEquals(90. * Math.sqrt(5.) * (2. * Math.PI) / 360., result.getMagnitude(), 0.000001);
         assertEquals(location.getAngle().plus(-90).asDouble(), result.getAngle().asDouble(), 0.000001);

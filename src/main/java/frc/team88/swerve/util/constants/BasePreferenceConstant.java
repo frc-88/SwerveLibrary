@@ -2,7 +2,6 @@ package frc.team88.swerve.util.constants;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**

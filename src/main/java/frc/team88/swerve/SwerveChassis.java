@@ -1,78 +1,178 @@
-// package frc.team88.swerve;
+package frc.team88.swerve;
 
-// import frc.team88.swerve.state.AbsoluteHeadingSwerveState;
-// import frc.team88.swerve.state.FullSwerveState;
-// import frc.team88.swerve.state.SwerveState;
-// import frc.team88.swerve.state.SwerveStateVisitor;
-// import frc.team88.swerve.state.VelocitySwerveState;
-// import frc.team88.swerve.SwerveTelemetry;
-// import frc.team88.swerve.util.Vector2D;
-// import frc.team88.swerve.util.wpilibwrappers.RobotControllerWrapper;
-// import frc.team88.swerve.util.SwerveUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
-// public class SwerveChassis {
+import frc.team88.swerve.kinematics.InverseKinematics;
+import frc.team88.swerve.swervemodule.SwerveModule;
+import frc.team88.swerve.util.Vector2D;
+import frc.team88.swerve.wrappers.gyro.Gyro;
 
-//     // Robot centric
-//     private SwerveState desiredState;
+/**
+ * Represents a complete swerve chassis, with high level operations for
+ * controlling it.
+ */
+public class SwerveChassis {
 
-//     private MotionController motionController = new MotionController();
+    // The swerve modules on this chassis.
+    private List<SwerveModule> modules;
 
-//     private long lastUpdateTime;
+    // The gyro for this chassis.
+    private Gyro gyro;
 
-//     public SwerveChassis() {
-//         desiredState = VelocitySwerveState.ZERO_STATE;
-//         lastUpdateTime = RobotControllerWrapper.getInstance().getFPGATime();
-//     }
+    // The inverse kinematics controller for this chassis.
+    private InverseKinematics inverseKinematics;
 
-//     public void setRobotCentricVelocityTargets(double xVelocity, 
-//             double yVelocity, double rotationalVelocity) {
+    // The target translation velocity, as a velocity vector in feet per
+    // second. Sperate from inverseKinematics to apply field-centricity.
+    private Vector2D translationVelocity = Vector2D.ORIGIN;
 
-//         desiredState = new VelocitySwerveState(
-//             Vector2D.createCartesianCoordinates(xVelocity, yVelocity), rotationalVelocity)
-//             .rotateFrame(-SwerveTelemetry.getInstance().getIMUHeading());
+    // True if in field-centric mode, false if in robot-centric mode
+    private boolean inFieldCentric = true;
 
-//     }
+    /**
+     * Construct.
+     * 
+     * @param gyro
+     *                    The gyro measuring this chassis's field-oriented angle.
+     * @param modules
+     *                    The modules on this chassis. Minimum 2.
+     */
+    public SwerveChassis(Gyro gyro, SwerveModule... modules) {
+        this.gyro = Objects.requireNonNull(gyro);
 
-//     public void setFieldCentricVelocityTargets(double xVelocity, 
-//             double yVelocity, double rotationalVelocity) {
+        if (modules.length < 2) {
+            throw new IllegalArgumentException("A swerve chassis must have at least 2 swerve modules");
+        }
+        for (SwerveModule module : modules) {
+            Objects.requireNonNull(module);
+        }
+        this.modules = Arrays.asList(modules);
 
-//         desiredState = new VelocitySwerveState(
-//             Vector2D.createCartesianCoordinates(xVelocity, yVelocity), rotationalVelocity);
+        this.inverseKinematics = new InverseKinematics(modules);
+    }
 
-//     }
+    /**
+     * Updates all periodic processes in the swerve chassis, such as
+     * setting module controls.
+     */
+    public void update() {
+        // Apply field-centric if necessary
+        if (this.inFieldCentric()) {
+            this.inverseKinematics.setTranslationVelocity(this.translationVelocity.rotate(-gyro.getYaw()));
+        } else {
+            this.inverseKinematics.setTranslationVelocity(this.translationVelocity);
+        }
 
-//     public void update() {
-//         this.desiredState.accept(this.motionController);
-//         lastUpdateTime = RobotControllerWrapper.getInstance().getFPGATime();
-//     }
+        // Update the inverse kinematics
+        this.inverseKinematics.update();
+    }
 
-//     private class MotionController implements SwerveStateVisitor<Void> {
+    /**
+     * Sets the translation velocity to target. Whether this is robot-centric or
+     * field-centric depends on which has been set.
+     * 
+     * @param velocity
+     *                     A velocity vector for chassis translation, in feet per
+     *                     second
+     */
+    public void setTranslationVelocity(Vector2D velocity) {
+        this.translationVelocity = Objects.requireNonNull(velocity);
+    }
 
-//         @Override
-//         public Void visitVelocitySwerveState(VelocitySwerveState desired) {
+    /**
+     * Gets the targetted translation velocity. Whether this is robot-centric or
+     * field-centric depends on which has been set.
+     * 
+     * @return A velocity vector for chassis translation, in feet per second
+     */
+    public Vector2D getTranslationVelocity() {
+        return this.translationVelocity;
+    }
 
-//             VelocitySwerveState commanded = desired;
-//             FullSwerveState current = SwerveTelemetry.getInstance().getRobotCentricState();
-            
-//             // SwerveUtils.limitAccelerations(current, desired, Constants.linearAccelLimit, 
-//             //     Constants.translationAngularAccelLimit, Constants.headingAngularAccelLimit, 
-//             //     RobotControllerWrapper.getInstance().getFPGATime() - lastUpdateTime);
+    /**
+     * Sets the rotation velocity to target.
+     * 
+     * @param velocity
+     *                     The rotation velocity, in degrees per second
+     */
+    public void setRotationVelocity(double velocity) {
+        this.inverseKinematics.setRotationVelocity(velocity);
+    }
 
-//             // TODO Convert to module commands
+    /**
+     * Gets the targetted rotation velocity.
+     * 
+     * @return The rotation velocity, in degrees per second
+     */
+    public double getRotationVelocity() {
+        return this.inverseKinematics.getRotationVelocity();
+    }
 
-//             return null;
-//         }
+    /**
+     * Sets the center of rotation. Always robot-centric.
+     * 
+     * @param center
+     *                   A position vector describing the center of rotation
+     *                   relative to the chassis's origin
+     */
+    public void setCenterOfRotation(Vector2D center) {
+        this.inverseKinematics.setCenterOfRotation(center);
+    }
 
-//         @Override
-//         public Void visitAbsoluteHeadingSwerveState(AbsoluteHeadingSwerveState vss) {
-//             return null;
-//         }
+    /**
+     * Gets the center of rotation. Always robot-centric.
+     * 
+     * @return A position vector describing the center of rotation relative to the
+     *         chassis's origin
+     */
+    public Vector2D getCenterOfRotation() {
+        return this.inverseKinematics.getCenterOfRotation();
+    }
 
-//         @Override
-//         public Void visitFullSwerveState(FullSwerveState vss) {
-//             return null;
-// 		}
+    /**
+     * Sets the max wheel speed.
+     * 
+     * @param speed The maximum wheel speed, in feet per second
+     */
+    public void setMaxWheelSpeed(double speed) {
+        this.inverseKinematics.setMaxSpeed(speed);
+    }
 
-//     }
+    /**
+     * Gets the max wheel speed.
+     * 
+     * @return The maximum wheel speed, in feet per second
+     */
+    public double getMaxWheelSpeed() {
+        return this.inverseKinematics.getMaxSpeed();
+    }
 
-// }
+    /**
+     * Enables field-centric mode, which means that all given translation angles are
+     * relative to gyro 0.
+     */
+    public void setFieldCentic() {
+        this.inFieldCentric = true;
+    }
+
+    /**
+     * Enables robot-centric mode, which means that all given translation angles are
+     * relative to the front of the robot.
+     */
+    public void setRobotCentic() {
+        this.inFieldCentric = false;
+    }
+
+    /**
+     * Is this chassis in field-centric mode?
+     * 
+     * @return True if in field-centric mode, false if in robot-centric mode
+     */
+    public boolean inFieldCentric() {
+        return this.inFieldCentric;
+    }
+
+}
