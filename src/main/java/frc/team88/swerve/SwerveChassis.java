@@ -86,10 +86,10 @@ public class SwerveChassis {
 
         this.inverseKinematics = new InverseKinematics(modules);
 
-        translationAccelerationLimit = new DoublePreferenceConstant("Translation Accel Limit", 25);
-        rotationAccelerationLimit = new DoublePreferenceConstant("Rotation Accel Limit", 720);
+        translationAccelerationLimit = new DoublePreferenceConstant("Translation Accel Limit", 100);
+        rotationAccelerationLimit = new DoublePreferenceConstant("Rotation Accel Limit", 1080);
         hammerModeAngle = new DoublePreferenceConstant("Hammer Mode Angle", 70);
-        hammerModeTime = new LongPreferenceConstant("Hammer Mode Time", 2_500_000);
+        hammerModeTime = new LongPreferenceConstant("Hammer Mode Time", 1_000_000);
     }
 
     /**
@@ -112,6 +112,7 @@ public class SwerveChassis {
                 minTimeToChange /= 2;
             }
             // Check if it is time to change
+
             if ((RobotControllerWrapper.getInstance().getFPGATime() - lastHammerModeChangeTime) > minTimeToChange) {
                 hammerModeChangeCount++;
                 lastHammerModeChangeTime = RobotControllerWrapper.getInstance().getFPGATime();
@@ -268,9 +269,11 @@ public class SwerveChassis {
      * Enables hammer mode.
      */
     public void enableHammerMode() {
-        this.inHammerMode = true;
-        lastHammerModeChangeTime = RobotControllerWrapper.getInstance().getFPGATime();
-        hammerModeChangeCount = 0;
+        if (!inHammerMode()) {
+            this.inHammerMode = true;
+            lastHammerModeChangeTime = RobotControllerWrapper.getInstance().getFPGATime();
+            hammerModeChangeCount = 0;
+        }
     }
 
     /*
