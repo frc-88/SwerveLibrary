@@ -140,4 +140,27 @@ public class Vector2D {
         return MathUtils.doubleEquals(this.getX(), that.getX()) && MathUtils.doubleEquals(this.getY(), that.getY());
     }
 
+    /**
+     * Limits the magnitude of the difference between this vector and the returned
+     * vector when trying to go from this vector to the desired vector.
+     * 
+     * @param desired
+     *                      The desired vector
+     * @param maxChange
+     *                      The maximum amount that the returned vector can differ
+     *                      from this vector
+     * @return The vector that is as close to the desired vector as possible without
+     *         exceeing the maximum change
+     */
+    public Vector2D limitChange(Vector2D desired, double maxChange) {
+        // Get the full difference between this vector and the desired vector
+        Vector2D difference = desired.plus(this.times(-1));
+        // Shorten the magnitude of the difference if it is too large
+        if (difference.getMagnitude() > maxChange) {
+            difference = Vector2D.createPolarCoordinates(maxChange, difference.getAngle());
+        }
+        // Add the difference back onto this vector
+        return this.plus(difference);
+    }
+
 }
