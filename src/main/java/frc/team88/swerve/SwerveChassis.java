@@ -10,8 +10,6 @@ import frc.team88.swerve.swervemodule.SwerveModule;
 import frc.team88.swerve.util.MathUtils;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.constants.DoublePreferenceConstant;
-import frc.team88.swerve.util.constants.LongPreferenceConstant;
-import frc.team88.swerve.wrappers.RobotControllerWrapper;
 import frc.team88.swerve.wrappers.gyro.Gyro;
 
 /**
@@ -21,18 +19,12 @@ import frc.team88.swerve.wrappers.gyro.Gyro;
 public class SwerveChassis {
 
     // Preference constants for the translation acceleration limit, in
-    // feet per second^2.
+    // feet per second^2
     private DoublePreferenceConstant translationAccelerationLimit;
 
     // Preference constant for the rotation acceleration limit, in
-    // rotations per second^2.
+    // rotations per second^2
     private DoublePreferenceConstant rotationAccelerationLimit;
-
-    // The angle to offset in hammer mode.
-    private DoublePreferenceConstant hammerModeAngle;
-
-    // The time to spend hammering in each direction
-    private LongPreferenceConstant hammerModeTime;
 
     // The swerve modules on this chassis.
     private List<SwerveModule> modules;
@@ -50,20 +42,11 @@ public class SwerveChassis {
     // The target rotation velocity, in degrees per second.
     private double rotationVelocity = 0;
 
-    // True if in field-centric mode, false if in robot-centric mode.
+    // True if in field-centric mode, false if in robot-centric mode
     private boolean inFieldCentric = true;
 
-    // True if in hammer mode, false otherwise.
-    private boolean inHammerMode = false;
-
-    // The expected rate at which update will be called, in Hz.
+    // The expected rate at which update will be called, in Hz
     private double expectedUpdateRate = 50.;
-
-    // The time when hammer mode direction was last changed, in microseconds.
-    private long lastHammerModeChangeTime;
-
-    // If count of how many times hammer mode has changed direction.
-    private int hammerModeChangeCount;
 
     /**
      * Construct.
@@ -88,8 +71,6 @@ public class SwerveChassis {
 
         translationAccelerationLimit = new DoublePreferenceConstant("Translation Accel Limit", 25);
         rotationAccelerationLimit = new DoublePreferenceConstant("Rotation Accel Limit", 720);
-        hammerModeAngle = new DoublePreferenceConstant("Hammer Mode Angle", 70);
-        hammerModeTime = new LongPreferenceConstant("Hammer Mode Time", 2_500_000);
     }
 
     /**
@@ -97,38 +78,18 @@ public class SwerveChassis {
      * controls.
      */
     public void update() {
-        Vector2D adjustedTranslation = this.translationVelocity;
-
         // Apply field-centric to translation if necessary
+        Vector2D gyroAdjustedTranslation;
         if (this.inFieldCentric()) {
-            adjustedTranslation = adjustedTranslation.rotate(-gyro.getYaw());
+            gyroAdjustedTranslation = this.translationVelocity.rotate(-gyro.getYaw());
+        } else {
+            gyroAdjustedTranslation = this.translationVelocity;
         }
-
-        // Apply hammer mode if necessary
-        if (inHammerMode()) {
-            // Halve the time to change if this is the first hammer
-            long minTimeToChange = hammerModeTime.getValue();
-            if (hammerModeChangeCount == 0) {
-                minTimeToChange /= 2;
-            }
-            // Check if it is time to change
-            if ((RobotControllerWrapper.getInstance().getFPGATime() - lastHammerModeChangeTime) > minTimeToChange) {
-                hammerModeChangeCount++;
-                lastHammerModeChangeTime = RobotControllerWrapper.getInstance().getFPGATime();
-            }
-            // Rotate the vector by the offset in the right direction
-            double angleToRotateVector = hammerModeAngle.getValue();
-            if (hammerModeChangeCount % 2 == 1) {
-                angleToRotateVector *= -1;
-            }
-            adjustedTranslation = adjustedTranslation.rotate(angleToRotateVector);
-        }
-        
         // Calculate the change limit for translation
         double translationChangeLimit = this.translationAccelerationLimit.getValue() / this.expectedUpdateRate;
         // Calculate the acceleration limited translation
         Vector2D changeLimitedTranslation = this.inverseKinematics.getTranslationVelocity()
-                .limitChange(adjustedTranslation, translationChangeLimit);
+                .limitChange(gyroAdjustedTranslation, translationChangeLimit);
         // Apply the translation velocity
         this.inverseKinematics.setTranslationVelocity(changeLimitedTranslation);
 
@@ -264,28 +225,4 @@ public class SwerveChassis {
         return this.inFieldCentric;
     }
 
-    /**
-     * Enables hammer mode.
-     */
-    public void enableHammerMode() {
-        this.inHammerMode = true;
-        lastHammerModeChangeTime = RobotControllerWrapper.getInstance().getFPGATime();
-        hammerModeChangeCount = 0;
-    }
-
-    /*
-     * Disables hammer mode.
-     */
-    public void disableHammerMode() {
-        this.inHammerMode = false;
-    }
-
-    /**
-     * Is this chassis in hammer mode?
-     * 
-     * @return True if in hammer mode, false otherwise
-     */
-    public boolean inHammerMode() {
-        return this.inHammerMode;
-    }
 }
