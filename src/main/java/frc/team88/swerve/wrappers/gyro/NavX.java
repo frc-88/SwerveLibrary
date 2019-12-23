@@ -53,12 +53,12 @@ public class NavX implements Gyro {
 
     @Override
     public double getYaw() {
-        return this.base.getYaw() + this.offset;
+        return -this.base.getYaw() + this.offset;
     }
 
     @Override
     public double getYawRate() {
-        return base.getRate();
+        return -this.base.getRate();
     }
 
     @Override
