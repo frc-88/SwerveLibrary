@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import frc.team88.swerve.kinematics.InverseKinematics;
 import frc.team88.swerve.swervemodule.SwerveModule;
+import frc.team88.swerve.swervemodule.SwerveModule.SwitchingMode;
 import frc.team88.swerve.util.MathUtils;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.constants.DoublePreferenceConstant;
@@ -81,6 +82,7 @@ public class SwerveChassis {
         }
         for (SwerveModule module : modules) {
             Objects.requireNonNull(module);
+            module.setSwitchingMode(SwitchingMode.kSmart);
         }
         this.modules = Arrays.asList(modules);
 
@@ -273,6 +275,9 @@ public class SwerveChassis {
             this.inHammerMode = true;
             lastHammerModeChangeTime = RobotControllerWrapper.getInstance().getFPGATime();
             hammerModeChangeCount = 0;
+            for (SwerveModule module : modules) {
+                module.setSwitchingMode(SwitchingMode.kAlwaysSwitch);
+            }
         }
     }
 
@@ -280,7 +285,12 @@ public class SwerveChassis {
      * Disables hammer mode.
      */
     public void disableHammerMode() {
-        this.inHammerMode = false;
+        if (inHammerMode()) {
+            this.inHammerMode = false;
+            for (SwerveModule module : modules) {
+                module.setSwitchingMode(SwitchingMode.kSmart);
+            }
+        }
     }
 
     /**

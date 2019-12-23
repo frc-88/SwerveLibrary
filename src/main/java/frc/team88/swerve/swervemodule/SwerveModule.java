@@ -18,6 +18,26 @@ import frc.team88.swerve.util.constants.PIDPreferenceConstants;
  */
 public class SwerveModule {
 
+    /**
+     * Enumerates the possible modes for deciding when to change wheel
+     * direction vs. rotating more.
+     */
+    public enum SwitchingMode {
+        /**
+         * Never switch wheel direction.
+         */
+        kNeverSwitch,
+        /**
+         * Always switch wheel direction if it will reduce rotation.
+         */
+        kAlwaysSwitch,
+        /** 
+         * Choose when switch depending on how much rotation would be saved 
+         * and how fast the wheel is moving.
+         */
+        kSmart
+    }
+
     // The motor for controlling wheel velocity, in feet per second.
     private PIDMotor wheelControl;
 
@@ -27,14 +47,17 @@ public class SwerveModule {
     // Reads the absolute azimuth alsolute angle, in degrees.
     private PositionVelocitySensor absoluteAzimuthSensor;
 
-    // PID controller for azimuth position
+    // PID controller for azimuth position.
     private SyncPIDController azimuthPositionPID;
 
-    // The location of this module relative to the robot's origin
+    // The location of this module relative to the robot's origin.
     private Vector2D location;
 
-    // True if the wheel is currently reversed, false otherwise
+    // True if the wheel is currently reversed, false otherwise.
     private boolean isWheelReversed = false;
+
+    // The switching mode being used.
+    private SwitchingMode switchingMode = SwitchingMode.kSmart;
 
     /**
      * Constructor.
@@ -156,23 +179,47 @@ public class SwerveModule {
     public Vector2D getLocation() {
         return Objects.requireNonNull(this.location);
     }
+    
+    /**
+     * Sets the direction current switching mode.
+     * @param mode The mode to set
+     */
+    public void setSwitchingMode(SwitchingMode mode) {
+        this.switchingMode = mode;
+    }
+
+    /**
+     * Gets the direction current switching mode.
+     * @return The switching mode
+     */
+    public SwitchingMode getSwitchingMode() {
+        return this.switchingMode;
+    }
 
     /**
      * Gets the curerent biasTo360 to use for determing how to get to the next
-     * angle, depending on the current wheel speed.
+     * angle, depending on the swithing mode.
      * 
      * @return The bias to use
      */
     private double getAzimuthWrapBias() {
-        // TODO: This should be fully paramaterizable when we have configurations
-        double currentSpeed = getWheelSpeed();
-        if (currentSpeed < 2.5) {
+        switch (getSwitchingMode()) {
+        case kAlwaysSwitch:
             return 90;
-        } else if (currentSpeed < 5.5) {
-            return 120;
-        } else {
+        case kNeverSwitch:
             return 180;
+        case kSmart:
+            // TODO: This should be fully paramaterizable when we have configurations
+            double currentSpeed = getWheelSpeed();
+            if (currentSpeed < 2.5) {
+                return 90;
+            } else if (currentSpeed < 5.5) {
+                return 120;
+            } else {
+                return 180;
+            }
         }
+        throw new IllegalStateException("Switching mode is not supported");
     }
 
 }
