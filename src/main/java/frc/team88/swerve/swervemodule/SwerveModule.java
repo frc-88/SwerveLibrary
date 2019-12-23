@@ -9,7 +9,6 @@ import frc.team88.swerve.swervemodule.motorsensor.PositionVelocitySensor;
 import frc.team88.swerve.util.SyncPIDController;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
-import frc.team88.swerve.util.constants.DoublePreferenceConstant;
 import frc.team88.swerve.util.constants.PIDPreferenceConstants;
 
 /**
