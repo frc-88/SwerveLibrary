@@ -33,32 +33,32 @@ public class SyncPIDControllerTest {
         controller = new SyncPIDController(kP, kI, kD, kF, iZone, iMax, tolerance);
 
         MockitoAnnotations.initMocks(this);
-        
+
         RobotControllerWrapper.setInstance(robotController);
     }
 
     @Test
     public void testSetKP() {
-        controller.setKP(2*kP);
-        assertEquals(2*kP, controller.getKP(), 0.0001);
+        controller.setKP(2 * kP);
+        assertEquals(2 * kP, controller.getKP(), 0.0001);
     }
 
     @Test
     public void testSetKI() {
-        controller.setKP(2*kP);
-        assertEquals(2*kP, controller.getKP(), 0.0001);
+        controller.setKP(2 * kP);
+        assertEquals(2 * kP, controller.getKP(), 0.0001);
     }
 
     @Test
     public void testSetKD() {
-        controller.setKP(2*kP);
-        assertEquals(2*kP, controller.getKP(), 0.0001);
+        controller.setKP(2 * kP);
+        assertEquals(2 * kP, controller.getKP(), 0.0001);
     }
 
     @Test
     public void testSetKF() {
-        controller.setKP(2*kP);
-        assertEquals(2*kP, controller.getKP(), 0.0001);
+        controller.setKP(2 * kP);
+        assertEquals(2 * kP, controller.getKP(), 0.0001);
     }
 
     @Test
@@ -76,23 +76,23 @@ public class SyncPIDControllerTest {
     @Test
     public void testSetIZone() {
         controller.disableIZone();
-        controller.setIZone(2*iZone);
-        assertEquals(2*iZone, controller.getIZone(), 0.0001);
+        controller.setIZone(2 * iZone);
+        assertEquals(2 * iZone, controller.getIZone(), 0.0001);
         assertTrue(controller.isIZoneEnabled());
     }
 
     @Test
     public void testSetIMax() {
         controller.disableIMax();
-        controller.setIMax(2*iMax);
-        assertEquals(2*iMax, controller.getIMax(), 0.0001);
+        controller.setIMax(2 * iMax);
+        assertEquals(2 * iMax, controller.getIMax(), 0.0001);
         assertTrue(controller.isIMaxEnabled());
     }
 
     @Test
     public void testSetTolerance() {
-        controller.setTolerance(2*tolerance);
-        assertEquals(2*tolerance, controller.getTolerance(), 0.0001);
+        controller.setTolerance(2 * tolerance);
+        assertEquals(2 * tolerance, controller.getTolerance(), 0.0001);
     }
 
     @Test
@@ -151,8 +151,7 @@ public class SyncPIDControllerTest {
 
     @Test
     public void testCalculateD() {
-        when(robotController.getFPGATime())
-                .thenReturn(1_000_000l).thenReturn(1_100_000l);
+        when(robotController.getFPGATime()).thenReturn(1_000_000l).thenReturn(1_100_000l);
         assertEquals(5, controller.calculateD(5));
         assertEquals(50, controller.calculateD(10));
     }
@@ -164,17 +163,14 @@ public class SyncPIDControllerTest {
 
     @Test
     public void testCalculateOutputNormal() {
-        when(robotController.getFPGATime())
-                .thenReturn(1_000_000l).thenReturn(1_100_000l);
+        when(robotController.getFPGATime()).thenReturn(1_000_000l).thenReturn(1_100_000l);
         assertEquals(500 + 50 + 5 + 0, controller.calculateOutput(-5, 0));
         assertEquals(300 + 80 - 20 + 1000, controller.calculateOutput(-2, 1));
     }
 
     @Test
     public void testCalculateOutputWithTolerance() {
-        when(robotController.getFPGATime())
-                .thenReturn(1_000_000l).thenReturn(2_000_000l)
-                .thenReturn(3_000_000l);
+        when(robotController.getFPGATime()).thenReturn(1_000_000l).thenReturn(2_000_000l).thenReturn(3_000_000l);
         assertNotEquals(0, controller.calculateOutput(-5, 0));
         assertNotEquals(0, controller.calculateOutput(5, 0));
         assertEquals(0, controller.calculateOutput(1, 0));

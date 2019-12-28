@@ -10,8 +10,7 @@ public class MathUtilsTest {
 
     @Test
     public void testDoubleEqualsTrue() {
-        assertTrue(MathUtils.doubleEquals((1./10_000.)*10., 
-                (10./1_000_000.)*100.));
+        assertTrue(MathUtils.doubleEquals((1. / 10_000.) * 10., (10. / 1_000_000.) * 100.));
     }
 
     @Test

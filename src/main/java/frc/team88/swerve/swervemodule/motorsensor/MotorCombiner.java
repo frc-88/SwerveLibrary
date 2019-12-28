@@ -260,7 +260,5 @@ public class MotorCombiner {
             }
             return outputValue;
         }
-
     }
-
 }
