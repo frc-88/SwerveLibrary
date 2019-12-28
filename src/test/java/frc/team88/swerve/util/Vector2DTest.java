@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 public class Vector2DTest {
 
-    private Vector2D origin;
     private Vector2D up2;
     private Vector2D left1;
     private Vector2D down3;
@@ -23,7 +22,6 @@ public class Vector2DTest {
 
     @BeforeEach
     public void setup() {
-        origin = Vector2D.createCartesianCoordinates(0, 0);
         up2 = Vector2D.createCartesianCoordinates(0, 2);
         left1 = Vector2D.createCartesianCoordinates(-1, 0);
         down3 = Vector2D.createCartesianCoordinates(0, -3);

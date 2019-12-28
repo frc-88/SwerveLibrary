@@ -21,16 +21,24 @@ public class PIDPreferenceConstants {
      * Constructor. All values given are defaults that will be overriden if a
      * preference for them already exists.
      * 
-     * @param name      The name to pre-pend to all preference names
-     * @param kP        The proportional gain
-     * @param kI        The integral gain
-     * @param kD        The differential gain
-     * @param kF        The feedforward gain
-     * @param iZone     The error range in which the integral accumulates
-     * @param iMax      The max error absolute value that the integral will
-     *                  acumulate
-     * @param tolerance The minimim error absolute value where an output will be
-     *                  applied
+     * @param name
+     *                      The name to pre-pend to all preference names
+     * @param kP
+     *                      The proportional gain
+     * @param kI
+     *                      The integral gain
+     * @param kD
+     *                      The differential gain
+     * @param kF
+     *                      The feedforward gain
+     * @param iZone
+     *                      The error range in which the integral accumulates
+     * @param iMax
+     *                      The max error absolute value that the integral will
+     *                      acumulate
+     * @param tolerance
+     *                      The minimim error absolute value where an output will be
+     *                      applied
      */
     public PIDPreferenceConstants(String name, double kP, double kI, double kD, double kF, double iZone, double iMax,
             double tolerance) {
@@ -119,5 +127,4 @@ public class PIDPreferenceConstants {
     public DoublePreferenceConstant getTolerance() {
         return tolerance;
     }
-
 }

@@ -28,7 +28,8 @@ public interface PreferenceConstant<T> extends UpdatableConstant {
      * Sets the value of this constant, update WPILib preferences and calling the
      * change handler.
      * 
-     * @param value The value to set.
+     * @param value
+     *                  The value to set.
      */
     public void setValue(T value);
 

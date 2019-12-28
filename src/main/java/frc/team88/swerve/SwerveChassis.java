@@ -1,6 +1,5 @@
 package frc.team88.swerve;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -126,7 +125,7 @@ public class SwerveChassis {
             }
             adjustedTranslation = adjustedTranslation.rotate(angleToRotateVector);
         }
-        
+
         // Calculate the change limit for translation
         double translationChangeLimit = this.translationAccelerationLimit.getValue() / this.expectedUpdateRate;
         // Calculate the acceleration limited translation

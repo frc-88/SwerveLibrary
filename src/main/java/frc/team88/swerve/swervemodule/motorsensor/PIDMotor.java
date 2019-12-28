@@ -11,7 +11,8 @@ public interface PIDMotor extends PositionVelocitySensor {
      * Set the velocity to PID to the given value. Only gauranteed to work when
      * enabled.
      * 
-     * @param velocity The velocity to set
+     * @param velocity
+     *                     The velocity to set
      */
     public void setVelocity(double velocity);
 

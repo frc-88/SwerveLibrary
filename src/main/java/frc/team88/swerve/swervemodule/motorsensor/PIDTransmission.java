@@ -44,7 +44,8 @@ public class PIDTransmission implements PIDMotor {
     /**
      * Applies the gear ratio to get from an input value to an output value.
      * 
-     * @param value The input value
+     * @param value
+     *                  The input value
      * @return The output value
      */
     private double applyForwardGearRatio(double value) {
@@ -54,7 +55,8 @@ public class PIDTransmission implements PIDMotor {
     /**
      * Applies the gear ratio to get from an output value to an input value.
      * 
-     * @param value The output value
+     * @param value
+     *                  The output value
      * @return The input value
      */
     private double applyReverseGearRatio(double value) {

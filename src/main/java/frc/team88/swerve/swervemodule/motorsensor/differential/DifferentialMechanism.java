@@ -33,8 +33,10 @@ public class DifferentialMechanism {
     /**
      * Constructor.
      * 
-     * @param positiveMotor The motor that is subtracted from in the difference
-     * @param negativeMotor The motor that is subtracted in the difference
+     * @param positiveMotor
+     *                          The motor that is subtracted from in the difference
+     * @param negativeMotor
+     *                          The motor that is subtracted in the difference
      */
     public DifferentialMechanism(PIDMotor positiveMotor, PIDMotor negativeMotor) {
         this.positiveMotor = Objects.requireNonNull(positiveMotor);
@@ -84,7 +86,8 @@ public class DifferentialMechanism {
     /**
      * Sets the velocity of the difference.
      * 
-     * @param velocity The difference velocity
+     * @param velocity
+     *                     The difference velocity
      */
     public void setDifferenceVelocity(double velocity) {
         this.differenceVelocity = velocity;
@@ -94,7 +97,8 @@ public class DifferentialMechanism {
     /**
      * Sets the velocity of the sum.
      * 
-     * @param velocity The sum velocity
+     * @param velocity
+     *                     The sum velocity
      */
     public void setSumVelocity(double velocity) {
         this.sumVelocity = velocity;

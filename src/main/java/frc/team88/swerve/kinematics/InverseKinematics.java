@@ -1,8 +1,5 @@
 package frc.team88.swerve.kinematics;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 import frc.team88.swerve.swervemodule.SwerveModule;
