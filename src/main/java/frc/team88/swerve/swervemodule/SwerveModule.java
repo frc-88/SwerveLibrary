@@ -19,8 +19,8 @@ import frc.team88.swerve.util.constants.PIDPreferenceConstants;
 public class SwerveModule {
 
     /**
-     * Enumerates the possible modes for deciding when to change wheel
-     * direction vs. rotating more.
+     * Enumerates the possible modes for deciding when to change wheel direction vs.
+     * rotating more.
      */
     public enum SwitchingMode {
         /**
@@ -31,9 +31,9 @@ public class SwerveModule {
          * Always switch wheel direction if it will reduce rotation.
          */
         kAlwaysSwitch,
-        /** 
-         * Choose when switch depending on how much rotation would be saved 
-         * and how fast the wheel is moving.
+        /**
+         * Choose when switch depending on how much rotation would be saved and how fast
+         * the wheel is moving.
          */
         kSmart
     }
@@ -173,16 +173,19 @@ public class SwerveModule {
     /**
      * Gets the location of this module.
      * 
-     * @param return A position vector from the robot's origin to the location
-     *                     of this module
+     * @param return
+     *                   A position vector from the robot's origin to the location
+     *                   of this module
      */
     public Vector2D getLocation() {
         return Objects.requireNonNull(this.location);
     }
-    
+
     /**
      * Sets the direction current switching mode.
-     * @param mode The mode to set
+     * 
+     * @param mode
+     *                 The mode to set
      */
     public void setSwitchingMode(SwitchingMode mode) {
         this.switchingMode = mode;
@@ -190,6 +193,7 @@ public class SwerveModule {
 
     /**
      * Gets the direction current switching mode.
+     * 
      * @return The switching mode
      */
     public SwitchingMode getSwitchingMode() {

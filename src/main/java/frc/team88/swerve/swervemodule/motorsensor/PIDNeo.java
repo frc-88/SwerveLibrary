@@ -17,16 +17,18 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
     /**
      * Constructor. Sets up the default configuration for a SparkMax.
      * 
-     * @param canID        The canID for the SparkMax
-     * @param pidConstants All of the PID constants for velocity control. Uses all
-     *                     constants except tolerance
+     * @param canID
+     *                         The canID for the SparkMax
+     * @param pidConstants
+     *                         All of the PID constants for velocity control. Uses
+     *                         all constants except tolerance
      */
     public PIDNeo(int canID, PIDPreferenceConstants pidConstants) {
         super(canID, MotorType.kBrushless);
 
         this.restoreFactoryDefaults();
         this.setIdleMode(IdleMode.kBrake);
-        
+
         pidConstants.getKP().addChangeHandler(this::setKP);
         pidConstants.getKI().addChangeHandler(this::setKI);
         pidConstants.getKD().addChangeHandler(this::setKD);
@@ -84,7 +86,8 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
     /**
      * Set the kP constant for the Spark Max velocity control.
      * 
-     * @param kP The proportional gain
+     * @param kP
+     *               The proportional gain
      */
     private void setKP(double kP) {
         this.getPIDController().setP(kP);
@@ -93,7 +96,8 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
     /**
      * Set the kI constant for the Spark Max velocity control.
      * 
-     * @param kI The integral gain
+     * @param kI
+     *               The integral gain
      */
     private void setKI(double kI) {
         this.getPIDController().setI(kI);
@@ -102,7 +106,8 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
     /**
      * Set the kD constant for the Spark Max velocity control.
      * 
-     * @param kD The differential gain
+     * @param kD
+     *               The differential gain
      */
     private void setKD(double kD) {
         this.getPIDController().setD(kD);
@@ -111,7 +116,8 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
     /**
      * Set the kF constant for the Spark Max velocity control.
      * 
-     * @param kF The feedforward gain
+     * @param kF
+     *               The feedforward gain
      */
     private void setKF(double kF) {
         this.getPIDController().setFF(kF);
@@ -120,7 +126,8 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
     /**
      * Set the iZone constant for the Spark Max velocity control.
      * 
-     * @param iZone The max error which will accumulate in the integral
+     * @param iZone
+     *                  The max error which will accumulate in the integral
      */
     private void setIZone(double iZone) {
         this.getPIDController().setIZone(iZone);
@@ -129,7 +136,8 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
     /**
      * Set the iMax constant for the Spark Max velocity control.
      * 
-     * @param iMax The max accumulated error for the integral
+     * @param iMax
+     *                 The max accumulated error for the integral
      */
     private void setIMax(double iMax) {
         this.getPIDController().setIMaxAccum(iMax, 0);

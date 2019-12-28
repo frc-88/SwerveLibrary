@@ -25,7 +25,8 @@ public interface PositionVelocitySensor {
      * Calibrate the sensor such that the current position will read as the given
      * value.
      * 
-     * @param position The position to set
+     * @param position
+     *                     The position to set
      */
     public void calibratePosition(double position);
 

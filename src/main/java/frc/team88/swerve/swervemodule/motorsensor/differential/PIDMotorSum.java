@@ -21,7 +21,8 @@ public class PIDMotorSum implements PIDMotor {
     /**
      * Constructor.
      * 
-     * @param differential The differential mechanism this derives from
+     * @param differential
+     *                         The differential mechanism this derives from
      */
     public PIDMotorSum(DifferentialMechanism differential) {
         this.differential = Objects.requireNonNull(differential);

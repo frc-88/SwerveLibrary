@@ -21,7 +21,8 @@ public class PIDMotorDifference implements PIDMotor {
     /**
      * Constructor.
      * 
-     * @param differential The differential mechanism this derives from
+     * @param differential
+     *                         The differential mechanism this derives from
      */
     public PIDMotorDifference(DifferentialMechanism differential) {
         this.differential = Objects.requireNonNull(differential);

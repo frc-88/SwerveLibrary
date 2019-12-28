@@ -27,14 +27,20 @@ public class SyncPIDController {
     /**
      * Constructor which specifies all parameters.
      * 
-     * @param kP    The proportional gain
-     * @param kI    The integral gain
-     * @param kD    The differential gain
-     * @param kF    The feedforward gain
-     * @param iZone The integral will only accumulate while the current error is
-     *              less than this value
-     * @param iMax  The maximum absolute value that the integral error will
-     *              accumulate
+     * @param kP
+     *                  The proportional gain
+     * @param kI
+     *                  The integral gain
+     * @param kD
+     *                  The differential gain
+     * @param kF
+     *                  The feedforward gain
+     * @param iZone
+     *                  The integral will only accumulate while the current error is
+     *                  less than this value
+     * @param iMax
+     *                  The maximum absolute value that the integral error will
+     *                  accumulate
      */
     public SyncPIDController(double kP, double kI, double kD, double kF, double iZone, double iMax, double tolerance) {
 
@@ -53,9 +59,12 @@ public class SyncPIDController {
     /**
      * Constructor with only the basic parameters.
      * 
-     * @param kP The proportional gain
-     * @param kI The integral gain
-     * @param kD The differential gain
+     * @param kP
+     *               The proportional gain
+     * @param kI
+     *               The integral gain
+     * @param kD
+     *               The differential gain
      */
     public SyncPIDController(double kP, double kI, double kD) {
         this(kP, kI, kD, 0, 0, 0, 0);
@@ -67,7 +76,9 @@ public class SyncPIDController {
     /**
      * Constructor that uses a PIDPreferencesConstant object.
      * 
-     * @param constants Contains all of the PID constants for this PID controller
+     * @param constants
+     *                      Contains all of the PID constants for this PID
+     *                      controller
      */
     public SyncPIDController(PIDPreferenceConstants constants) {
         this(constants.getKP().getValue(), constants.getKI().getValue(), constants.getKD().getValue(),
@@ -86,7 +97,8 @@ public class SyncPIDController {
     /**
      * Sets the proportial constant for the PID.
      * 
-     * @param kP The proportional gain
+     * @param kP
+     *               The proportional gain
      */
     public void setKP(double kP) {
         this.kP = kP;
@@ -95,7 +107,8 @@ public class SyncPIDController {
     /**
      * Sets the integral constant for the PID.
      * 
-     * @param kI The integral gain
+     * @param kI
+     *               The integral gain
      */
     public void setKI(double kI) {
         this.kI = kI;
@@ -104,7 +117,8 @@ public class SyncPIDController {
     /**
      * Sets the differential constant for the PID.
      * 
-     * @param kD The differential gain
+     * @param kD
+     *               The differential gain
      */
     public void setKD(double kD) {
         this.kD = kD;
@@ -113,7 +127,8 @@ public class SyncPIDController {
     /**
      * Sets the feedforward constant for the PID.
      * 
-     * @param kF The feedforward gain
+     * @param kF
+     *               The feedforward gain
      */
     public void setKF(double kF) {
         this.kF = kF;
@@ -123,7 +138,8 @@ public class SyncPIDController {
      * Sets the maximum error for the integral to accumulate, and enable the iZone
      * functionality
      * 
-     * @param iZone the maximum error for integral accumulation
+     * @param iZone
+     *                  the maximum error for integral accumulation
      */
     public void setIZone(double iZone) {
         this.iZone = iZone;
@@ -141,7 +157,8 @@ public class SyncPIDController {
      * Sets the maximum error the integral will accumulate, and enable the iMax
      * functionality
      * 
-     * @param iMax The maximum accumulated error
+     * @param iMax
+     *                 The maximum accumulated error
      */
     public void setIMax(double iMax) {
         this.iMax = iMax;
@@ -239,7 +256,8 @@ public class SyncPIDController {
     /**
      * Set the tolerance for the PID.
      * 
-     * @param tolerance The max error to consider the PID on target
+     * @param tolerance
+     *                      The max error to consider the PID on target
      */
     public void setTolerance(double tolerance) {
         this.tolerance = tolerance;
@@ -259,8 +277,10 @@ public class SyncPIDController {
     /**
      * Gets the output calculated by this PID.
      * 
-     * @param input    The current input value
-     * @param setpoint The target input value
+     * @param input
+     *                     The current input value
+     * @param setpoint
+     *                     The target input value
      * @return The output value
      */
     public double calculateOutput(double input, double setpoint) {
@@ -282,7 +302,8 @@ public class SyncPIDController {
     /**
      * Calculate the proportional output
      * 
-     * @param error The current error
+     * @param error
+     *                  The current error
      * @return The proportional output
      */
     protected double calculateP(double error) {
@@ -292,7 +313,8 @@ public class SyncPIDController {
     /**
      * Calculate the integral output
      * 
-     * @param error The current error
+     * @param error
+     *                  The current error
      * @return The integral output
      */
     protected double calculateI(double error) {
@@ -315,7 +337,8 @@ public class SyncPIDController {
     /**
      * Calculate the differential output
      * 
-     * @param error The current error
+     * @param error
+     *                  The current error
      * @return The differential output
      */
     protected double calculateD(double error) {
@@ -334,7 +357,8 @@ public class SyncPIDController {
     /**
      * Calulcate the feedforward output
      * 
-     * @param setpoint The current setpoint
+     * @param setpoint
+     *                     The current setpoint
      * @return The feedforward output
      */
     protected double calculateF(double setpoint) {

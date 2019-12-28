@@ -15,9 +15,11 @@ public final class FloatPreferenceConstant extends BasePreferenceConstant<Float>
     /**
      * Constructor. Will call update() once.
      * 
-     * @param name         The name to be used as a key in WPILib preferences
-     * @param defaultValue The value that will be set as default if the value
-     *                     doesn't exist in WPILib preferences
+     * @param name
+     *                         The name to be used as a key in WPILib preferences
+     * @param defaultValue
+     *                         The value that will be set as default if the value
+     *                         doesn't exist in WPILib preferences
      */
     public FloatPreferenceConstant(String name, float defaultValue) {
         this.name = Objects.requireNonNull(name);
