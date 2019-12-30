@@ -211,14 +211,16 @@ public class Vector2DTest {
     public void testLimitChangeRestrictedSameAngle() {
         Vector2D current = Vector2D.createPolarCoordinates(5, new WrappedAngle(50));
         Vector2D target = Vector2D.createPolarCoordinates(2, new WrappedAngle(50));
-        assertTrue(Vector2D.createPolarCoordinates(4, new WrappedAngle(50)).approximatelyEquals(current.limitChange(target, 1)));
+        assertTrue(Vector2D.createPolarCoordinates(4, new WrappedAngle(50))
+                .approximatelyEquals(current.limitChange(target, 1)));
     }
 
     @Test
     public void testLimitChangeRestrictedOppositveAngle() {
         Vector2D current = Vector2D.createPolarCoordinates(2, new WrappedAngle(60));
         Vector2D target = Vector2D.createPolarCoordinates(5, new WrappedAngle(-120));
-        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(-120)).approximatelyEquals(current.limitChange(target, 3)));
+        assertTrue(Vector2D.createPolarCoordinates(1, new WrappedAngle(-120))
+                .approximatelyEquals(current.limitChange(target, 3)));
     }
 
 }
