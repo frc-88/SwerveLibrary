@@ -71,7 +71,7 @@ public class MotorCombiner {
      * Get the output "motor" that represents the given row in the matrix.
      * 
      * @param idx
-     *                The row in the matrix to get the output for
+     *                The row in the matrix to get the output for. Zero indexed
      * @return The ouput
      */
     public PIDMotor getOutput(int idx) {
@@ -144,7 +144,7 @@ public class MotorCombiner {
          *                                represents what to multiply this input by to
          *                                get each of the outputs
          */
-        public void addInput(PIDMotor input, double... forwardCoefficients) {
+        public Builder addInput(PIDMotor input, double... forwardCoefficients) {
             if (currentInputToAdd >= matrixSize) {
                 throw new IllegalStateException(
                         "Tried to add too many inputs, expected number of inputs is " + matrixSize);
@@ -157,6 +157,9 @@ public class MotorCombiner {
             for (int row = 0; row < matrixSize; row++) {
                 forwardMatrix.setEntry(row, currentInputToAdd, forwardCoefficients[row]);
             }
+
+            ++currentInputToAdd;
+            return this;
         }
 
         /**
@@ -236,7 +239,12 @@ public class MotorCombiner {
         }
 
         /**
+         * Gets the contribution of target velocity for the input with the given index.
          * 
+         * @param inputIdx
+         *                     the index of the input to get the velocity component for.
+         *                     Zero indexed
+         * @return The component velocity for this output on the given input
          */
         public double getInputTargetVelocity(int inputIdx) {
             return this.inverseCoefficients[inputIdx] * this.targetVelocity;

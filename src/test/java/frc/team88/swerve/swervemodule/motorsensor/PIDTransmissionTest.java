@@ -1,6 +1,8 @@
 package frc.team88.swerve.swervemodule.motorsensor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.AdditionalMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +19,7 @@ public class PIDTransmissionTest {
     private PIDTransmission speedUpTransmission;
 
     private double reductionGearRatio = 10.;
-    private double speedUpGearRatio = 1./10.;
+    private double speedUpGearRatio = 1. / 10.;
 
     @BeforeEach
     public void setup() {
@@ -37,6 +39,18 @@ public class PIDTransmissionTest {
     public void testSpeedUpGetPosition() {
         when(inputMotor.getPosition()).thenReturn(2.);
         assertEquals(20., speedUpTransmission.getPosition(), 0.000001);
+    }
+
+    @Test
+    public void testReductionCalibratePosition() {
+        reductionTransmission.calibratePosition(0.1);
+        verify(inputMotor).calibratePosition(eq(1., 0.000001));
+    }
+
+    @Test
+    public void testSpeedUpCalibratePosition() {
+        speedUpTransmission.calibratePosition(10.);
+        verify(inputMotor).calibratePosition(eq(1., 0.000001));
     }
 
     @Test
