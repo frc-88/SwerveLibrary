@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import frc.team88.swerve.motion.state.FullVelocityMotionState;
 import frc.team88.swerve.swervemodule.SwerveModule;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
@@ -26,15 +27,15 @@ public class InverseKinematicsTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        
+
         ik = new InverseKinematics(module1, module2);
     }
 
     @Test
     public void testCalculateModuleTranslationVector() {
         Vector2D translation = Vector2D.createPolarCoordinates(2, new WrappedAngle(90));
-        ik.setTranslationVelocity(translation);
-        Vector2D result = ik.calculateModuleTranslationVector();
+        Vector2D result = ik.calculateModuleTranslationVector(
+                FullVelocityMotionState.createRobotCentricDefault().changeTranslationVelocity(translation));
         assertTrue(translation.approximatelyEquals(result));
     }
 
@@ -42,10 +43,9 @@ public class InverseKinematicsTest {
     public void testCalculateModuleRotationVectorPositive() {
         Vector2D location = Vector2D.createCartesianCoordinates(3, 2);
         when(module1.getLocation()).thenReturn(location);
-        ik.setRotationVelocity(180);
-        ik.setCenterOfRotation(Vector2D.createCartesianCoordinates(1, 0));
-        Vector2D result = ik.calculateModuleRotationVectors(module1);
-
+        Vector2D result = ik.calculateModuleRotationVectors(FullVelocityMotionState.createRobotCentricDefault()
+                .changeRotationVelocity(180).changeCenterOfRotation(Vector2D.createCartesianCoordinates(1, 0)),
+                module1);
         assertEquals(180. * Math.sqrt(8.) * (2. * Math.PI) / 360., result.getMagnitude(), 0.000001);
         assertEquals(45., result.getAngle().asDouble(), 0.000001);
     }
@@ -54,9 +54,7 @@ public class InverseKinematicsTest {
     public void testCalculateModuleRotationVectorNegative() {
         Vector2D location = Vector2D.createCartesianCoordinates(1, -2);
         when(module1.getLocation()).thenReturn(location);
-        ik.setRotationVelocity(-90);
-        ik.setCenterOfRotation(Vector2D.createCartesianCoordinates(0, 0));
-        Vector2D result = ik.calculateModuleRotationVectors(module1);
+        Vector2D result = ik.calculateModuleRotationVectors(FullVelocityMotionState.createRobotCentricDefault().changeRotationVelocity(-90), module1);
 
         assertEquals(90. * Math.sqrt(5.) * (2. * Math.PI) / 360., result.getMagnitude(), 0.000001);
         assertEquals(location.getAngle().plus(-90).asDouble(), result.getAngle().asDouble(), 0.000001);
@@ -64,12 +62,10 @@ public class InverseKinematicsTest {
 
     @Test
     public void testScaleIntoRangeNoScaling() {
-        Vector2D[] input = {
-            Vector2D.createPolarCoordinates(10, new WrappedAngle(0)),
-            Vector2D.createPolarCoordinates(8, new WrappedAngle(60)),
-            Vector2D.createPolarCoordinates(10, new WrappedAngle(-90)),
-            Vector2D.createPolarCoordinates(4, new WrappedAngle(70))
-        };
+        Vector2D[] input = { Vector2D.createPolarCoordinates(10, new WrappedAngle(0)),
+                Vector2D.createPolarCoordinates(8, new WrappedAngle(60)),
+                Vector2D.createPolarCoordinates(10, new WrappedAngle(-90)),
+                Vector2D.createPolarCoordinates(4, new WrappedAngle(70)) };
         ik.setMaxSpeed(10);
         Vector2D[] output = ik.scaleIntoRange(input);
 
@@ -85,12 +81,10 @@ public class InverseKinematicsTest {
 
     @Test
     public void testScaleIntoRangeScaleFromFirst() {
-        Vector2D[] input = {
-            Vector2D.createPolarCoordinates(20, new WrappedAngle(0)),
-            Vector2D.createPolarCoordinates(8, new WrappedAngle(60)),
-            Vector2D.createPolarCoordinates(16, new WrappedAngle(-90)),
-            Vector2D.createPolarCoordinates(4, new WrappedAngle(70))
-        };
+        Vector2D[] input = { Vector2D.createPolarCoordinates(20, new WrappedAngle(0)),
+                Vector2D.createPolarCoordinates(8, new WrappedAngle(60)),
+                Vector2D.createPolarCoordinates(16, new WrappedAngle(-90)),
+                Vector2D.createPolarCoordinates(4, new WrappedAngle(70)) };
         ik.setMaxSpeed(10);
         Vector2D[] output = ik.scaleIntoRange(input);
 
@@ -106,12 +100,10 @@ public class InverseKinematicsTest {
 
     @Test
     public void testScaleIntoRangeScaleFromMiddle() {
-        Vector2D[] input = {
-            Vector2D.createPolarCoordinates(20, new WrappedAngle(0)),
-            Vector2D.createPolarCoordinates(16, new WrappedAngle(60)),
-            Vector2D.createPolarCoordinates(40, new WrappedAngle(-90)),
-            Vector2D.createPolarCoordinates(12, new WrappedAngle(70))
-        };
+        Vector2D[] input = { Vector2D.createPolarCoordinates(20, new WrappedAngle(0)),
+                Vector2D.createPolarCoordinates(16, new WrappedAngle(60)),
+                Vector2D.createPolarCoordinates(40, new WrappedAngle(-90)),
+                Vector2D.createPolarCoordinates(12, new WrappedAngle(70)) };
         ik.setMaxSpeed(10);
         Vector2D[] output = ik.scaleIntoRange(input);
 
