@@ -1,9 +1,10 @@
 package frc.team88.swerve.swervemodule.motorsensor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.AdditionalMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import static frc.team88.swerve.TestUtils.assertDoubleEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,12 +17,12 @@ public class MotorCombinerTest {
     private PIDMotor output1;
     private PIDMotor output2;
 
-    private final double[] input1ForwardCoefficients = {1, 10};
-    private final double[] input2ForwardCoefficients = {1, -8};
+    private final double[] input1ForwardCoefficients = { 1, 10 };
+    private final double[] input2ForwardCoefficients = { 1, -8 };
 
     @Mock
     PIDMotor input1;
-    
+
     @Mock
     PIDMotor input2;
 
@@ -29,11 +30,9 @@ public class MotorCombinerTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        combiner = new MotorCombiner.Builder(2)
-                .addInput(input1, input1ForwardCoefficients)
-                .addInput(input2, input2ForwardCoefficients)
-                .build();
-        
+        combiner = new MotorCombiner.Builder(2).addInput(input1, input1ForwardCoefficients)
+                .addInput(input2, input2ForwardCoefficients).build();
+
         output1 = combiner.getOutput(0);
         output2 = combiner.getOutput(1);
     }
@@ -42,14 +41,14 @@ public class MotorCombinerTest {
     public void testGetPositionAdditive() {
         when(input1.getPosition()).thenReturn(2.);
         when(input2.getPosition()).thenReturn(5.);
-        assertEquals(7., output1.getPosition(), 0.000001);
+        assertDoubleEquals(7., output1.getPosition());
     }
 
     @Test
     public void testGetPositionDifferential() {
         when(input1.getPosition()).thenReturn(2.);
         when(input2.getPosition()).thenReturn(5.);
-        assertEquals(-20., output2.getPosition(), 0.000001);
+        assertDoubleEquals(-20., output2.getPosition());
     }
 
     @Test
@@ -57,7 +56,7 @@ public class MotorCombinerTest {
         when(input1.getPosition()).thenReturn(2.).thenReturn(10.);
         when(input2.getPosition()).thenReturn(5.).thenReturn(0.);
         output1.calibratePosition(1.);
-        assertEquals(4., output1.getPosition(), 0.000001);
+        assertDoubleEquals(4., output1.getPosition());
     }
 
     @Test
@@ -65,21 +64,21 @@ public class MotorCombinerTest {
         when(input1.getPosition()).thenReturn(2.).thenReturn(10.);
         when(input2.getPosition()).thenReturn(5.).thenReturn(0.);
         output2.calibratePosition(20.);
-        assertEquals(140., output2.getPosition(), 0.000001);
+        assertDoubleEquals(140., output2.getPosition());
     }
 
     @Test
     public void testGetVelocityAdditive() {
         when(input1.getVelocity()).thenReturn(2.);
         when(input2.getVelocity()).thenReturn(5.);
-        assertEquals(7., output1.getVelocity(), 0.000001);
+        assertDoubleEquals(7., output1.getVelocity());
     }
 
     @Test
     public void testGetVelocityDifferential() {
         when(input1.getVelocity()).thenReturn(2.);
         when(input2.getVelocity()).thenReturn(5.);
-        assertEquals(-20., output2.getVelocity(), 0.000001);
+        assertDoubleEquals(-20., output2.getVelocity());
     }
 
     @Test

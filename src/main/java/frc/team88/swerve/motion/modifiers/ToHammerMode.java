@@ -46,7 +46,7 @@ public class ToHammerMode implements MotionModifier<MotionState> {
     }
 
     @Override
-    public MotionState applyToFullVelocityState(FullVelocityMotionState state) {
+    public FullVelocityMotionState applyToFullVelocityState(FullVelocityMotionState state) {
         // Halve the time to change if this is the first hammer
         long minTimeToChange = switchTime.getValue();
         if (hammerModeChangeCount == 0) {
@@ -54,7 +54,7 @@ public class ToHammerMode implements MotionModifier<MotionState> {
         }
 
         // Check if it is time to change
-        if ((RobotControllerWrapper.getInstance().getFPGATime() - lastHammerModeChangeTime) > minTimeToChange) {
+        if ((RobotControllerWrapper.getInstance().getFPGATime() - lastHammerModeChangeTime) >= minTimeToChange) {
             hammerModeChangeCount++;
             lastHammerModeChangeTime = RobotControllerWrapper.getInstance().getFPGATime();
         }

@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Preferences;
 /**
  * Preferences constant for long values.
  */
-public final class LongPreferenceConstant extends BasePreferenceConstant<Long> {
+public class LongPreferenceConstant extends BasePreferenceConstant<Long> {
 
     String name;
     long defaultValue;

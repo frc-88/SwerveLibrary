@@ -3,6 +3,7 @@ package frc.team88.swerve.motion.state;
 import java.util.Objects;
 
 import frc.team88.swerve.motion.modifiers.MotionModifier;
+import frc.team88.swerve.util.MathUtils;
 import frc.team88.swerve.util.Vector2D;
 
 /**
@@ -125,4 +126,4 @@ public class FullVelocityMotionState implements MotionState {
         return new FullVelocityMotionState(true, this.translationVelocity, this.rotationVelocity,
                 this.centerOfRotation);
     }
-}
+ }

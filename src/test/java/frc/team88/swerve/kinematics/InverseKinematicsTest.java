@@ -1,8 +1,10 @@
 package frc.team88.swerve.kinematics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+
+import static frc.team88.swerve.TestUtils.assertDoubleEquals;
+import static frc.team88.swerve.TestUtils.assertVectorEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +38,7 @@ public class InverseKinematicsTest {
         Vector2D translation = Vector2D.createPolarCoordinates(2, new WrappedAngle(90));
         Vector2D result = ik.calculateModuleTranslationVector(
                 FullVelocityMotionState.createRobotCentricDefault().changeTranslationVelocity(translation));
-        assertTrue(translation.approximatelyEquals(result));
+        assertVectorEquals(translation, result);
     }
 
     @Test
@@ -46,8 +48,8 @@ public class InverseKinematicsTest {
         Vector2D result = ik.calculateModuleRotationVectors(FullVelocityMotionState.createRobotCentricDefault()
                 .changeRotationVelocity(180).changeCenterOfRotation(Vector2D.createCartesianCoordinates(1, 0)),
                 module1);
-        assertEquals(180. * Math.sqrt(8.) * (2. * Math.PI) / 360., result.getMagnitude(), 0.000001);
-        assertEquals(45., result.getAngle().asDouble(), 0.000001);
+        assertDoubleEquals(180. * Math.sqrt(8.) * (2. * Math.PI) / 360., result.getMagnitude());
+        assertDoubleEquals(45., result.getAngle().asDouble());
     }
 
     @Test
@@ -56,8 +58,8 @@ public class InverseKinematicsTest {
         when(module1.getLocation()).thenReturn(location);
         Vector2D result = ik.calculateModuleRotationVectors(FullVelocityMotionState.createRobotCentricDefault().changeRotationVelocity(-90), module1);
 
-        assertEquals(90. * Math.sqrt(5.) * (2. * Math.PI) / 360., result.getMagnitude(), 0.000001);
-        assertEquals(location.getAngle().plus(-90).asDouble(), result.getAngle().asDouble(), 0.000001);
+        assertDoubleEquals(90. * Math.sqrt(5.) * (2. * Math.PI) / 360., result.getMagnitude());
+        assertDoubleEquals(location.getAngle().plus(-90).asDouble(), result.getAngle().asDouble());
     }
 
     @Test
@@ -69,14 +71,14 @@ public class InverseKinematicsTest {
         ik.setMaxSpeed(10);
         Vector2D[] output = ik.scaleIntoRange(input);
 
-        assertEquals(10, output[0].getMagnitude(), 0.000001);
-        assertEquals(0, output[0].getAngle().asDouble(), 0.000001);
-        assertEquals(8, output[1].getMagnitude(), 0.000001);
-        assertEquals(60, output[1].getAngle().asDouble(), 0.000001);
-        assertEquals(10, output[2].getMagnitude(), 0.000001);
-        assertEquals(-90, output[2].getAngle().asDouble(), 0.000001);
-        assertEquals(4, output[3].getMagnitude(), 0.000001);
-        assertEquals(70, output[3].getAngle().asDouble(), 0.000001);
+        assertDoubleEquals(10, output[0].getMagnitude());
+        assertDoubleEquals(0, output[0].getAngle().asDouble());
+        assertDoubleEquals(8, output[1].getMagnitude());
+        assertDoubleEquals(60, output[1].getAngle().asDouble());
+        assertDoubleEquals(10, output[2].getMagnitude());
+        assertDoubleEquals(-90, output[2].getAngle().asDouble());
+        assertDoubleEquals(4, output[3].getMagnitude());
+        assertDoubleEquals(70, output[3].getAngle().asDouble());
     }
 
     @Test
@@ -88,14 +90,14 @@ public class InverseKinematicsTest {
         ik.setMaxSpeed(10);
         Vector2D[] output = ik.scaleIntoRange(input);
 
-        assertEquals(10, output[0].getMagnitude(), 0.000001);
-        assertEquals(0, output[0].getAngle().asDouble(), 0.000001);
-        assertEquals(4, output[1].getMagnitude(), 0.000001);
-        assertEquals(60, output[1].getAngle().asDouble(), 0.000001);
-        assertEquals(8, output[2].getMagnitude(), 0.000001);
-        assertEquals(-90, output[2].getAngle().asDouble(), 0.000001);
-        assertEquals(2, output[3].getMagnitude(), 0.000001);
-        assertEquals(70, output[3].getAngle().asDouble(), 0.000001);
+        assertDoubleEquals(10, output[0].getMagnitude());
+        assertDoubleEquals(0, output[0].getAngle().asDouble());
+        assertDoubleEquals(4, output[1].getMagnitude());
+        assertDoubleEquals(60, output[1].getAngle().asDouble());
+        assertDoubleEquals(8, output[2].getMagnitude());
+        assertDoubleEquals(-90, output[2].getAngle().asDouble());
+        assertDoubleEquals(2, output[3].getMagnitude());
+        assertDoubleEquals(70, output[3].getAngle().asDouble());
     }
 
     @Test
@@ -107,13 +109,13 @@ public class InverseKinematicsTest {
         ik.setMaxSpeed(10);
         Vector2D[] output = ik.scaleIntoRange(input);
 
-        assertEquals(5, output[0].getMagnitude(), 0.000001);
-        assertEquals(0, output[0].getAngle().asDouble(), 0.000001);
-        assertEquals(4, output[1].getMagnitude(), 0.000001);
-        assertEquals(60, output[1].getAngle().asDouble(), 0.000001);
-        assertEquals(10, output[2].getMagnitude(), 0.000001);
-        assertEquals(-90, output[2].getAngle().asDouble(), 0.000001);
-        assertEquals(3, output[3].getMagnitude(), 0.000001);
-        assertEquals(70, output[3].getAngle().asDouble(), 0.000001);
+        assertDoubleEquals(5, output[0].getMagnitude());
+        assertDoubleEquals(0, output[0].getAngle().asDouble());
+        assertDoubleEquals(4, output[1].getMagnitude());
+        assertDoubleEquals(60, output[1].getAngle().asDouble());
+        assertDoubleEquals(10, output[2].getMagnitude());
+        assertDoubleEquals(-90, output[2].getAngle().asDouble());
+        assertDoubleEquals(3, output[3].getMagnitude());
+        assertDoubleEquals(70, output[3].getAngle().asDouble());
     }
 }

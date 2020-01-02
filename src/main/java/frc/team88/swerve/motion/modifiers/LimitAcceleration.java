@@ -52,7 +52,16 @@ public class LimitAcceleration implements MotionModifier<MotionState> {
         return newState;
     }
 
-    private Vector2D limitTranslationVelocity(Vector2D targetVelocity) {
+    /**
+     * Limits the translation velocity of the given target vector such that the
+     * difference between it and the vector from the previous motion state have some
+     * maximum difference.
+     * 
+     * @param targetVelocity
+     *                           The target velocity
+     * @return The target velocity or capped velocity
+     */
+    protected Vector2D limitTranslationVelocity(Vector2D targetVelocity) {
         // Calculate the change limit for translation
         double translationChangeLimit = translationLimit.getValue() / this.expectedUpdateRate;
         // Calculate the acceleration limited translation
@@ -60,7 +69,15 @@ public class LimitAcceleration implements MotionModifier<MotionState> {
                 translationChangeLimit);
     }
 
-    private double limitRotationVelocity(double targetVelocity) {
+    /**
+     * Limits the rotation of the given value such that the difference between it
+     * and the rotation from the previous motion state have some maximum difference.
+     * 
+     * @param targetVelocity
+     *                           The target velocity
+     * @return The target velocity or capped velocity
+     */
+    protected double limitRotationVelocity(double targetVelocity) {
         // Calculate the change limit for rotation
         double rotationChangeLimit = this.rotationLimit.getValue() / this.expectedUpdateRate;
         // Calculate the acceleration limited rotation

@@ -174,18 +174,6 @@ public class Vector2D {
     }
 
     /**
-     * Determines if this vector is equal to the given vector except for a floating
-     * point error
-     * 
-     * @param that
-     *                 The vector to compare this to
-     * @return True if the 2 vectors are approximately equal, false otherwise
-     */
-    public boolean approximatelyEquals(Vector2D that) {
-        return MathUtils.doubleEquals(this.getX(), that.getX()) && MathUtils.doubleEquals(this.getY(), that.getY());
-    }
-
-    /**
      * Limits the magnitude of the difference between this vector and the returned
      * vector when trying to go from this vector to the desired vector.
      * 
