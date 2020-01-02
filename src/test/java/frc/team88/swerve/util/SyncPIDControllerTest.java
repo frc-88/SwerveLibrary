@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import static frc.team88.swerve.TestUtils.assertDoubleEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -40,25 +42,25 @@ public class SyncPIDControllerTest {
     @Test
     public void testSetKP() {
         controller.setKP(2 * kP);
-        assertEquals(2 * kP, controller.getKP(), 0.0001);
+        assertDoubleEquals(2 * kP, controller.getKP());
     }
 
     @Test
     public void testSetKI() {
         controller.setKP(2 * kP);
-        assertEquals(2 * kP, controller.getKP(), 0.0001);
+        assertDoubleEquals(2 * kP, controller.getKP());
     }
 
     @Test
     public void testSetKD() {
         controller.setKP(2 * kP);
-        assertEquals(2 * kP, controller.getKP(), 0.0001);
+        assertDoubleEquals(2 * kP, controller.getKP());
     }
 
     @Test
     public void testSetKF() {
         controller.setKP(2 * kP);
-        assertEquals(2 * kP, controller.getKP(), 0.0001);
+        assertDoubleEquals(2 * kP, controller.getKP());
     }
 
     @Test
@@ -77,7 +79,7 @@ public class SyncPIDControllerTest {
     public void testSetIZone() {
         controller.disableIZone();
         controller.setIZone(2 * iZone);
-        assertEquals(2 * iZone, controller.getIZone(), 0.0001);
+        assertDoubleEquals(2 * iZone, controller.getIZone());
         assertTrue(controller.isIZoneEnabled());
     }
 
@@ -85,96 +87,96 @@ public class SyncPIDControllerTest {
     public void testSetIMax() {
         controller.disableIMax();
         controller.setIMax(2 * iMax);
-        assertEquals(2 * iMax, controller.getIMax(), 0.0001);
+        assertDoubleEquals(2 * iMax, controller.getIMax());
         assertTrue(controller.isIMaxEnabled());
     }
 
     @Test
     public void testSetTolerance() {
-        controller.setTolerance(2 * tolerance);
-        assertEquals(2 * tolerance, controller.getTolerance(), 0.0001);
+        controller.setTolerance(2. * tolerance);
+        assertDoubleEquals(2. * tolerance, controller.getTolerance());
     }
 
     @Test
     public void testCalculateP() {
-        assertEquals(500, controller.calculateP(5));
+        assertDoubleEquals(500., controller.calculateP(5.));
     }
 
     @Test
     public void testCalculateISimple() {
-        assertEquals(50, controller.calculateI(5));
+        assertDoubleEquals(50., controller.calculateI(5.));
     }
 
     @Test
     public void testCalculateIMultipleTimes() {
-        assertEquals(50, controller.calculateI(5));
-        assertEquals(90, controller.calculateI(4));
+        assertDoubleEquals(50., controller.calculateI(5.));
+        assertDoubleEquals(90., controller.calculateI(4.));
     }
 
     @Test
     public void testCalculateIIZoneDisabled() {
         controller.disableIZone();
-        assertEquals(60, controller.calculateI(6));
-        assertEquals(90, controller.calculateI(3));
-        assertEquals(70, controller.calculateI(-2));
-        assertEquals(-60, controller.calculateI(-13));
+        assertDoubleEquals(60., controller.calculateI(6.));
+        assertDoubleEquals(90., controller.calculateI(3.));
+        assertDoubleEquals(70., controller.calculateI(-2.));
+        assertDoubleEquals(-60., controller.calculateI(-13.));
     }
 
     @Test
     public void testCalculateIIZoneEnabled() {
-        assertEquals(0, controller.calculateI(11));
-        assertEquals(30, controller.calculateI(3));
-        assertEquals(10, controller.calculateI(-2));
-        assertEquals(10, controller.calculateI(-13));
+        assertDoubleEquals(0., controller.calculateI(11.));
+        assertDoubleEquals(30., controller.calculateI(3.));
+        assertDoubleEquals(10., controller.calculateI(-2.));
+        assertDoubleEquals(10., controller.calculateI(-13.));
     }
 
     @Test
     public void testCalculateIIMaxDisabled() {
         controller.disableIMax();
-        assertEquals(90, controller.calculateI(9));
-        assertEquals(120, controller.calculateI(3));
-        assertEquals(140, controller.calculateI(2));
-        assertEquals(50, controller.calculateI(-9));
-        assertEquals(-40, controller.calculateI(-9));
-        assertEquals(-130, controller.calculateI(-9));
+        assertDoubleEquals(90., controller.calculateI(9.));
+        assertDoubleEquals(120., controller.calculateI(3.));
+        assertDoubleEquals(140., controller.calculateI(2.));
+        assertDoubleEquals(50., controller.calculateI(-9.));
+        assertDoubleEquals(-40., controller.calculateI(-9.));
+        assertDoubleEquals(-130., controller.calculateI(-9.));
     }
 
     @Test
     public void testCalculateIIMaxEnabled() {
-        assertEquals(90, controller.calculateI(9));
-        assertEquals(100, controller.calculateI(3));
-        assertEquals(100, controller.calculateI(2));
-        assertEquals(10, controller.calculateI(-9));
-        assertEquals(-80, controller.calculateI(-9));
-        assertEquals(-100, controller.calculateI(-5));
+        assertDoubleEquals(90., controller.calculateI(9.));
+        assertDoubleEquals(100., controller.calculateI(3.));
+        assertDoubleEquals(100., controller.calculateI(2.));
+        assertDoubleEquals(10., controller.calculateI(-9.));
+        assertDoubleEquals(-80., controller.calculateI(-9.));
+        assertDoubleEquals(-100., controller.calculateI(-5.));
     }
 
     @Test
     public void testCalculateD() {
         when(robotController.getFPGATime()).thenReturn(1_000_000l).thenReturn(1_100_000l);
-        assertEquals(5, controller.calculateD(5));
-        assertEquals(50, controller.calculateD(10));
+        assertDoubleEquals(5., controller.calculateD(5.));
+        assertDoubleEquals(50., controller.calculateD(10.));
     }
 
     @Test
     public void testCalculateF() {
-        assertEquals(5000, controller.calculateF(5));
+        assertDoubleEquals(5000., controller.calculateF(5.));
     }
 
     @Test
     public void testCalculateOutputNormal() {
         when(robotController.getFPGATime()).thenReturn(1_000_000l).thenReturn(1_100_000l);
-        assertEquals(500 + 50 + 5 + 0, controller.calculateOutput(-5, 0));
-        assertEquals(300 + 80 - 20 + 1000, controller.calculateOutput(-2, 1));
+        assertEquals(500. + 50. + 5. + 0., controller.calculateOutput(-5., 0.));
+        assertEquals(300. + 80. - 20. + 1000., controller.calculateOutput(-2., 1.));
     }
 
     @Test
     public void testCalculateOutputWithTolerance() {
         when(robotController.getFPGATime()).thenReturn(1_000_000l).thenReturn(2_000_000l).thenReturn(3_000_000l);
-        assertNotEquals(0, controller.calculateOutput(-5, 0));
-        assertNotEquals(0, controller.calculateOutput(5, 0));
-        assertEquals(0, controller.calculateOutput(1, 0));
-        assertEquals(0, controller.calculateOutput(1, 0));
+        assertNotEquals(0., controller.calculateOutput(-5., 0.));
+        assertNotEquals(0., controller.calculateOutput(5., 0.));
+        assertEquals(0., controller.calculateOutput(1., 0.));
+        assertEquals(0., controller.calculateOutput(1., 0.));
     }
 
 }

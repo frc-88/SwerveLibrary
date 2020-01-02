@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Preferences;
 /**
  * Preferences constant for boolean values.
  */
-public final class BooleanPreferenceConstant extends BasePreferenceConstant<Boolean> {
+public class BooleanPreferenceConstant extends BasePreferenceConstant<Boolean> {
 
     String name;
     boolean defaultValue;

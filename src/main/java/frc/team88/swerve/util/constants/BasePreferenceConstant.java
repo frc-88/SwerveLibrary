@@ -44,12 +44,12 @@ public abstract class BasePreferenceConstant<T> implements PreferenceConstant<T>
     }
 
     @Override
-    public final T getValue() {
+    public T getValue() {
         return this.value;
     }
 
     @Override
-    public final void addChangeHandler(Consumer<T> handler) {
+    public void addChangeHandler(Consumer<T> handler) {
         this.changeHandlers.add(handler);
     }
 

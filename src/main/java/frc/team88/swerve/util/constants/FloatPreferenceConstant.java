@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Preferences;
 /**
  * Preferences constant for float values.
  */
-public final class FloatPreferenceConstant extends BasePreferenceConstant<Float> {
+public class FloatPreferenceConstant extends BasePreferenceConstant<Float> {
 
     String name;
     float defaultValue;

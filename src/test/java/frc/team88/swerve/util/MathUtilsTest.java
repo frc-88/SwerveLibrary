@@ -1,8 +1,9 @@
 package frc.team88.swerve.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static frc.team88.swerve.TestUtils.assertDoubleEquals;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,21 +21,21 @@ public class MathUtilsTest {
 
     @Test
     public void testLimitChangeIncreaseUnrestricted() {
-        assertEquals(10., MathUtils.limitChange(8., 10., 4.), 0.000001);
+        assertDoubleEquals(10., MathUtils.limitChange(8., 10., 4.));
     }
 
     @Test
     public void testLimitChangeIncreaseRestricted() {
-        assertEquals(12., MathUtils.limitChange(8., 16., 4.), 0.000001);
+        assertDoubleEquals(12., MathUtils.limitChange(8., 16., 4.));
     }
 
     @Test
     public void testLimitChangeDecreaseUnrestricted() {
-        assertEquals(8., MathUtils.limitChange(10., 8., 6.), 0.000001);
+        assertDoubleEquals(8., MathUtils.limitChange(10., 8., 6.));
     }
 
     @Test
     public void testLimitChangeDecreaseRestricted() {
-        assertEquals(4., MathUtils.limitChange(10., 2., 6.), 0.000001);
+        assertDoubleEquals(4., MathUtils.limitChange(10., 2., 6.));
     }
 }

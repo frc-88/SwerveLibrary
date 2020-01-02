@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Preferences;
 /**
  * Preferences constant for double values
  */
-public final class DoublePreferenceConstant extends BasePreferenceConstant<Double> {
+public class DoublePreferenceConstant extends BasePreferenceConstant<Double> {
 
     String name;
     double defaultValue;

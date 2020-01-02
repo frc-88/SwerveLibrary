@@ -12,7 +12,7 @@ package frc.team88.swerve.util;
 public class Vector2D {
 
     // The origin point / zero vector
-    public static Vector2D ORIGIN = createCartesianCoordinates(0, 0);
+    public static final Vector2D ORIGIN = createCartesianCoordinates(0, 0);
 
     // The components of the vector
     private final double x;
@@ -96,6 +96,51 @@ public class Vector2D {
     }
 
     /**
+     * Creates a new Vector2D that is a copy of this one, except with the given
+     * x component.
+     * 
+     * @param x The x component for the new vector
+     * @return The changed vector
+     */
+    public Vector2D changeX(double x) {
+        return Vector2D.createCartesianCoordinates(x, this.getY());
+    }
+
+    /**
+     * Creates a new Vector2D that is a copy of this one, except with the given
+     * y component.
+     * 
+     * @param y The y component for the new vector
+     * @return The changed vector
+     */
+    public Vector2D changeY(double y) {
+        return Vector2D.createCartesianCoordinates(this.getX(), y);
+    }
+
+
+    /**
+     * Creates a new Vector2D that is a copy of this one, except with the given
+     * magnitude.
+     * 
+     * @param x The magnitude for the new vector
+     * @return The changed vector
+     */
+    public Vector2D changeMagnitude(double magnitude) {
+        return Vector2D.createPolarCoordinates(magnitude, this.getAngle());
+    }
+
+    /**
+     * Creates a new Vector2D that is a copy of this one, except with the given
+     * angle.
+     * 
+     * @param angle The angle for the new vector
+     * @return The changed vector
+     */
+    public Vector2D changeAngle(WrappedAngle angle) {
+        return Vector2D.createPolarCoordinates(this.getMagnitude(), angle);
+    }
+
+    /**
      * Returns this vector added to the given vector.
      * 
      * @param that
@@ -114,7 +159,7 @@ public class Vector2D {
      * @return The product
      */
     public Vector2D times(double scalar) {
-        return createPolarCoordinates(this.getMagnitude() * scalar, this.getAngle());
+        return this.changeMagnitude(this.getMagnitude() * scalar);
     }
 
     /**
@@ -125,19 +170,7 @@ public class Vector2D {
      * @return The rotated vector
      */
     public Vector2D rotate(double angle) {
-        return createPolarCoordinates(this.getMagnitude(), this.getAngle().plus(angle));
-    }
-
-    /**
-     * Determines if this vector is equal to the given vector except for a floating
-     * point error
-     * 
-     * @param that
-     *                 The vector to compare this to
-     * @return True if the 2 vectors are approximately equal, false otherwise
-     */
-    public boolean approximatelyEquals(Vector2D that) {
-        return MathUtils.doubleEquals(this.getX(), that.getX()) && MathUtils.doubleEquals(this.getY(), that.getY());
+        return this.changeAngle(this.getAngle().plus(angle));
     }
 
     /**
@@ -157,7 +190,7 @@ public class Vector2D {
         Vector2D difference = desired.plus(this.times(-1));
         // Shorten the magnitude of the difference if it is too large
         if (difference.getMagnitude() > maxChange) {
-            difference = Vector2D.createPolarCoordinates(maxChange, difference.getAngle());
+            difference = difference.changeMagnitude(maxChange);
         }
         // Add the difference back onto this vector
         return this.plus(difference);

@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Preferences;
 /**
  * Preferences constant for string values.
  */
-public final class StringPreferenceConstant extends BasePreferenceConstant<String> {
+public class StringPreferenceConstant extends BasePreferenceConstant<String> {
 
     String name;
     String defaultValue;
