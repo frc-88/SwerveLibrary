@@ -1,6 +1,5 @@
 package frc.team88.swerve.kinematics;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import static frc.team88.swerve.TestUtils.assertDoubleEquals;

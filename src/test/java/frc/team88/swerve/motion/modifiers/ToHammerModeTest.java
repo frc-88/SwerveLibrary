@@ -1,6 +1,5 @@
 package frc.team88.swerve.motion.modifiers;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import static frc.team88.swerve.TestUtils.assertMotionStateEquals;
