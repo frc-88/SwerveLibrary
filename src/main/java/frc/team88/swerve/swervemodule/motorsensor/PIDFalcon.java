@@ -4,8 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 
 import frc.team88.swerve.util.constants.PIDPreferenceConstants;
 
@@ -44,7 +42,7 @@ public class PIDFalcon extends TalonFX implements PIDMotor {
         this.config_kI(0, pidConstants.getKI().getValue());
         this.config_kD(0, pidConstants.getKD().getValue());
         this.config_kF(0, pidConstants.getKF().getValue());
-        this.config_IntegralZone(0, pidConstants.getIZone().getValue());
+        this.config_IntegralZone(0, pidConstants.getIZone().getValue().intValue());
         this.setIMax(pidConstants.getIMax().getValue());
     }
 
@@ -55,7 +53,7 @@ public class PIDFalcon extends TalonFX implements PIDMotor {
      */
     @Override
     public double getPosition() {
-        return this.getSelectedSensorPosition() + offset;
+        return this.getSelectedSensorPosition() / 2048 + offset;
     }
 
     /**
@@ -65,7 +63,7 @@ public class PIDFalcon extends TalonFX implements PIDMotor {
      */
     @Override
     public double getVelocity() {
-        return this.getSelectedSensorVelocity() / 60.;
+        return this.getSelectedSensorVelocity() * 10. / 2048.;
     }
 
     /**
@@ -85,7 +83,7 @@ public class PIDFalcon extends TalonFX implements PIDMotor {
      */
     @Override
     public void setVelocity(double velocity) {
-        this.set(ControlMode.Velocity, velocity * 60.);
+        this.set(ControlMode.Velocity, velocity * 2048 / 10);
     }
 
     /**
@@ -135,7 +133,7 @@ public class PIDFalcon extends TalonFX implements PIDMotor {
      *                  The max error which will accumulate in the integral
      */
     private void setIZone(double iZone) {
-        this.config_IntegralZone(0, iZone);
+        this.config_IntegralZone(0, (int)iZone);
     }
 
     /**
@@ -145,7 +143,7 @@ public class PIDFalcon extends TalonFX implements PIDMotor {
      *                 The max accumulated error for the integral
      */
     private void setIMax(double iMax) {
-        this.setIMax(iMax);
+        this.configMaxIntegralAccumulator(0, iMax);
     }
 
 }
