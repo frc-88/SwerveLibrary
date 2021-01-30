@@ -3,6 +3,7 @@ package frc.team88.swerve.swervemodule.motorsensor;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import frc.team88.swerve.util.constants.PIDPreferenceConstants;
@@ -31,6 +32,8 @@ public class PIDFalcon extends TalonFX implements PIDMotor {
         this.configFactoryDefault();
         this.setNeutralMode(NeutralMode.Brake);
         this.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+        this.configNeutralDeadband(0);
+        this.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 0));
 
         pidConstants.getKP().addChangeHandler(this::setKP);
         pidConstants.getKI().addChangeHandler(this::setKI);
