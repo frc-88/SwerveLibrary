@@ -32,10 +32,10 @@ public class ToRobotCentric implements MotionModifier<MotionState> {
 
     @Override
     public FullVelocityMotionState applyToFullVelocityState(FullVelocityMotionState state) {
-        if (!state.isFieldCentric()) {
-            // Already robot-centric, nothing to do
-            return state;
-        }
+        // if (!state.isFieldCentric()) {
+        //     // Already robot-centric, nothing to do
+        //     return state;
+        // }
 
         Vector2D currentTranslationVelocity = state.getTranslationVelocity();
         WrappedAngle newAngle = currentTranslationVelocity.getAngle().plus(-gyro.getYaw());
