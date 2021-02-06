@@ -13,6 +13,7 @@ import frc.team88.swerve.swervemodule.SwerveModule;
 import frc.team88.swerve.swervemodule.SwerveModule.SwitchingMode;
 import frc.team88.swerve.util.constants.DoublePreferenceConstant;
 import frc.team88.swerve.util.constants.LongPreferenceConstant;
+import frc.team88.swerve.util.logging.DataLogger;
 import frc.team88.swerve.wrappers.gyro.Gyro;
 
 /**
@@ -20,6 +21,9 @@ import frc.team88.swerve.wrappers.gyro.Gyro;
  * controlling it.
  */
 public class SwerveChassis {
+
+    // The gyro to use for this chassis.
+    private Gyro gyro;
 
     // The swerve modules on this chassis.
     private List<SwerveModule> modules;
@@ -32,7 +36,7 @@ public class SwerveChassis {
 
     // True if in field-centric mode, false if in robot-centric mode.
     private boolean inFieldCentric = true;
-    
+
     // True if in hammer mode, false otherwise
     private boolean inHammerMode = false;
 
@@ -49,13 +53,17 @@ public class SwerveChassis {
      * Construct.
      * 
      * @param gyro
-     *                    The gyro measuring this chassis's field-oriented angle.
+     *                               The gyro measuring this chassis's
+     *                               field-oriented angle.
      * @param modules
-     *                    The modules on this chassis. Minimum 2.
-     * @param expectedUpdateRate The expected rate at which update will be called, in Hz.
+     *                               The modules on this chassis. Minimum 2.
+     * @param expectedUpdateRate
+     *                               The expected rate at which update will be
+     *                               called, in Hz.
      */
     public SwerveChassis(Gyro gyro, double expectedUpdateRate, SwerveModule... modules) {
         Objects.requireNonNull(gyro);
+        this.gyro = gyro;
 
         if (modules.length < 2) {
             throw new IllegalArgumentException("A swerve chassis must have at least 2 swerve modules");
@@ -71,8 +79,11 @@ public class SwerveChassis {
         this.targetState = inverseKinematics.getTargetState();
 
         fieldCentricModifier = new ToRobotCentric(gyro);
-        hammerModeModifier = new ToHammerMode(new DoublePreferenceConstant("Hammer Mode Angle", 70), new LongPreferenceConstant("Hammer Mode Time", 1_000_000));
-        accelerationLimitModifier = new LimitAcceleration(new DoublePreferenceConstant("Translation Accel Limit", 100), new DoublePreferenceConstant("Rotation Accel Limit", 1080), inverseKinematics::getTargetState, expectedUpdateRate);
+        hammerModeModifier = new ToHammerMode(new DoublePreferenceConstant("Hammer Mode Angle", 70),
+                new LongPreferenceConstant("Hammer Mode Time", 1_000_000));
+        accelerationLimitModifier = new LimitAcceleration(new DoublePreferenceConstant("Translation Accel Limit", 100),
+                new DoublePreferenceConstant("Rotation Accel Limit", 1080), inverseKinematics::getTargetState,
+                expectedUpdateRate);
     }
 
     /**
@@ -80,7 +91,19 @@ public class SwerveChassis {
      * controls.
      */
     public void update() {
+        // Log Gyro State
+        class GyroInfo {
+            double yaw;
+            double yawRate;
+            public GyroInfo(Gyro gyro) {
+                this.yaw = gyro.getYaw();
+                this.yawRate = gyro.getYawRate();
+            }
+        }
+        DataLogger.getInstance().addData("Gyro Info", new GyroInfo(this.gyro));
+
         MotionState modifiedState = this.targetState;
+        DataLogger.getInstance().addData("Target State", modifiedState);
 
         // Apply field-centric to translation if necessary
         if (this.inFieldCentric()) {
@@ -95,6 +118,8 @@ public class SwerveChassis {
         // Apply acceleration limits
         modifiedState = accelerationLimitModifier.apply(modifiedState);
 
+        DataLogger.getInstance().addData("Modified State", modifiedState);
+
         // Set the target state
         this.inverseKinematics.setTargetState(modifiedState);
 
@@ -105,7 +130,8 @@ public class SwerveChassis {
     /**
      * Sets the target motion state.
      * 
-     * @param target The motion state to set
+     * @param target
+     *                   The motion state to set
      */
     public void setTargetState(MotionState target) {
         this.targetState = Objects.requireNonNull(target);
