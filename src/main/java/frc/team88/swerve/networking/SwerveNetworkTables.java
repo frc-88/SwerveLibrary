@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.team88.swerve.networking;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
