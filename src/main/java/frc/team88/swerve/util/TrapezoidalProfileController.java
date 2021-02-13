@@ -149,6 +149,15 @@ public class TrapezoidalProfileController {
     }
 
     /**
+     * Gets the last commanded position.
+     * 
+     * @return The last commanded position
+     */
+    public double getLastCommandedPosition() {
+        return this.lastCommandedPosition;
+    }
+
+    /**
      * Gets the position PID controller.
      * 
      * @return The position controller used to adjust the velocity
