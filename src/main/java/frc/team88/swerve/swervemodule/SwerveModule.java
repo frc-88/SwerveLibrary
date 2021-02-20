@@ -82,6 +82,7 @@ public class SwerveModule {
         SyncPIDController azimuthPID = new SyncPIDController(Objects.requireNonNull(azimuthPositionPIDConstants));
         this.azimuthPositionController = new TrapezoidalProfileController(maxSpeed.getValue(),
                 maxAcceleration.getValue(), azimuthPID);
+        this.azimuthPositionController.reset(this.getAzimuthPosition().asDouble());
     }
 
     /**
@@ -142,7 +143,7 @@ public class SwerveModule {
         this.azimuthPositionController.setTargetVelocity(0);
         this.azimuthPositionController.setTargetPosition(unwrappedAngle);
         this.setAzimuthVelocity(azimuthPositionController.calculateCommandVelocity(
-                this.absoluteAzimuthSensor.getPosition(), this.absoluteAzimuthSensor.getVelocity()));
+                this.absoluteAzimuthSensor.getPosition(), this.azimuthControl.getVelocity()));
     }
 
     /**

@@ -34,6 +34,9 @@ public class TrapezoidalProfileController {
     // The commanded position from the last time the output was calculated.
     private double lastCommandedPosition = 0;
 
+    // The commanded velocity from the last time the output was calculated.
+    private double lastCommandedVelocity = 0;
+
     /**
      * Constructor.
      * 
@@ -190,29 +193,39 @@ public class TrapezoidalProfileController {
      * @return The velocity value to command as the output, in units per second
      */
     public double calculateCommandVelocity(double currentPosition, double currentVelocity) {
+        System.out.println("Current Pos: " + currentPosition);
+        System.out.println("Current Vel: " + currentVelocity);
+        System.out.println("Target Pos: " + targetPosition);
         // Determine if the position target is ahead of or behind the current position
-        boolean forwards = targetPosition > currentPosition;
+        boolean forwards = targetPosition > lastCommandedPosition;
+        System.out.println("Forwards: " + forwards);
 
         // Calculate the command velocity based on the current velocity and max
         // acceleration
-        double commandVelocity = calculateAcceleratedVelocity(currentVelocity, forwards);
+        double commandVelocity = calculateAcceleratedVelocity(lastCommandedVelocity, forwards);
+        System.out.println("Command Vel #1: " + commandVelocity);
 
         // Limit the command velocity based on the max speed
         commandVelocity = applyMaxSpeedLimit(commandVelocity);
+        System.out.println("Command Vel #2: " + commandVelocity);
 
         // Limit the command velocity such that it has time to deccelerate to hit the
         // target at the right velocity
         commandVelocity = applyDeccelerationLimit(commandVelocity, forwards);
+        System.out.println("Command Vel #3: " + commandVelocity);
 
         // Determine the position to command
         double commandPosition = calculateCommandPosition(commandVelocity);
+        System.out.println("Command Pos: " + commandPosition);
 
         // Apply the position PID
         commandVelocity += positionPID.calculateOutput(currentPosition, commandPosition);
+        System.out.println("Command Vel #4: " + commandVelocity);
 
         // Update the last calculation time and commanded position
         this.lastCalculationTime = RobotControllerWrapper.getInstance().getFPGATime();
-        lastCommandedPosition = commandPosition;
+        this.lastCommandedPosition = commandPosition;
+        this.lastCommandedVelocity = commandVelocity;
 
         // Return the command velocity
         return commandVelocity;
@@ -232,7 +245,7 @@ public class TrapezoidalProfileController {
      */
     protected double calculateAcceleratedVelocity(double currentVelocity, boolean forwards) {
         double sign = forwards ? 1 : -1;
-        double addedVelocity = (RobotControllerWrapper.getInstance().getFPGATime() - lastCalculationTime)
+        double addedVelocity = ((RobotControllerWrapper.getInstance().getFPGATime() - lastCalculationTime) / 1_000_000.)
                 * this.getMaxAcceleration() * sign;
         return currentVelocity + addedVelocity;
     }
@@ -257,8 +270,10 @@ public class TrapezoidalProfileController {
      */
     protected double applyDeccelerationLimit(double commandVelocity, boolean forwards) {
         // v^2 = v0^2 + 2ax -> v0 = sqrt(v^2 - 2ax)
-        double limitVelocity = Math
-                .sqrt(Math.pow(targetVelocity, 2) - 2 * maxAcceleration * (targetPosition - lastCommandedPosition));
+        int accel_sign = forwards ? 1 : -1;
+        double limitVelocity = Math.pow(targetVelocity, 2) + 2 * accel_sign * maxAcceleration * (targetPosition - lastCommandedPosition);
+        limitVelocity = Math.signum(limitVelocity) * Math.sqrt(Math.abs(limitVelocity));
+        System.out.println("Vel Decel Limit: " + limitVelocity);
         if (forwards) {
             return Math.min(limitVelocity, commandVelocity);
         } else {
@@ -273,7 +288,7 @@ public class TrapezoidalProfileController {
      * @return The position to command
      */
     protected double calculateCommandPosition(double commandVelocity) {
-        return lastCommandedPosition + (RobotControllerWrapper.getInstance().getFPGATime() - lastCalculationTime) * commandVelocity;
+        return lastCommandedPosition + ((RobotControllerWrapper.getInstance().getFPGATime() - lastCalculationTime) / 1_000_000.) * commandVelocity;
     }
 
 }
