@@ -8,6 +8,7 @@ import frc.team88.swerve.motion.state.MotionState;
 import frc.team88.swerve.swervemodule.SwerveModule;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
+import frc.team88.swerve.util.logging.DataLogger;
 
 /**
  * Handles the mathematical processing of inverse kinematics for a swerve drive.
@@ -130,6 +131,29 @@ public class InverseKinematics implements MotionModifier<Void> {
 
         // Apply to modules
         for (int idx = 0; idx < modules.length; ++idx) {
+            // Log module data
+            class ModuleData {
+                double targetWheelSpeed;
+                double targetAzimuthAngle;
+                double actualWheelSpeed;
+                double actualAzimuthAngle;
+                double actualAzimuthSpeed;
+                double xPos;
+                double yPos;
+
+                public ModuleData(double targetWheelSpeed, double targetAzimuthAngle, SwerveModule module) {
+                    this.targetWheelSpeed = targetWheelSpeed;
+                    this.targetAzimuthAngle = targetAzimuthAngle;
+                    this.actualWheelSpeed = module.getWheelSpeed();
+                    this.actualAzimuthAngle = module.getAzimuthPosition().asDouble();
+                    this.actualAzimuthSpeed = module.getAzimuthVelocity();
+                    this.xPos = module.getLocation().getX();
+                    this.yPos = module.getLocation().getY();
+                }
+            }
+            DataLogger.getInstance().addData("Module " + idx, new ModuleData(moduleVectors[idx].getMagnitude(),
+                    moduleVectors[idx].getAngle().asDouble(), this.modules[idx]));
+
             modules[idx].setWheelSpeed(moduleVectors[idx].getMagnitude());
             if (moduleVectors[idx].getMagnitude() == 0.) {
                 modules[idx].setAzimuthPosition(lastGoodAzimuths[idx]);

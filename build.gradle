@@ -6,7 +6,7 @@ buildscript {
             }
         }
         dependencies {
-            classpath "edu.wpi.first:GradleRIO:2020.2.2"
+            classpath "edu.wpi.first:GradleRIO:2021.2.2"
         }
     }
 }
@@ -33,6 +33,9 @@ dependencies {
 
     // Apache Commons Math (for linear algebra)
     api "org.apache.commons:commons-math3:3.6.1"
+
+    // GSON (for JSON logging)
+    api 'com.google.code.gson:gson:2.8.6'
 
     // Use JUnit Jupiter API for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
