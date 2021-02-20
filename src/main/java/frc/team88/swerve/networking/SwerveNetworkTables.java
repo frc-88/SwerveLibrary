@@ -7,6 +7,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 
 import frc.team88.swerve.SwerveChassis;
+import frc.team88.swerve.motion.state.OdomState;
 
 
 public class SwerveNetworkTables {
@@ -52,15 +53,20 @@ public class SwerveNetworkTables {
         
     }
 
-    public void setOdom(double timestamp, double x, double y, double theta, double vx, double vy, double vtheta)
+    public void setOdom(double timestamp, OdomState state)
     {
         odom_time.setDouble(timestamp);
-        odom_x.setDouble(x);
-        odom_y.setDouble(y);
-        odom_t.setDouble(theta);
-        odom_vx.setDouble(vx);
-        odom_vy.setDouble(vy);
-        odom_vt.setDouble(vtheta);
+        odom_x.setDouble(state.x);
+        odom_y.setDouble(state.y);
+        odom_t.setDouble(state.t);
+        odom_vx.setDouble(state.vx);
+        odom_vy.setDouble(state.vy);
+        odom_vt.setDouble(state.vt);
+    }
+
+    public double getCmdTime()
+    {
+        return command_time.getDouble(0.0);
     }
 
     public double getLinearXCmd()
