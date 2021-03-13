@@ -179,6 +179,7 @@ public class TrapezoidalProfileController {
     public void reset(double currentPosition) {
         this.lastCalculationTime = RobotControllerWrapper.getInstance().getFPGATime();
         this.targetPosition = currentPosition;
+        this.lastCommandedPosition = currentPosition;
         this.positionPID.reset();
     }
 
@@ -265,15 +266,15 @@ public class TrapezoidalProfileController {
      * Limit the command velocity such that it has time to deccelerate to hit the
      * target at the right velocity.
      * 
-     * @param commandVelocity The command velocity to limit, in units per second
+     * @param commandVelocity
+     *                            The command velocity to limit, in units per second
      * @return The limited velocity, in units per second
      */
     protected double applyDeccelerationLimit(double commandVelocity, boolean forwards) {
         // v^2 = v0^2 + 2ax -> v0 = sqrt(v^2 - 2ax)
-        int accel_sign = forwards ? 1 : -1;
-        double limitVelocity = Math.pow(targetVelocity, 2) + 2 * accel_sign * maxAcceleration * (targetPosition - lastCommandedPosition);
+        double limitVelocity = MathUtils.signedPow(targetVelocity, 2)
+                + 2 * this.maxAcceleration * (this.targetPosition - this.lastCommandedPosition);
         limitVelocity = Math.signum(limitVelocity) * Math.sqrt(Math.abs(limitVelocity));
-        System.out.println("Vel Decel Limit: " + limitVelocity);
         if (forwards) {
             return Math.min(limitVelocity, commandVelocity);
         } else {
@@ -282,13 +283,18 @@ public class TrapezoidalProfileController {
     }
 
     /**
-     * Determine the command position based on the last command position and the velocity.
+     * Determine the command position based on the last command position and the
+     * velocity.
      * 
-     * @param commandVelocity The currently commanded velocity, in units per second
+     * @param commandVelocity
+     *                            The currently commanded velocity, in units per
+     *                            second
      * @return The position to command
      */
     protected double calculateCommandPosition(double commandVelocity) {
-        return lastCommandedPosition + ((RobotControllerWrapper.getInstance().getFPGATime() - lastCalculationTime) / 1_000_000.) * commandVelocity;
+        return lastCommandedPosition
+                + ((RobotControllerWrapper.getInstance().getFPGATime() - lastCalculationTime) / 1_000_000.)
+                        * commandVelocity;
     }
 
 }

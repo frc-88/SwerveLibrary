@@ -38,4 +38,24 @@ public class MathUtilsTest {
     public void testLimitChangeDecreaseRestricted() {
         assertDoubleEquals(4., MathUtils.limitChange(10., 2., 6.));
     }
+
+    @Test
+    public void testSignedPowPositiveBaseOddExponent() {
+        assertDoubleEquals(MathUtils.signedPow(3., 3), 27.);
+    }
+
+    @Test
+    public void testSignedPowPositiveBaseEvenExponent() {
+        assertDoubleEquals(MathUtils.signedPow(3., 2), 9.);
+    }
+
+    @Test
+    public void testSignedPowNegativeBaseOddExponent() {
+        assertDoubleEquals(MathUtils.signedPow(-3., 3), -27.);
+    }
+
+    @Test
+    public void testSignedPowNegativeBaseEvenExponent() {
+        assertDoubleEquals(MathUtils.signedPow(-3., 2), -9.);
+    }
 }

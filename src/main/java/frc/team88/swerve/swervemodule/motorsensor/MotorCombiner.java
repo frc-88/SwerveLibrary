@@ -7,8 +7,6 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import frc.team88.swerve.swervemodule.motorsensor.PIDMotor;
-
 /**
  * Takes n PID motors and applies nxn matrix A to them to produce n PID "motors"
  * representing the resulting linear combinations of motors. Useful for
