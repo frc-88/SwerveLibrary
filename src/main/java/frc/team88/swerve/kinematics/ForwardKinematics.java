@@ -7,7 +7,10 @@ import frc.team88.swerve.util.WrappedAngle;
 
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
+import org.apache.commons.math3.linear.RealMatrixFormat;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -39,7 +42,7 @@ public class ForwardKinematics
         this.modules = modules;
         state = new OdomState();
 
-        inverseKinematics = new Array2DRowRealMatrix(modules.length, 3);
+        inverseKinematics = new Array2DRowRealMatrix(modules.length * 2, 3);
         moduleStatesMatrix = new Array2DRowRealMatrix(modules.length * 2, 1);
 
         poseVector = new Array2DRowRealMatrix(3, 1);
@@ -83,18 +86,24 @@ public class ForwardKinematics
                 ...
             ]
         */
-        for (int idx = 0; idx < modules.length; ++idx) {
+        for (int idx = 0; idx < modules.length; idx++) {
             Vector2D module_loc = modules[idx].getLocation();
             inverseKinematics.setEntry(idx * 2, 0, 1);
-            inverseKinematics.setEntry(idx * 2, 1, 1);
+            inverseKinematics.setEntry(idx * 2, 1, 0);
             inverseKinematics.setEntry(idx * 2, 2, -module_loc.getY());
-            inverseKinematics.setEntry(idx * 2 + 1, 0, 1);
+            inverseKinematics.setEntry(idx * 2 + 1, 0, 0);
             inverseKinematics.setEntry(idx * 2 + 1, 1, 1);
             inverseKinematics.setEntry(idx * 2 + 1, 2, module_loc.getX());
         }
         SingularValueDecomposition svd = new SingularValueDecomposition(inverseKinematics);
         DecompositionSolver solver = svd.getSolver();
         forwardKinematics = solver.getInverse();
+
+        RealMatrixFormat TABLE_FORMAT = new RealMatrixFormat("", "", "", "\n", "", ", ");
+        System.out.println("inverseKinematics:");
+        System.out.println(TABLE_FORMAT.format(inverseKinematics));
+        System.out.println("forwardKinematics:");
+        System.out.println(TABLE_FORMAT.format(forwardKinematics));
     }
 
     private void calculateChassisVector()
@@ -103,15 +112,20 @@ public class ForwardKinematics
             WrappedAngle azimuth = modules[idx].getAzimuthPosition();
             double wheel_speed = modules[idx].getWheelSpeed();
 
-            double vx = wheel_speed * Math.cos(azimuth.asDouble());
-            double vy = wheel_speed * Math.sin(azimuth.asDouble());
+            double azimuthRad = Math.toRadians(azimuth.asDouble());
+
+            System.out.println("time: " + Timer.getFPGATimestamp() + ", idx: " + idx + ", wheel_speed: " + wheel_speed + ", azimuth: " + azimuth.asDouble());
+
+            double vx = wheel_speed * Math.cos(azimuthRad);
+            double vy = wheel_speed * Math.sin(azimuthRad);
             moduleStatesMatrix.setEntry(idx * 2, 0, vx);
             moduleStatesMatrix.setEntry(idx * 2 + 1, 0, vy);
         }
         RealMatrix chassisVector = forwardKinematics.multiply(moduleStatesMatrix);
         state.vx = chassisVector.getEntry(0, 0);
-        state.vy = chassisVector.getEntry(0, 1);
-        state.vt = chassisVector.getEntry(0, 2);
+        state.vy = chassisVector.getEntry(1, 0);
+        state.vt = chassisVector.getEntry(2, 0);
+        
     }
 
     /**
@@ -175,7 +189,10 @@ public class ForwardKinematics
         poseVector.setEntry(1, 0, dy);
         poseVector.setEntry(2, 0, dtheta);
 
+        System.out.println("dt: " + dt);
+        System.out.println("1: dx: " + poseVector.getEntry(0, 0) + ", dy: " + poseVector.getEntry(1, 0) + ", dtheta: " + poseVector.getEntry(2, 0));
         deltaPoseVector = poseRotationMatrix.multiply(poseTranslationMatrix.multiply(poseVector));
+        System.out.println("2: dx: " + deltaPoseVector.getEntry(0, 0) + ", dy: " + deltaPoseVector.getEntry(1, 0) + ", dtheta: " + deltaPoseVector.getEntry(2, 0));
 
         state.x += deltaPoseVector.getEntry(0, 0);
         state.y += deltaPoseVector.getEntry(1, 0);
