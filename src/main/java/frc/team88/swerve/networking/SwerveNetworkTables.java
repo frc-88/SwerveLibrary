@@ -1,5 +1,6 @@
 package frc.team88.swerve.networking;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -11,6 +12,8 @@ import frc.team88.swerve.motion.state.OdomState;
 
 
 public class SwerveNetworkTables {
+    SwerveChassis chassis;
+    
     NetworkTable odom_table;
     NetworkTableEntry odom_time;
     NetworkTableEntry odom_x;
@@ -20,14 +23,17 @@ public class SwerveNetworkTables {
     NetworkTableEntry odom_vy;
     NetworkTableEntry odom_vt;
 
+    NetworkTable module_table;
+
     NetworkTable command_table;
     NetworkTableEntry command_time;
     NetworkTableEntry command_linear_x;
     NetworkTableEntry command_linear_y;
     NetworkTableEntry command_angular_z;
 
-    public SwerveNetworkTables()
+    public SwerveNetworkTables(SwerveChassis chassis)
     {
+        this.chassis = chassis;
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         inst.setUpdateRate(0.01);
         NetworkTable table = inst.getTable("Swerve");
@@ -46,11 +52,24 @@ public class SwerveNetworkTables {
         command_linear_x = command_table.getEntry("linear_x");
         command_linear_y = command_table.getEntry("linear_y");
         command_angular_z = command_table.getEntry("angular_z");
+
+        module_table = table.getSubTable("modules");
     }
 
-    public void updateWithSwerve(SwerveChassis chassis)
+    public void publishSwerve()
     {
-        
+        long timestamp = RobotController.getFPGATime();
+        OdomState state = chassis.getOdomState();
+        setOdom(timestamp, state);
+
+        for (int index = 0; index < chassis.getNumModules(); index++) {
+            NetworkTable module_subtable = module_table.getSubTable(Integer.toString(index));
+            NetworkTableEntry module_wheel = module_subtable.getEntry("wheel");
+            NetworkTableEntry module_azimuth = module_subtable.getEntry("azimuth");
+
+            module_wheel.setDouble(chassis.getModule(index).getWheelSpeed());
+            module_azimuth.setDouble(chassis.getModule(index).getAzimuthPosition().asDouble());
+        }
     }
 
     public void setOdom(double timestamp, OdomState state)

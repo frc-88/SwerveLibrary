@@ -162,6 +162,27 @@ public class SwerveChassis {
     }
 
     /**
+     * Gets a module object
+     * 
+     * @return A module object
+     */
+    public SwerveModule getModule(int module_num) {
+        if (module_num >= modules.size() || module_num < 0) {
+            throw new IllegalArgumentException(module_num + " exceeds module num bounds");
+        }
+        return modules.get(module_num);
+    }
+
+    /**
+     * Gets the number of modules
+     * 
+     * @return Number of modules
+     */
+    public int getNumModules() {
+        return modules.size();
+    }
+
+    /**
      * Sets the chassis odometry state.
      * (for setting chassis initial conditions)
      * 

@@ -114,8 +114,6 @@ public class ForwardKinematics
 
             double azimuthRad = Math.toRadians(azimuth.asDouble());
 
-            System.out.println("time: " + Timer.getFPGATimestamp() + ", idx: " + idx + ", wheel_speed: " + wheel_speed + ", azimuth: " + azimuth.asDouble());
-
             double vx = wheel_speed * Math.cos(azimuthRad);
             double vy = wheel_speed * Math.sin(azimuthRad);
             moduleStatesMatrix.setEntry(idx * 2, 0, vx);
@@ -189,10 +187,7 @@ public class ForwardKinematics
         poseVector.setEntry(1, 0, dy);
         poseVector.setEntry(2, 0, dtheta);
 
-        System.out.println("dt: " + dt);
-        System.out.println("1: dx: " + poseVector.getEntry(0, 0) + ", dy: " + poseVector.getEntry(1, 0) + ", dtheta: " + poseVector.getEntry(2, 0));
         deltaPoseVector = poseRotationMatrix.multiply(poseTranslationMatrix.multiply(poseVector));
-        System.out.println("2: dx: " + deltaPoseVector.getEntry(0, 0) + ", dy: " + deltaPoseVector.getEntry(1, 0) + ", dtheta: " + deltaPoseVector.getEntry(2, 0));
 
         state.x += deltaPoseVector.getEntry(0, 0);
         state.y += deltaPoseVector.getEntry(1, 0);
