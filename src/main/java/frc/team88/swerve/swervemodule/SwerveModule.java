@@ -7,8 +7,10 @@ import org.javatuples.Pair;
 import frc.team88.swerve.swervemodule.motorsensor.PIDMotor;
 import frc.team88.swerve.swervemodule.motorsensor.PositionVelocitySensor;
 import frc.team88.swerve.util.SyncPIDController;
+import frc.team88.swerve.util.TrapezoidalProfileController;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
+import frc.team88.swerve.util.constants.DoublePreferenceConstant;
 import frc.team88.swerve.util.constants.PIDPreferenceConstants;
 
 /**
@@ -48,7 +50,9 @@ public class SwerveModule {
     private PositionVelocitySensor absoluteAzimuthSensor;
 
     // PID controller for azimuth position.
-    private SyncPIDController azimuthPositionPID;
+    private TrapezoidalProfileController azimuthPositionController;
+
+    private double maxWheelSpeed;
 
     // The location of this module relative to the robot's origin.
     private Vector2D location;
@@ -62,33 +66,32 @@ public class SwerveModule {
     /**
      * Constructor.
      * 
-     * @param wheelControl
-     *                                        The PIDMotor which controls the wheel
-     *                                        velocity, in feet per second
-     * @param azimuthControl
-     *                                        The PIDMotor which controls azimuth
-     *                                        velocity, in degrees per second
-     * @param absoluteAzimuthSensor
-     *                                        The sensor for absolute azimuth angle,
-     *                                        in degrees
-     * @param azimuthPositionPIDConstants
-     *                                        The PID constants for the azimuth
-     *                                        position pid control. All PID gains
-     *                                        are used
+     * @param wheelControl                The PIDMotor which controls the wheel
+     *                                    velocity, in feet per second
+     * @param azimuthControl              The PIDMotor which controls azimuth
+     *                                    velocity, in degrees per second
+     * @param absoluteAzimuthSensor       The sensor for absolute azimuth angle, in
+     *                                    degrees
+     * @param azimuthPositionPIDConstants The PID constants for the azimuth position
+     *                                    pid control. All PID gains are used
      */
     public SwerveModule(PIDMotor wheelControl, PIDMotor azimuthControl, PositionVelocitySensor absoluteAzimuthSensor,
-            PIDPreferenceConstants azimuthPositionPIDConstants) {
+            PIDPreferenceConstants azimuthPositionPIDConstants, double maxWheelSpeed, DoublePreferenceConstant maxAzimuthSpeed,
+            DoublePreferenceConstant maxAzimuthAcceleration) {
         this.wheelControl = Objects.requireNonNull(wheelControl);
         this.azimuthControl = Objects.requireNonNull(azimuthControl);
         this.absoluteAzimuthSensor = Objects.requireNonNull(absoluteAzimuthSensor);
-        this.azimuthPositionPID = new SyncPIDController(Objects.requireNonNull(azimuthPositionPIDConstants));
+        SyncPIDController azimuthPID = new SyncPIDController(Objects.requireNonNull(azimuthPositionPIDConstants));
+        this.azimuthPositionController = new TrapezoidalProfileController(maxAzimuthSpeed.getValue(),
+                maxAzimuthAcceleration.getValue(), azimuthPID);
+        this.azimuthPositionController.reset(this.getAzimuthPosition().asDouble());
+        this.maxWheelSpeed = maxWheelSpeed;
     }
 
     /**
      * Sets the wheel to the given speed.
      * 
-     * @param speed
-     *                  The speed to set, in feet per second
+     * @param speed The speed to set, in feet per second
      */
     public void setWheelSpeed(double speed) {
         if (speed < 0) {
@@ -97,6 +100,7 @@ public class SwerveModule {
         if (isWheelReversed) {
             speed *= -1;
         }
+        speed = limitWheelSpeedForAzimuth(speed);
         this.wheelControl.setVelocity(speed);
     }
 
@@ -112,8 +116,7 @@ public class SwerveModule {
     /**
      * Sets the azimuth to the given velocity.
      * 
-     * @param velocity
-     *                     The velocity to set, in degrees per second
+     * @param velocity The velocity to set, in degrees per second
      */
     public void setAzimuthVelocity(double velocity) {
         this.azimuthControl.setVelocity(velocity);
@@ -131,8 +134,7 @@ public class SwerveModule {
     /**
      * Sets the azimuth to the given position.
      * 
-     * @param position
-     *                     The position to set, in degrees
+     * @param position The position to set, in degrees
      */
     public void setAzimuthPosition(WrappedAngle position) {
         Pair<Double, Boolean> distanceAndFlip = this.getAzimuthPosition().getSmallestDifferenceWithHalfAngle(position,
@@ -142,8 +144,10 @@ public class SwerveModule {
             this.setWheelSpeed(this.getWheelSpeed());
         }
         double unwrappedAngle = this.absoluteAzimuthSensor.getPosition() + distanceAndFlip.getValue0();
-        this.setAzimuthVelocity(
-                azimuthPositionPID.calculateOutput(this.absoluteAzimuthSensor.getPosition(), unwrappedAngle));
+        this.azimuthPositionController.setTargetVelocity(0);
+        this.azimuthPositionController.setTargetPosition(unwrappedAngle);
+        this.setAzimuthVelocity(azimuthPositionController.calculateCommandVelocity(
+                this.absoluteAzimuthSensor.getPosition(), this.azimuthControl.getVelocity()));
     }
 
     /**
@@ -160,11 +164,19 @@ public class SwerveModule {
     }
 
     /**
+     * Gets the current commanded azimuth position from the trapezoidal profile.
+     * 
+     * @return The current commanded azimuth position.
+     */
+    public WrappedAngle getCommandedAzimuthPosition() {
+        return new WrappedAngle(this.azimuthPositionController.getLastCommandedPosition());
+    }
+
+    /**
      * Sets the location of this module.
      * 
-     * @param location
-     *                     A position vector from the robot's origin to the location
-     *                     of this module
+     * @param location A position vector from the robot's origin to the location of
+     *                 this module
      */
     public void setLocation(Vector2D location) {
         this.location = location;
@@ -173,9 +185,8 @@ public class SwerveModule {
     /**
      * Gets the location of this module.
      * 
-     * @param return
-     *                   A position vector from the robot's origin to the location
-     *                   of this module
+     * @param return A position vector from the robot's origin to the location of
+     *               this module
      */
     public Vector2D getLocation() {
         return Objects.requireNonNull(this.location);
@@ -184,8 +195,7 @@ public class SwerveModule {
     /**
      * Sets the direction current switching mode.
      * 
-     * @param mode
-     *                 The mode to set
+     * @param mode The mode to set
      */
     public void setSwitchingMode(SwitchingMode mode) {
         this.switchingMode = mode;
@@ -215,7 +225,9 @@ public class SwerveModule {
         case kSmart:
             // TODO: This should be fully paramaterizable when we have configurations
             double currentSpeed = getWheelSpeed();
-            if (currentSpeed < 2.5) {
+            if (this.getAzimuthVelocity() > 30) {
+                return 180;
+            } else if (currentSpeed < 2.5) {
                 return 90;
             } else if (currentSpeed < 5.5) {
                 return 120;
@@ -224,6 +236,18 @@ public class SwerveModule {
             }
         }
         throw new IllegalStateException("Switching mode is not supported");
+    }
+
+    /**
+     * Limits the given wheel speed in order to leave enough headroom for the
+     * azimuth to have full control.
+     * 
+     * @param speed The initial wheel speed.
+     * @return The limited wheel speed.
+     */
+    private double limitWheelSpeedForAzimuth(double speed) {
+        double limit = this.maxWheelSpeed - this.getAzimuthVelocity() * 0.02;
+        return Math.min(limit, Math.max(-limit, speed));
     }
 
 }

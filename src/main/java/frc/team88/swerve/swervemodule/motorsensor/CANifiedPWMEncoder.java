@@ -3,6 +3,7 @@ package frc.team88.swerve.swervemodule.motorsensor;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.CANifier;
+import com.ctre.phoenix.CANifierStatusFrame;
 import com.ctre.phoenix.CANifier.PWMChannel;
 
 import frc.team88.swerve.util.constants.DoublePreferenceConstant;
@@ -45,6 +46,10 @@ public class CANifiedPWMEncoder implements PositionVelocitySensor {
         this.channel = channel;
         this.velocitySupplier = velocitySupplier;
         this.offset = offset;
+        this.canifier.setStatusFramePeriod(CANifierStatusFrame.Status_3_PwmInputs0, 5);
+        this.canifier.setStatusFramePeriod(CANifierStatusFrame.Status_4_PwmInputs1, 5);
+        this.canifier.setStatusFramePeriod(CANifierStatusFrame.Status_5_PwmInputs2, 5);
+        this.canifier.setStatusFramePeriod(CANifierStatusFrame.Status_6_PwmInputs3, 5);
     }
 
     @Override
