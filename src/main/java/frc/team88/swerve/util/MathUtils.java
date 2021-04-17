@@ -47,4 +47,19 @@ public class MathUtils {
             return Math.max(desired, current - maxChange);
         }
     }
+
+    /**
+     * Calculates the exponentiation while mantaining sign for even exponents.
+     * 
+     * @param base
+     *               The base value.
+     * @param exp
+     *               The exponent value.
+     * @return
+     *               The result of the exponentiation.
+     */
+    public static double signedPow(double base, int exp){
+        double raw = Math.pow(base, exp);
+        return (base < 0 && exp % 2 == 0) ? -raw : raw;
+    }
 }
