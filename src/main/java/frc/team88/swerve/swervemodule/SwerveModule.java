@@ -52,6 +52,8 @@ public class SwerveModule {
     // PID controller for azimuth position.
     private TrapezoidalProfileController azimuthPositionController;
 
+    private double maxWheelSpeed;
+
     // The location of this module relative to the robot's origin.
     private Vector2D location;
 
@@ -74,15 +76,16 @@ public class SwerveModule {
      *                                    pid control. All PID gains are used
      */
     public SwerveModule(PIDMotor wheelControl, PIDMotor azimuthControl, PositionVelocitySensor absoluteAzimuthSensor,
-            PIDPreferenceConstants azimuthPositionPIDConstants, DoublePreferenceConstant maxSpeed,
-            DoublePreferenceConstant maxAcceleration) {
+            PIDPreferenceConstants azimuthPositionPIDConstants, double maxWheelSpeed, DoublePreferenceConstant maxAzimuthSpeed,
+            DoublePreferenceConstant maxAzimuthAcceleration) {
         this.wheelControl = Objects.requireNonNull(wheelControl);
         this.azimuthControl = Objects.requireNonNull(azimuthControl);
         this.absoluteAzimuthSensor = Objects.requireNonNull(absoluteAzimuthSensor);
         SyncPIDController azimuthPID = new SyncPIDController(Objects.requireNonNull(azimuthPositionPIDConstants));
-        this.azimuthPositionController = new TrapezoidalProfileController(maxSpeed.getValue(),
-                maxAcceleration.getValue(), azimuthPID);
+        this.azimuthPositionController = new TrapezoidalProfileController(maxAzimuthSpeed.getValue(),
+                maxAzimuthAcceleration.getValue(), azimuthPID);
         this.azimuthPositionController.reset(this.getAzimuthPosition().asDouble());
+        this.maxWheelSpeed = maxWheelSpeed;
     }
 
     /**
@@ -97,6 +100,7 @@ public class SwerveModule {
         if (isWheelReversed) {
             speed *= -1;
         }
+        speed = limitWheelSpeedForAzimuth(speed);
         this.wheelControl.setVelocity(speed);
     }
 
@@ -221,15 +225,29 @@ public class SwerveModule {
         case kSmart:
             // TODO: This should be fully paramaterizable when we have configurations
             double currentSpeed = getWheelSpeed();
-            if (currentSpeed < 2.5) {
+            if (this.getAzimuthVelocity() > 30) {
+                return 180;
+            } else if (currentSpeed < 2.5) {
                 return 90;
             } else if (currentSpeed < 5.5) {
-                return 90;
+                return 120;
             } else {
-                return 90;
+                return 180;
             }
         }
         throw new IllegalStateException("Switching mode is not supported");
+    }
+
+    /**
+     * Limits the given wheel speed in order to leave enough headroom for the
+     * azimuth to have full control.
+     * 
+     * @param speed The initial wheel speed.
+     * @return The limited wheel speed.
+     */
+    private double limitWheelSpeedForAzimuth(double speed) {
+        double limit = this.maxWheelSpeed - this.getAzimuthVelocity() * 0.02;
+        return Math.min(limit, Math.max(-limit, speed));
     }
 
 }
