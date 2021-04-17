@@ -83,9 +83,9 @@ public class SwerveNetworkTables {
         odom_vt.setDouble(state.vt);
     }
 
-    public double getCmdTime()
+    public long getCmdTime()
     {
-        return command_time.getDouble(0.0);
+        return command_time.getNumber(0).longValue();
     }
 
     public double getLinearXCmd()
