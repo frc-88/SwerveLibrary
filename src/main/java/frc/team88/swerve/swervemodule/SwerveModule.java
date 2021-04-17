@@ -224,9 +224,9 @@ public class SwerveModule {
             if (currentSpeed < 2.5) {
                 return 90;
             } else if (currentSpeed < 5.5) {
-                return 120;
+                return 90;
             } else {
-                return 180;
+                return 90;
             }
         }
         throw new IllegalStateException("Switching mode is not supported");
