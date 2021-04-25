@@ -33,8 +33,6 @@ public class ForwardKinematics
     private RealMatrix poseVector;
     private RealMatrix deltaPoseVector;
 
-    double m_azimuthOffset = 90.0;
-
     public ForwardKinematics(SwerveModule... modules)
     {
         if (modules.length < 2) {
@@ -113,7 +111,7 @@ public class ForwardKinematics
             WrappedAngle azimuth = modules[idx].getAzimuthPosition();
             double wheel_speed = modules[idx].getWheelSpeed();
 
-            double azimuthRad = Math.toRadians(azimuth.asDouble() + m_azimuthOffset);
+            double azimuthRad = Math.toRadians(azimuth.asDouble());
 
             double vx = wheel_speed * Math.cos(azimuthRad);
             double vy = wheel_speed * Math.sin(azimuthRad);
