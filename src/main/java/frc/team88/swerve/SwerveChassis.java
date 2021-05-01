@@ -4,11 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import edu.wpi.first.wpilibj.RobotController;
+import frc.team88.swerve.kinematics.ForwardKinematics;
 import frc.team88.swerve.kinematics.InverseKinematics;
 import frc.team88.swerve.motion.modifiers.LimitAcceleration;
 import frc.team88.swerve.motion.modifiers.ToHammerMode;
 import frc.team88.swerve.motion.modifiers.ToRobotCentric;
 import frc.team88.swerve.motion.state.MotionState;
+import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.swervemodule.SwerveModule;
 import frc.team88.swerve.swervemodule.SwerveModule.SwitchingMode;
 import frc.team88.swerve.util.constants.DoublePreferenceConstant;
@@ -34,6 +37,9 @@ public class SwerveChassis {
     // The inverse kinematics controller for this chassis.
     private InverseKinematics inverseKinematics;
 
+    // The forward kinematics controller for this chassis.
+    private ForwardKinematics forwardKinematics;
+
     // True if in field-centric mode, false if in robot-centric mode.
     private boolean inFieldCentric = true;
 
@@ -48,6 +54,10 @@ public class SwerveChassis {
 
     // Modifier for acceleration limiting
     private LimitAcceleration accelerationLimitModifier;
+
+    // Timers for computing update rate
+    private double currentTime;
+    private double prevTime;
 
     /**
      * Construct.
@@ -75,6 +85,10 @@ public class SwerveChassis {
         this.modules = Arrays.asList(modules);
 
         this.inverseKinematics = new InverseKinematics(modules);
+        this.forwardKinematics = new ForwardKinematics(modules);
+
+        currentTime = 0.0;
+        prevTime = 0.0;
 
         this.targetState = inverseKinematics.getTargetState();
 
@@ -125,6 +139,70 @@ public class SwerveChassis {
 
         // Update the inverse kinematics
         this.inverseKinematics.update();
+
+        // Update the forward kinematics and compute current pose
+        this.forwardKinematics.update(getDt());
+    }
+
+    private double getDt()
+    {
+        currentTime = RobotController.getFPGATime() * 1E-6;
+        double dt = currentTime - prevTime;
+        prevTime = currentTime;
+        return dt;
+    }
+
+    /**
+     * Gets the chassis odometry state.
+     * 
+     * @return The odometry state
+     */
+    public OdomState getOdomState() {
+        return this.forwardKinematics.getOdom();
+    }
+
+    /**
+     * Gets a module object
+     * 
+     * @return A module object
+     */
+    public SwerveModule getModule(int module_num) {
+        if (module_num >= modules.size() || module_num < 0) {
+            throw new IllegalArgumentException(module_num + " exceeds module num bounds");
+        }
+        return modules.get(module_num);
+    }
+
+    /**
+     * Gets the number of modules
+     * 
+     * @return Number of modules
+     */
+    public int getNumModules() {
+        return modules.size();
+    }
+
+    /**
+     * Sets the chassis odometry state.
+     * (for setting chassis initial conditions)
+     * 
+     * @param state  state to set the chassis to
+     */
+    public void setOdomState(OdomState state) {
+        this.forwardKinematics.setOdom(state);
+    }
+    public void setOdomState(double x, double y) {
+        OdomState state = new OdomState();
+        state.x = x;
+        state.y = y;
+        this.setOdomState(state);
+    }
+    public void setOdomState(double x, double y, double theta) {
+        OdomState state = new OdomState();
+        state.x = x;
+        state.y = y;
+        state.t = theta;
+        this.setOdomState(state);
     }
 
     /**
