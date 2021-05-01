@@ -63,7 +63,7 @@ public class SwerveNetworkTables {
         setOdom(timestamp, state);
 
         for (int index = 0; index < chassis.getNumModules(); index++) {
-            NetworkTable module_subtable = module_table.getSubTable(Integer.toString(index));
+            NetworkTable module_subtable = module_table.getSubTable(Integer.toString(index + 1));
             NetworkTableEntry module_wheel = module_subtable.getEntry("wheel");
             NetworkTableEntry module_azimuth = module_subtable.getEntry("azimuth");
 
