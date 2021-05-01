@@ -72,7 +72,7 @@ public class PIDFalcon extends TalonFX implements PIDMotor {
     /**
      * {@inheritDoc}
      * 
-     * @return The position to set, in rotations
+     * @param position The position to set, in rotations
      */
     @Override
     public void calibratePosition(double position) {
@@ -82,11 +82,11 @@ public class PIDFalcon extends TalonFX implements PIDMotor {
     /**
      * {@inheritDoc}
      * 
-     * @return The velocity to set, in rotations per second
+     * @param velocity The velocity to set, in rotations per second
      */
     @Override
     public void setVelocity(double velocity) {
-        this.set(ControlMode.Velocity, velocity * 2048 / 10);
+        this.set(ControlMode.Velocity, velocity * 2048. / 10.);
     }
 
     /**

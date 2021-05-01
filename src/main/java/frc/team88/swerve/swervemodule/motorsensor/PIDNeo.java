@@ -66,7 +66,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
     /**
      * {@inheritDoc}
      * 
-     * @return The position to set, in rotations
+     * @param position The position to set, in rotations
      */
     @Override
     public void calibratePosition(double position) {
@@ -76,7 +76,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
     /**
      * {@inheritDoc}
      * 
-     * @return The velocity to set, in rotations per second
+     * @param velocity The velocity to set, in rotations per second
      */
     @Override
     public void setVelocity(double velocity) {

@@ -164,6 +164,8 @@ public class SwerveChassis {
     /**
      * Gets a module object
      * 
+     * @param module_num The ID number for the module
+     * 
      * @return A module object
      */
     public SwerveModule getModule(int module_num) {

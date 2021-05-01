@@ -34,6 +34,8 @@ public class RobotControllerWrapper {
 
     /**
      * Sets the singleton instance. Used only for testing.
+     * 
+     * @param instance The new singleton instance to set.
      */
     public static void setInstance(RobotControllerWrapper instance) {
         RobotControllerWrapper.instance = instance;

@@ -93,7 +93,6 @@ public class MotorCombiner {
     /**
      * Builds a MotorCombiner. To use:
      * 
-     * <p>
      * <ol>
      * <li>Construct with the desired number of inputs, which is also the number of
      * outputs.
@@ -101,7 +100,6 @@ public class MotorCombiner {
      * it in the forward matrix.
      * <li>Build the MotorCombiner.
      * </ol>
-     * </p>
      */
     public static class Builder {
 
@@ -141,6 +139,8 @@ public class MotorCombiner {
          *                                The column in the forward matrix that
          *                                represents what to multiply this input by to
          *                                get each of the outputs
+         * 
+         * @return This builder.
          */
         public Builder addInput(PIDMotor input, double... forwardCoefficients) {
             if (currentInputToAdd >= matrixSize) {

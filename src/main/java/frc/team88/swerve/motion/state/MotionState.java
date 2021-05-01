@@ -13,6 +13,9 @@ public interface MotionState {
      * Visitor accept method for motion modifiers. Should dispatch to the
      * appropriate visitor method for the implementing class.
      * 
+     * @param <R> The type of the modifier
+     * @param modifier The modifer being accepted
+     * 
      * @return The result of applying the modifier on this motion state
      */
     public <R> R acceptModifier(MotionModifier<R> modifier);
@@ -43,7 +46,6 @@ public interface MotionState {
      * 
      * @return The center of rotation, as a position vector from the robot's origin,
      *         in feet
-     * @return The new motion state
      */
     public Vector2D getCenterOfRotation();
 

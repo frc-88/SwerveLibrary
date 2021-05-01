@@ -42,6 +42,8 @@ public class DataLogger {
 
     /**
      * Gets the DataLogger singleton instance.
+     * 
+     * @return The DataLogger singleton instance
      */
     public static DataLogger getInstance() {
         if (Objects.isNull(instance)) {

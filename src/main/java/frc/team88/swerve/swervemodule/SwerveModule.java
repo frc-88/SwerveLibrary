@@ -74,6 +74,9 @@ public class SwerveModule {
      *                                    degrees
      * @param azimuthPositionPIDConstants The PID constants for the azimuth position
      *                                    pid control. All PID gains are used
+     * @param maxWheelSpeed               The max speed the wheel is allowed to go
+     * @param maxAzimuthSpeed             The max speed the azumuth is allowed to spin
+     * @param maxAzimuthAcceleration      The max acceleration allowed for the azimuth
      */
     public SwerveModule(PIDMotor wheelControl, PIDMotor azimuthControl, PositionVelocitySensor absoluteAzimuthSensor,
             PIDPreferenceConstants azimuthPositionPIDConstants, double maxWheelSpeed, DoublePreferenceConstant maxAzimuthSpeed,
@@ -185,7 +188,7 @@ public class SwerveModule {
     /**
      * Gets the location of this module.
      * 
-     * @param return A position vector from the robot's origin to the location of
+     * @return A position vector from the robot's origin to the location of
      *               this module
      */
     public Vector2D getLocation() {

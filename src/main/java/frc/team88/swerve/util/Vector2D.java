@@ -21,8 +21,8 @@ public class Vector2D {
     /**
      * Private constructor using cartesian coordinates.
      * 
-     * @param x
-     * @param y
+     * @param x The x component of the vector.
+     * @param y The y component of the vector.
      */
     public Vector2D(double x, double y) {
         this.x = x;
@@ -122,7 +122,7 @@ public class Vector2D {
      * Creates a new Vector2D that is a copy of this one, except with the given
      * magnitude.
      * 
-     * @param x The magnitude for the new vector
+     * @param magnitude The magnitude for the new vector
      * @return The changed vector
      */
     public Vector2D changeMagnitude(double magnitude) {

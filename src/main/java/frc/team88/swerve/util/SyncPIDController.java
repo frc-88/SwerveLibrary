@@ -41,6 +41,10 @@ public class SyncPIDController {
      * @param iMax
      *                  The maximum absolute value that the integral error will
      *                  accumulate
+     * 
+     * @param tolerance
+     *                  The tolerance for when the controller will consider
+     *                  itself on target and output 0.
      */
     public SyncPIDController(double kP, double kI, double kD, double kF, double iZone, double iMax, double tolerance) {
 

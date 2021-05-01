@@ -6,7 +6,7 @@ buildscript {
             }
         }
         dependencies {
-            classpath "edu.wpi.first:GradleRIO:2021.2.2"
+            classpath "edu.wpi.first:GradleRIO:2021.3.1"
         }
     }
 }
@@ -18,15 +18,12 @@ plugins {
 
 apply plugin: 'edu.wpi.first.GradleRIO'
 
-repositories {
-    // Use Maven for resolving dependencies
-    mavenCentral()
-}
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 dependencies {
-    api wpi.deps.wpilib()
-
-    api wpi.deps.vendor.java()
+    compile wpi.deps.wpilib()
+    compile wpi.deps.vendor.java()
 
     // Tuples library
     api "org.javatuples:javatuples:1.2"
@@ -50,4 +47,19 @@ dependencies {
 test {
     // Use junit platform for unit tests
     useJUnitPlatform()
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }

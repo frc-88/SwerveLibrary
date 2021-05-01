@@ -265,6 +265,7 @@ public class TrapezoidalProfileController {
      * 
      * @param commandVelocity
      *                            The command velocity to limit, in units per second
+     * @param forwards Whether we are moving forwards or backwards.
      * @return The limited velocity, in units per second
      */
     protected double applyDeccelerationLimit(double commandVelocity, boolean forwards) {
