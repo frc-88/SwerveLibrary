@@ -110,6 +110,29 @@ public class InverseKinematics implements MotionModifier<Void> {
         return state.acceptModifier(this);
     }
 
+    /**
+     * POJO for logging module state.
+     */
+    class ModuleData {
+        double targetWheelSpeed;
+        double targetAzimuthAngle;
+        double actualWheelSpeed;
+        double actualAzimuthAngle;
+        double actualAzimuthSpeed;
+        double xPos;
+        double yPos;
+
+        public ModuleData(double targetWheelSpeed, double targetAzimuthAngle, SwerveModule module) {
+            this.targetWheelSpeed = targetWheelSpeed;
+            this.targetAzimuthAngle = targetAzimuthAngle;
+            this.actualWheelSpeed = module.getWheelSpeed();
+            this.actualAzimuthAngle = module.getAzimuthPosition().asDouble();
+            this.actualAzimuthSpeed = module.getAzimuthVelocity();
+            this.xPos = module.getLocation().getX();
+            this.yPos = module.getLocation().getY();
+        }
+    }
+
     @Override
     public Void applyToFullVelocityState(FullVelocityMotionState state) {
         // Get the translation and rotation vectors
@@ -132,25 +155,6 @@ public class InverseKinematics implements MotionModifier<Void> {
         // Apply to modules
         for (int idx = 0; idx < modules.length; ++idx) {
             // Log module data
-            class ModuleData {
-                double targetWheelSpeed;
-                double targetAzimuthAngle;
-                double actualWheelSpeed;
-                double actualAzimuthAngle;
-                double actualAzimuthSpeed;
-                double xPos;
-                double yPos;
-
-                public ModuleData(double targetWheelSpeed, double targetAzimuthAngle, SwerveModule module) {
-                    this.targetWheelSpeed = targetWheelSpeed;
-                    this.targetAzimuthAngle = targetAzimuthAngle;
-                    this.actualWheelSpeed = module.getWheelSpeed();
-                    this.actualAzimuthAngle = module.getAzimuthPosition().asDouble();
-                    this.actualAzimuthSpeed = module.getAzimuthVelocity();
-                    this.xPos = module.getLocation().getX();
-                    this.yPos = module.getLocation().getY();
-                }
-            }
             DataLogger.getInstance().addData("Module " + idx, new ModuleData(moduleVectors[idx].getMagnitude(),
                     moduleVectors[idx].getAngle().asDouble(), this.modules[idx]));
 

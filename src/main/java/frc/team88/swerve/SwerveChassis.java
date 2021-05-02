@@ -101,19 +101,23 @@ public class SwerveChassis {
     }
 
     /**
+     * POJO for logging gyro state.
+     */
+    static class GyroInfo {
+        double yaw;
+        double yawRate;
+        public GyroInfo(Gyro gyro) {
+            this.yaw = gyro.getYaw();
+            this.yawRate = gyro.getYawRate();
+        }
+    }
+
+    /**
      * Updates all periodic processes in the swerve chassis, such as setting module
      * controls.
      */
     public void update() {
         // Log Gyro State
-        class GyroInfo {
-            double yaw;
-            double yawRate;
-            public GyroInfo(Gyro gyro) {
-                this.yaw = gyro.getYaw();
-                this.yawRate = gyro.getYawRate();
-            }
-        }
         DataLogger.getInstance().addData("Gyro Info", new GyroInfo(this.gyro));
 
         MotionState modifiedState = this.targetState;
