@@ -9,14 +9,14 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.commons.math3.linear.RealMatrixFormat;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
-
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.DecompositionSolver;
 
 import java.lang.Math;
+
+// Heavily influenced by these wpilib classes:
+// import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+// import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 
 public class ForwardKinematics
 {
@@ -92,7 +92,8 @@ public class ForwardKinematics
             inverseKinematics.setEntry(idx * 2, 2, -module_loc.getY());
             inverseKinematics.setEntry(idx * 2 + 1, 0, 0);
             inverseKinematics.setEntry(idx * 2 + 1, 1, 1);
-            inverseKinematics.setEntry(idx * 2 + 1, 2, module_loc.getX());
+            inverseKinematics.setEntry(idx * 2 + 1, 2, -module_loc.getX());  // flipping X to match SwerveLibrary convention
+            // inverseKinematics.setEntry(idx * 2 + 1, 2, module_loc.getX());
         }
         SingularValueDecomposition svd = new SingularValueDecomposition(inverseKinematics);
         DecompositionSolver solver = svd.getSolver();
@@ -119,8 +120,8 @@ public class ForwardKinematics
             moduleStatesMatrix.setEntry(idx * 2 + 1, 0, vx);
         }
         RealMatrix chassisVector = forwardKinematics.multiply(moduleStatesMatrix);
-        state.vx = chassisVector.getEntry(0, 0);
-        state.vy = chassisVector.getEntry(1, 0);
+        state.vy = chassisVector.getEntry(0, 0);
+        state.vx = chassisVector.getEntry(1, 0);
         state.vt = chassisVector.getEntry(2, 0);
         
     }
@@ -138,10 +139,13 @@ public class ForwardKinematics
         }
         double dx = state.vx * dt;
         double dy = state.vy * dt;
-        double dtheta = state.vt * dt;
+        double dtheta = -state.vt * dt;
 
-        double sin_theta = Math.sin(dtheta);
-        double cos_theta = Math.cos(dtheta);
+        double sin_dtheta = Math.sin(dtheta);
+        double cos_dtheta = Math.cos(dtheta);
+
+        double sin_theta = Math.sin(state.t + dtheta);
+        double cos_theta = Math.cos(state.t + dtheta);
 
         double s;
         double c1;
@@ -153,9 +157,9 @@ public class ForwardKinematics
             c1 = 0.5 * dtheta;
             c2 = -0.5 * dtheta;
         } else {
-            s = sin_theta / dtheta;
-            c1 = (1 - cos_theta) / dtheta;
-            c2 = (cos_theta - 1) / dtheta;
+            s = sin_dtheta / dtheta;
+            c1 = (1 - cos_dtheta) / dtheta;
+            c2 = (cos_dtheta - 1) / dtheta;
         }
 
         /*  Matrix format:
