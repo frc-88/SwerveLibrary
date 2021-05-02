@@ -24,7 +24,7 @@ public class DataLogger {
 
     private static DataLogger instance;
 
-    private static final Path LOGS_DIR = Paths.get("/data/");
+    private static final Path LOGS_DIR = Paths.get("/home/lvuser/data/");
     private static final Path LAST_LOG_PATH = LOGS_DIR.resolve("last_log_num.txt");
 
     private Path logPath;
@@ -75,17 +75,6 @@ public class DataLogger {
             return;
         }
 
-        // Create POJO for data representation.
-        class LogItem {
-            String label;
-            Object data;
-
-            public LogItem(String label, Object data) {
-                this.label = label;
-                this.data = data;
-            }
-        }
-
         // Start with a timestamp object.
         List<LogItem> logItems = new LinkedList<>();
         logItems.add(new LogItem("Timestamp", RobotController.getFPGATime()));
@@ -97,13 +86,27 @@ public class DataLogger {
 
         // Write line to log file.
         try {
-            Files.writeString(this.logPath, this.gson.toJson(logItems) + "/n");
+            System.out.println(logItems.size() + " " + logItems.get(0).label);
+            Files.writeString(this.logPath, this.gson.toJson(logItems) + "\n", StandardOpenOption.APPEND);
         } catch (IOException err) {
             System.err.format("Encountered IO Exception when writing logs: %s%n", err);
         }
 
         // Clear old data.
         this.dataToLog.clear();
+    }
+
+    /**
+     * Class for a single item in the log.
+     */
+    static class LogItem {
+        String label;
+        Object data;
+
+        public LogItem(String label, Object data) {
+            this.label = label;
+            this.data = data;
+        }
     }
 
     /**
