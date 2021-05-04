@@ -3,7 +3,6 @@ package frc.team88.swerve.util.logging;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,6 +14,7 @@ import java.util.Map.Entry;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 
 /**
@@ -24,7 +24,7 @@ public class DataLogger {
 
     private static DataLogger instance;
 
-    private static final Path LOGS_DIR = Paths.get("/data/");
+    private static final Path LOGS_DIR = Filesystem.getOperatingDirectory().toPath().resolve("data/");
     private static final Path LAST_LOG_PATH = LOGS_DIR.resolve("last_log_num.txt");
 
     private Path logPath;

@@ -100,10 +100,6 @@ public class ForwardKinematics
         forwardKinematics = solver.getInverse();
 
         RealMatrixFormat TABLE_FORMAT = new RealMatrixFormat("", "", "", "\n", "", ", ");
-        System.out.println("inverseKinematics:");
-        System.out.println(TABLE_FORMAT.format(inverseKinematics));
-        System.out.println("forwardKinematics:");
-        System.out.println(TABLE_FORMAT.format(forwardKinematics));
     }
 
     private void calculateChassisVector()
