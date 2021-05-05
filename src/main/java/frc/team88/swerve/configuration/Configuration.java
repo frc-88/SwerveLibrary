@@ -1,5 +1,6 @@
 package frc.team88.swerve.configuration;
 
+import java.util.List;
 import java.util.Objects;
 
 import com.electronwill.nightconfig.core.Config;
@@ -13,7 +14,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
-import edu.wpi.first.wpilibj.I2C.Port;
+import frc.team88.swerve.swervemodule.SwerveModule;
 import frc.team88.swerve.wrappers.gyro.Gyro;
 import frc.team88.swerve.wrappers.gyro.NavX;
 
@@ -22,8 +23,8 @@ import frc.team88.swerve.wrappers.gyro.NavX;
  */
 
 /**
- * Parses a swerve configuration file and provides access to all of its
- * contents.
+ * Parses a swerve configuration file, generates objects from it, and provides
+ * access to all of its contents.
  */
 public class Configuration {
 
@@ -32,6 +33,9 @@ public class Configuration {
 
     // The gyro from this configuration
     private Gyro gyro;
+
+    // The swerve modules from this configuration
+    private SwerveModule[] modules;
     
     /**
      * Loads the base config and user config from the filesystem.
@@ -53,7 +57,7 @@ public class Configuration {
 
         // Create all of the objects and configs
         this.instantiateGyro();
-
+        this.instantiateModules();
     }
 
     /**
@@ -65,7 +69,11 @@ public class Configuration {
         return this.gyro;
     }
 
-    private Config instantiateDesign(Config designConfig, Config instanceConfig) {
+    /**
+     * Instantiates a design's config by apppending and overwritting the design
+     * with an instance-specific config.
+     */
+    private Config instantiateDesignConfig(Config designConfig, Config instanceConfig) {
         instanceConfig = Config.copy(instanceConfig, TomlFormat.instance());
         Config instantiatedConfig = Config.copy(designConfig, TomlFormat.instance());
 
@@ -101,7 +109,7 @@ public class Configuration {
      */
     private void instantiateGyro() {
         String design = this.configData.get("gyro.design");
-        Config gyroConfig = instantiateDesign(configData.get("gyro-designs." + design), configData.get("gyro"));
+        Config gyroConfig = instantiateDesignConfig(configData.get("gyro-designs." + design), configData.get("gyro"));
 
         switch (design) {
 
@@ -110,6 +118,31 @@ public class Configuration {
                 break;
             default:
                 throw new IllegalArgumentException(String.format("The design %s does not have a corresponding gyro class.", design));
+        }
+    }
+
+    /**
+     * Instantiates an individual module.
+     * 
+     * @param instanceConfig The instance config for this module.
+     * @return The module object.
+     */
+    private SwerveModule instantiateModule(Config instanceConfig) {
+        String design = instanceConfig.get("design");
+        Config moduleConfig = instantiateDesignConfig(configData.get("module-designs." + design), instanceConfig);
+
+        
+    }
+
+    /**
+     * Instantiates the module objects from the config.
+     */
+    private void instantiateModules() {
+        List<Config> moduleConfigs = this.configData.get("modules");
+        this.modules = new SwerveModule[moduleConfigs.size()];
+
+        for (int moduleIndex = 0; moduleIndex < moduleConfigs.size(); moduleIndex++) {
+            this.modules[moduleIndex] = this.instantiateModule(moduleConfigs.get(moduleIndex));
         }
     }
 }

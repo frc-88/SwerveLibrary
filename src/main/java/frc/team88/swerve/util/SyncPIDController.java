@@ -1,6 +1,8 @@
 package frc.team88.swerve.util;
 
-import frc.team88.swerve.util.constants.PIDPreferenceConstants;
+import java.util.Objects;
+
+import frc.team88.swerve.configuration.PIDConfiguration;
 import frc.team88.swerve.wrappers.RobotControllerWrapper;
 
 /**
@@ -78,24 +80,16 @@ public class SyncPIDController {
     }
 
     /**
-     * Constructor that uses a PIDPreferencesConstant object.
+     * Constructor that uses a PIDConfiguration object.
      * 
      * @param constants
      *                      Contains all of the PID constants for this PID
      *                      controller
      */
-    public SyncPIDController(PIDPreferenceConstants constants) {
-        this(constants.getKP().getValue(), constants.getKI().getValue(), constants.getKD().getValue(),
-                constants.getKF().getValue(), constants.getIZone().getValue(), constants.getIMax().getValue(),
-                constants.getTolerance().getValue());
-
-        constants.getKP().addChangeHandler(this::setKP);
-        constants.getKI().addChangeHandler(this::setKI);
-        constants.getKD().addChangeHandler(this::setKD);
-        constants.getKF().addChangeHandler(this::setKF);
-        constants.getIZone().addChangeHandler(this::setIZone);
-        constants.getIMax().addChangeHandler(this::setIMax);
-        constants.getTolerance().addChangeHandler(this::setTolerance);
+    public SyncPIDController(final PIDConfiguration constants) {
+        this(Objects.requireNonNull(constants).getKP(), constants.getKI(), constants.getKD(),
+                constants.getKF(), constants.getIZone(), constants.getIMax(),
+                constants.getTolerance());
     }
 
     /**

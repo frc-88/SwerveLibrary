@@ -24,7 +24,7 @@ public class Vector2D {
      * @param x The x component of the vector.
      * @param y The y component of the vector.
      */
-    public Vector2D(double x, double y) {
+    private Vector2D(double x, double y) {
         this.x = x;
         this.y = y;
     }

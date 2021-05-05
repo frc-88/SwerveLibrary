@@ -5,10 +5,10 @@ import java.util.Objects;
 /**
  * Composed of a single sensor, and applies a gear ratio to it.
  */
-public class SensorTransmission implements PositionVelocitySensor {
+public class SensorTransmission implements PositionSensor {
 
     // The sensor on the input of the transmission
-    private PositionVelocitySensor inputSensor;
+    private PositionSensor inputSensor;
 
     // The gear ratio being applied to the sensor
     private double gearRatio;
@@ -19,7 +19,7 @@ public class SensorTransmission implements PositionVelocitySensor {
      * @param inputSensor The sensor on the input of the transmission
      * @param gearRatio   The gear ratio being applied to the sensor
      */
-    public SensorTransmission(PositionVelocitySensor inputSensor, double gearRatio) {
+    public SensorTransmission(PositionSensor inputSensor, double gearRatio) {
         this.inputSensor = Objects.requireNonNull(inputSensor);
         if (gearRatio != 0.) {
             this.gearRatio = gearRatio;
@@ -31,11 +31,6 @@ public class SensorTransmission implements PositionVelocitySensor {
     @Override
     public double getPosition() {
         return applyForwardGearRatio(inputSensor.getPosition());
-    }
-
-    @Override
-    public double getVelocity() {
-        return applyForwardGearRatio(inputSensor.getVelocity());
     }
 
     @Override

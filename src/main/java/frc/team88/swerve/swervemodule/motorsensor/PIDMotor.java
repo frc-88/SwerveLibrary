@@ -5,7 +5,14 @@ package frc.team88.swerve.swervemodule.motorsensor;
  * provide PID configuration options, since those will vary depending on whether
  * the loop is being run on the RIO or the motor controller.
  */
-public interface PIDMotor extends PositionVelocitySensor {
+public interface PIDMotor extends PositionSensor {
+
+    /**
+     * Get the velocity value of the sensor.
+     * 
+     * @return The velocity value
+     */
+    public double getVelocity();
 
     /**
      * Set the velocity to PID to the given value. Only gauranteed to work when
