@@ -15,7 +15,7 @@ ki = 0.0007
 kd = 0
 kf = 1
 
-[azimuth-sensor-designs.canifier-pwm]
+[position-sensor-designs.canifier-pwm]
 ratio = 1
 
 [module-designs.team88.diff-swerve-2021.beta]

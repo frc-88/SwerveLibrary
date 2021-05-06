@@ -1,5 +1,6 @@
 package frc.team88.swerve.configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.team88.swerve.swervemodule.SwerveModule;
+import frc.team88.swerve.swervemodule.motorsensor.PositionSensor;
 import frc.team88.swerve.swervemodule.motorsensor.SwerveFalcon;
 import frc.team88.swerve.swervemodule.motorsensor.SwerveMotor;
 import frc.team88.swerve.swervemodule.motorsensor.SwerveNeo;
@@ -81,7 +83,21 @@ public class Configuration {
         Config instantiatedConfig = Config.copy(templateConfig, TomlFormat.instance());
 
         for (Entry entry : instanceConfig.entrySet()) {
-            instantiatedConfig.set(entry.getKey(), entry.getValue());
+            Object value = entry.getValue();
+            if (value instanceof List<?>) {
+                List<Object> newList = new ArrayList<Object>();
+                for (Object subvalue : (List<?>)value) {
+                    if (subvalue instanceof Config) {
+                        newList.add(this.instantiateTemplateConfig(templateConfig.get(entry.getKey()), (Config)value));
+                    } else {
+                        newList.add(subvalue);
+                    }
+                }
+                value = newList;
+            } else if (value instanceof Config) {
+                value = this.instantiateTemplateConfig(templateConfig.get(entry.getKey()), (Config)value);
+            }
+            instantiatedConfig.set(entry.getKey(), value);
         }
 
         return instantiatedConfig;
@@ -174,6 +190,7 @@ public class Configuration {
         Config moduleConfig = this.instantiateTemplateConfig(configData.get("module-templates." + template), instanceConfig);
 
         SwerveMotor motors[] = new SwerveMotor[]{this.instantiateMotor(moduleConfig.get("motors.0")), this.instantiateMotor(moduleConfig.get("motors.1"))};
+        PositionSensor azimuthSensor = this.instantiateSensor(moduleConfig.get("azimuth-sensor"));
     }
 
     /**
