@@ -13,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 public class PIDTransmissionTest {
 
     @Mock
-    private PIDMotor inputMotor;
+    private SwerveMotor inputMotor;
 
     private PIDTransmission reductionTransmission;
     private PIDTransmission speedUpTransmission;

@@ -70,12 +70,12 @@ public class Configuration {
     }
 
     /**
-     * Instantiates a design's config by apppending and overwritting the design
+     * Instantiates a template's config by apppending and overwritting the design
      * with an instance-specific config.
      */
-    private Config instantiateDesignConfig(Config designConfig, Config instanceConfig) {
+    private Config instantiateTemplateConfig(Config templateConfig, Config instanceConfig) {
         instanceConfig = Config.copy(instanceConfig, TomlFormat.instance());
-        Config instantiatedConfig = Config.copy(designConfig, TomlFormat.instance());
+        Config instantiatedConfig = Config.copy(templateConfig, TomlFormat.instance());
 
         for (Entry entry : instanceConfig.entrySet()) {
             instantiatedConfig.set(entry.getKey(), entry.getValue());
@@ -108,16 +108,15 @@ public class Configuration {
      * Instantiates the gyro object from the config.
      */
     private void instantiateGyro() {
-        String design = this.configData.get("gyro.design");
-        Config gyroConfig = instantiateDesignConfig(configData.get("gyro-designs." + design), configData.get("gyro"));
+        String template = this.configData.get("gyro.template");
+        Config gyroConfig = instantiateTemplateConfig(configData.get("gyro-templates." + template), configData.get("gyro"));
 
-        switch (design) {
-
+        switch (template) {
             case "navx":
                 this.gyro = this.instantiateNavX(gyroConfig);
                 break;
             default:
-                throw new IllegalArgumentException(String.format("The design %s does not have a corresponding gyro class.", design));
+                throw new IllegalArgumentException(String.format("The template %s does not have a corresponding gyro class.", template));
         }
     }
 
@@ -128,8 +127,8 @@ public class Configuration {
      * @return The module object.
      */
     private SwerveModule instantiateModule(Config instanceConfig) {
-        String design = instanceConfig.get("design");
-        Config moduleConfig = instantiateDesignConfig(configData.get("module-designs." + design), instanceConfig);
+        String template = instanceConfig.get("template");
+        Config moduleConfig = instantiateTemplateConfig(configData.get("module-templates." + template), instanceConfig);
 
         
     }

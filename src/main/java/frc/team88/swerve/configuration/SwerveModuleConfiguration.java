@@ -21,11 +21,12 @@ public class SwerveModuleConfiguration {
     private final RealMatrix inverseMatrix;
     private final double wheelDiameter;
     private final AzimuthControllerConfiguration azimuthControllerConfig;
+    private final PIDConfiguration wheelControllerConfig;
 
     /**
-     * Constructs this configuration from an instantiated module design.
+     * Constructs this configuration from an instantiated module template.
      * 
-     * @param instantiatedConfig The instantiated module design.
+     * @param instantiatedConfig The instantiated module template.
      */
     public SwerveModuleConfiguration(Config instantiatedConfig) {
         Objects.requireNonNull(instantiatedConfig);
@@ -35,6 +36,7 @@ public class SwerveModuleConfiguration {
         this.inverseMatrix = MatrixUtils.inverse(this.forwardMatrix);
         this.wheelDiameter = instantiatedConfig.get("wheel-diameter-inches");
         this.azimuthControllerConfig = new AzimuthControllerConfiguration(instantiatedConfig.get("azimuth-controller"));
+        this.wheelControllerConfig = new PIDConfiguration(instantiatedConfig.get("wheel-controller"));
     }
 
     /**
@@ -80,10 +82,19 @@ public class SwerveModuleConfiguration {
     /**
      * Gets the azimuth controller configuration.
      * 
-     * @return The configuration info for the azimuth controller.
+     * @return The configuration info for the azimuth position controller.
      */
     public AzimuthControllerConfiguration getAzimuthControllerConfig() {
         return this.azimuthControllerConfig;
+    }
+
+    /**
+     * Gets the wheel controller configuration
+     * 
+     * @return The configuration info for the wheel velocity contoller.
+     */
+    public PIDConfiguration getWheelControllerConfig() {
+        return this.wheelControllerConfig;
     }
 
     /**

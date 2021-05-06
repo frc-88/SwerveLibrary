@@ -62,4 +62,15 @@ public class MathUtils {
         double raw = Math.pow(base, exp);
         return (base < 0 && exp % 2 == 0) ? -raw : raw;
     }
+
+    /**
+     * Clamps x such that it is at least minValue and at most maxValue.
+     * @param x The value to clamp.
+     * @param minValue The lower limit.
+     * @param maxValue The upper limit.
+     * @return Clamped x.
+     */
+    public static double clamp(double x, double minValue, double maxValue) {
+        return Math.max(minValue, Math.min(maxValue, x));
+    }
 }

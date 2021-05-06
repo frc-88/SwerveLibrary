@@ -12,7 +12,7 @@ import frc.team88.swerve.util.constants.PIDPreferenceConstants;
  * PIDMotor implementation for the NEO. Uses the built-in encoder and PID on the
  * Spark Max.
  */
-public class PIDFalcon extends TalonFX implements PIDMotor {
+public class SwerveFalcon extends TalonFX implements SwerveMotor {
 
     // The offset to add to position values, in rotations.
     private double offset = 0;
@@ -26,7 +26,7 @@ public class PIDFalcon extends TalonFX implements PIDMotor {
      *                         All of the PID constants for velocity control. Uses
      *                         all constants except tolerance
      */
-    public PIDFalcon(int canID, PIDPreferenceConstants pidConstants) {
+    public SwerveFalcon(int canID, PIDPreferenceConstants pidConstants) {
         super(canID);
 
         this.configFactoryDefault();

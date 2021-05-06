@@ -20,9 +20,6 @@ public class CANifiedPWMEncoder implements PositionSensor {
     // The channel that the encoder is plugged into
     private PWMChannel channel;
 
-    // Gets the current velocity of whatever this is measuring, in rotations
-    private DoubleSupplier velocitySupplier;
-
     // The offset to add to position values, in rotations.
     private DoublePreferenceConstant offset;
 

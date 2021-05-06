@@ -14,17 +14,17 @@ import org.mockito.MockitoAnnotations;
 public class MotorCombinerTest {
 
     private MotorCombiner combiner;
-    private PIDMotor output1;
-    private PIDMotor output2;
+    private SwerveMotor output1;
+    private SwerveMotor output2;
 
     private final double[] input1ForwardCoefficients = { 1, 10 };
     private final double[] input2ForwardCoefficients = { 1, -8 };
 
     @Mock
-    PIDMotor input1;
+    SwerveMotor input1;
 
     @Mock
-    PIDMotor input2;
+    SwerveMotor input2;
 
     @BeforeEach
     public void setup() {

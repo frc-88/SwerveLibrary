@@ -9,7 +9,7 @@ import frc.team88.swerve.util.constants.PIDPreferenceConstants;
  * PIDMotor implementation for the NEO. Uses the built-in encoder and PID on the
  * Spark Max.
  */
-public class PIDNeo extends CANSparkMax implements PIDMotor {
+public class SwerveNeo extends CANSparkMax implements SwerveMotor {
 
     // The offset to add to position values, in rotations.
     private double offset = 0;
@@ -23,7 +23,7 @@ public class PIDNeo extends CANSparkMax implements PIDMotor {
      *                         All of the PID constants for velocity control. Uses
      *                         all constants except tolerance
      */
-    public PIDNeo(int canID, PIDPreferenceConstants pidConstants) {
+    public SwerveNeo(int canID, PIDPreferenceConstants pidConstants) {
         super(canID, MotorType.kBrushless);
 
         this.restoreFactoryDefaults();
