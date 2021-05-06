@@ -15,6 +15,9 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.team88.swerve.swervemodule.SwerveModule;
+import frc.team88.swerve.swervemodule.motorsensor.SwerveFalcon;
+import frc.team88.swerve.swervemodule.motorsensor.SwerveMotor;
+import frc.team88.swerve.swervemodule.motorsensor.SwerveNeo;
 import frc.team88.swerve.wrappers.gyro.Gyro;
 import frc.team88.swerve.wrappers.gyro.NavX;
 
@@ -87,8 +90,8 @@ public class Configuration {
     /**
      * Instatiates a NavX object.
      * 
-     * @param gyroConfig The config for the gyro
-     * @return The navx object
+     * @param gyroConfig The config for the gyro.
+     * @return The navx object.
      */
     private NavX instantiateNavX(Config gyroConfig) {
         String portType = gyroConfig.get("port-type");
@@ -109,7 +112,7 @@ public class Configuration {
      */
     private void instantiateGyro() {
         String template = this.configData.get("gyro.template");
-        Config gyroConfig = instantiateTemplateConfig(configData.get("gyro-templates." + template), configData.get("gyro"));
+        Config gyroConfig = this.instantiateTemplateConfig(configData.get("gyro-templates." + template), configData.get("gyro"));
 
         switch (template) {
             case "navx":
@@ -121,6 +124,46 @@ public class Configuration {
     }
 
     /**
+     * Instantiates a Falcon 500.
+     * 
+     * @param instanceConfig The config for the Falcon 500.
+     * @return The falcon object.
+     */
+    private SwerveFalcon instantiateFalcon500(Config instanceConfig) {
+        return new SwerveFalcon(instanceConfig.getInt("can-id"), new Falcon500Configuration(instanceConfig));
+    }
+
+    /**
+     * Instantiates a Neo.
+     * 
+     * @param instanceConfig The config for the Neo.
+     * @return The neo object.
+     */
+    private SwerveNeo instantiateNeo(Config instanceConfig) {
+        return new SwerveNeo(instanceConfig.getInt("can-id"), new NeoConfiguration(instanceConfig));
+    }
+
+    /**
+     * Instantiates a motor.
+     * 
+     * @param instanceConfig The instance config for this motor.
+     * @return The motor object.
+     */
+    private SwerveMotor instantiateMotor(Config instanceConfig) {
+        String template = instanceConfig.get("template");
+        Config motorConfig = this.instantiateTemplateConfig(configData.get("motor-templates." + template), instanceConfig);
+
+        switch (template) {
+            case "falcon500":
+                return this.instantiateFalcon500(motorConfig);
+            case "neo":
+                return this.instantiateNeo(motorConfig);
+            default:
+                throw new IllegalArgumentException(String.format("The template %s does not have a corresponding motor class.", template));
+        }
+    }
+
+    /**
      * Instantiates an individual module.
      * 
      * @param instanceConfig The instance config for this module.
@@ -128,9 +171,9 @@ public class Configuration {
      */
     private SwerveModule instantiateModule(Config instanceConfig) {
         String template = instanceConfig.get("template");
-        Config moduleConfig = instantiateTemplateConfig(configData.get("module-templates." + template), instanceConfig);
+        Config moduleConfig = this.instantiateTemplateConfig(configData.get("module-templates." + template), instanceConfig);
 
-        
+        SwerveMotor motors[] = new SwerveMotor[]{this.instantiateMotor(moduleConfig.get("motors.0")), this.instantiateMotor(moduleConfig.get("motors.1"))};
     }
 
     /**

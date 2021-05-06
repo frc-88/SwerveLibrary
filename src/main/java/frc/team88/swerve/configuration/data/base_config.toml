@@ -18,6 +18,17 @@
 # Falcon500
 #######################################
 
+[motor-templates.falcon500]
+inverted = false
+max-speed-rps = 100.0
+
+#######################################
+# Neo
+#######################################
+
+[motor-templates.neo]
+inverted = false
+max-speed-rps = 90.0
 
 
 ###########################################################
@@ -34,6 +45,14 @@ differential-matrix = [
         [0.09722222, 0.069444444]
     ]
 wheel-diameter-inches = 3.5
+
+[module-designs.team88.diff-swerve-2021.beta.motors.0]
+design = "falcon500"
+inverted = true
+
+[module-designs.team88.diff-swerve-2021.beta.motors.1]
+design = "falcon500"
+inverted = true
 
 [module-templates.team88.diff-swerve-2021.beta.azimuth-controller]
 kP = 10.0
