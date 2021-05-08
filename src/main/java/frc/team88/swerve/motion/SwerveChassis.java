@@ -22,7 +22,7 @@ public class SwerveChassis {
     // The config for this swerve drive.
     private Configuration config;
 
-    // The unmodified commanded target state
+    // The unmodified commanded target state.
     private MotionState targetState;
 
     // The inverse kinematics controller for this chassis.

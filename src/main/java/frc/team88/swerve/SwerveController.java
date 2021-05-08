@@ -8,6 +8,8 @@ import com.ctre.phoenix.CANifier;
 import frc.team88.swerve.configuration.Configuration;
 import frc.team88.swerve.gyro.SwerveGyro;
 import frc.team88.swerve.module.SwerveModule;
+import frc.team88.swerve.motion.state.VelocityState;
+import frc.team88.swerve.motion.state.OdomState;
 
 /**
  * The high-level API for controlling a swerve drive with this library.
@@ -47,7 +49,7 @@ public class SwerveController {
 
     }
     
-    public void setVelocities(double translationDirection, double translationSpeed, double rotationVelocity, boolean fieldCentric) {
+    public void setVelocity(double translationDirection, double translationSpeed, double rotationVelocity, boolean fieldCentric) {
 
     }
 
@@ -55,6 +57,22 @@ public class SwerveController {
 
     }
 
+    public void setCenterOfRotation(double x, double y) {
+
+    }
+ 
+    public VelocityState getTargetVelocity() {
+
+    }
+    
+    public VelocityState getConstrainedVelocity() {
+
+    }
+    
+    public OdomState getOdometry() {
+
+    }
+    
     /**
      * Gets the gyro being used by this swerve controller.
      * 
@@ -80,5 +98,21 @@ public class SwerveController {
      */
     public Map<Integer, CANifier> getCanifiers() {
         return this.config.getCanifiers();
+    }
+
+    public void enableLoggingOnRIO() {
+
+    }
+
+    public void disableLoggingOnRIO() {
+
+    }
+
+    public void enableNetworkTablesPublishing() {
+
+    }
+
+    public void disableNetworkTablesPublishing() {
+        
     }
 }
