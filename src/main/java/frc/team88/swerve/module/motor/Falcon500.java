@@ -1,4 +1,4 @@
-package frc.team88.swerve.swervemodule.motorsensor;
+package frc.team88.swerve.module.motor;
 
 import java.util.Objects;
 
@@ -13,7 +13,7 @@ import frc.team88.swerve.configuration.Falcon500Configuration;
 /**
  * SwerveMotor implementation for the Falcon 500.
  */
-public class SwerveFalcon extends TalonFX implements SwerveMotor {
+public class Falcon500 extends TalonFX implements SwerveMotor {
 
     // The configuration data for this motor.
     private final Falcon500Configuration config;
@@ -29,7 +29,7 @@ public class SwerveFalcon extends TalonFX implements SwerveMotor {
      * @param config
      *                         The config data for this motor.
      */
-    public SwerveFalcon(int canID, Falcon500Configuration config) {
+    public Falcon500(int canID, Falcon500Configuration config) {
         super(canID);
 
         this.config = Objects.requireNonNull(config);

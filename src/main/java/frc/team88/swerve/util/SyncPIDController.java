@@ -3,7 +3,6 @@ package frc.team88.swerve.util;
 import java.util.Objects;
 
 import frc.team88.swerve.configuration.PIDConfiguration;
-import frc.team88.swerve.wrappers.RobotControllerWrapper;
 
 /**
  * Class that performs the math of a PID controller, converting a setpoint and

@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import frc.team88.swerve.module.motor.SwerveMotor;
+
 public class MotorCombinerTest {
 
     private MotorCombiner combiner;

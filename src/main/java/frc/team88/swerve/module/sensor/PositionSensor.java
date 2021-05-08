@@ -1,4 +1,4 @@
-package frc.team88.swerve.swervemodule.motorsensor;
+package frc.team88.swerve.module.sensor;
 
 /**
  * Represents a sensor which can provide position in one dimension, such as an

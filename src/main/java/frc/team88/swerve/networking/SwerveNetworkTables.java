@@ -6,8 +6,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import edu.wpi.first.wpilibj.Timer;
-
-import frc.team88.swerve.SwerveChassis;
+import frc.team88.swerve.motion.SwerveChassis;
 import frc.team88.swerve.motion.state.OdomState;
 
 

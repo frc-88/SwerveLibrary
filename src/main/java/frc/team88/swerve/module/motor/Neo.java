@@ -1,4 +1,4 @@
-package frc.team88.swerve.swervemodule.motorsensor;
+package frc.team88.swerve.module.motor;
 
 import java.util.Objects;
 
@@ -10,7 +10,7 @@ import frc.team88.swerve.configuration.NeoConfiguration;
  * PIDMotor implementation for the NEO. Uses the built-in encoder and PID on the
  * Spark Max.
  */
-public class SwerveNeo extends CANSparkMax implements SwerveMotor {
+public class Neo extends CANSparkMax implements SwerveMotor {
 
     // The configuration data for this motor.
     private final NeoConfiguration config;
@@ -26,7 +26,7 @@ public class SwerveNeo extends CANSparkMax implements SwerveMotor {
      * @param config
      *                         The config data for this motor.
      */
-    public SwerveNeo(int canID, NeoConfiguration config) {
+    public Neo(int canID, NeoConfiguration config) {
         super(canID, MotorType.kBrushless);
 
         this.config = Objects.requireNonNull(config);

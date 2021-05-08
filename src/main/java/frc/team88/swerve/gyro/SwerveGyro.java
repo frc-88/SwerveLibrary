@@ -1,4 +1,4 @@
-package frc.team88.swerve.wrappers.gyro;
+package frc.team88.swerve.gyro;
 
 /**
  * Represents a gyroscope. Values returned follow our rules for units and the
@@ -18,7 +18,7 @@ package frc.team88.swerve.wrappers.gyro;
  * rule.
  * </p>
  */
-public interface Gyro {
+public interface SwerveGyro {
 
     /**
      * Gets the current yaw.

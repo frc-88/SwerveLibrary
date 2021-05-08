@@ -10,8 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import frc.team88.swerve.module.SwerveModule;
+import frc.team88.swerve.motion.kinematics.InverseKinematics;
 import frc.team88.swerve.motion.state.FullVelocityMotionState;
-import frc.team88.swerve.swervemodule.SwerveModule;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
 

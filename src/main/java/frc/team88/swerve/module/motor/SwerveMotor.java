@@ -1,4 +1,6 @@
-package frc.team88.swerve.swervemodule.motorsensor;
+package frc.team88.swerve.module.motor;
+
+import frc.team88.swerve.module.sensor.PositionSensor;
 
 /**
  * Motor with associated sensor that can be set to a velocity.

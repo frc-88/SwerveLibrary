@@ -1,4 +1,4 @@
-package frc.team88.swerve.swervemodule;
+package frc.team88.swerve.module;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -7,8 +7,8 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.javatuples.Pair;
 
 import frc.team88.swerve.configuration.SwerveModuleConfiguration;
-import frc.team88.swerve.swervemodule.motorsensor.SwerveMotor;
-import frc.team88.swerve.swervemodule.motorsensor.PositionSensor;
+import frc.team88.swerve.module.sensor.PositionSensor;
+import frc.team88.swerve.module.motor.SwerveMotor;
 import frc.team88.swerve.util.MathUtils;
 import frc.team88.swerve.util.SyncPIDController;
 import frc.team88.swerve.util.TrapezoidalProfileController;

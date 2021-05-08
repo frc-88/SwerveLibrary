@@ -1,23 +1,17 @@
-package frc.team88.swerve;
+package frc.team88.swerve.motion;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import edu.wpi.first.wpilibj.RobotController;
-import frc.team88.swerve.kinematics.ForwardKinematics;
-import frc.team88.swerve.kinematics.InverseKinematics;
-import frc.team88.swerve.motion.modifiers.LimitAcceleration;
-import frc.team88.swerve.motion.modifiers.ToHammerMode;
-import frc.team88.swerve.motion.modifiers.ToRobotCentric;
-import frc.team88.swerve.motion.state.MotionState;
+import frc.team88.swerve.configuration.Configuration;
+import frc.team88.swerve.gyro.SwerveGyro;
+import frc.team88.swerve.module.SwerveModule;
+import frc.team88.swerve.motion.kinematics.ForwardKinematics;
+import frc.team88.swerve.motion.kinematics.InverseKinematics;
 import frc.team88.swerve.motion.state.OdomState;
-import frc.team88.swerve.swervemodule.SwerveModule;
-import frc.team88.swerve.swervemodule.SwerveModule.SwitchingMode;
-import frc.team88.swerve.util.constants.DoublePreferenceConstant;
-import frc.team88.swerve.util.constants.LongPreferenceConstant;
 import frc.team88.swerve.util.logging.DataLogger;
-import frc.team88.swerve.wrappers.gyro.Gyro;
 
 /**
  * Represents a complete swerve chassis, with high level operations for
@@ -25,11 +19,8 @@ import frc.team88.swerve.wrappers.gyro.Gyro;
  */
 public class SwerveChassis {
 
-    // The gyro to use for this chassis.
-    private Gyro gyro;
-
-    // The swerve modules on this chassis.
-    private List<SwerveModule> modules;
+    // The config for this swerve drive.
+    private Configuration config;
 
     // The unmodified commanded target state
     private MotionState targetState;
@@ -60,32 +51,15 @@ public class SwerveChassis {
     private double prevTime;
 
     /**
-     * Construct.
+     * Constructs the SwerveChassis from the config.
      * 
-     * @param gyro
-     *                               The gyro measuring this chassis's
-     *                               field-oriented angle.
-     * @param modules
-     *                               The modules on this chassis. Minimum 2.
-     * @param expectedUpdateRate
-     *                               The expected rate at which update will be
-     *                               called, in Hz.
+     * @param config The config info for this swerve.
      */
-    public SwerveChassis(Gyro gyro, double expectedUpdateRate, SwerveModule... modules) {
-        Objects.requireNonNull(gyro);
-        this.gyro = gyro;
+    public SwerveChassis(Configuration config) {
+        this.config = Objects.requireNonNull(config);
 
-        if (modules.length < 2) {
-            throw new IllegalArgumentException("A swerve chassis must have at least 2 swerve modules");
-        }
-        for (SwerveModule module : modules) {
-            Objects.requireNonNull(module);
-            module.setSwitchingMode(SwitchingMode.kSmart);
-        }
-        this.modules = Arrays.asList(modules);
-
-        this.inverseKinematics = new InverseKinematics(modules);
-        this.forwardKinematics = new ForwardKinematics(modules);
+        this.inverseKinematics = new InverseKinematics(this.config.getModules());
+        this.forwardKinematics = new ForwardKinematics(this.config.getModules());
 
         currentTime = 0.0;
         prevTime = 0.0;
@@ -109,7 +83,7 @@ public class SwerveChassis {
         class GyroInfo {
             double yaw;
             double yawRate;
-            public GyroInfo(Gyro gyro) {
+            public GyroInfo(SwerveGyro gyro) {
                 this.yaw = gyro.getYaw();
                 this.yawRate = gyro.getYawRate();
             }

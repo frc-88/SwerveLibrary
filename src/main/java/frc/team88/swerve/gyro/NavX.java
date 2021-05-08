@@ -1,4 +1,4 @@
-package frc.team88.swerve.wrappers.gyro;
+package frc.team88.swerve.gyro;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 
-public class NavX implements Gyro {
+public class NavX implements SwerveGyro {
 
     // The navx object that this is based on.
     private AHRS base;

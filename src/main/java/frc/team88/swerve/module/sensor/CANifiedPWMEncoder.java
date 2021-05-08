@@ -1,6 +1,4 @@
-package frc.team88.swerve.swervemodule.motorsensor;
-
-import java.util.function.DoubleSupplier;
+package frc.team88.swerve.module.sensor;
 
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifierStatusFrame;

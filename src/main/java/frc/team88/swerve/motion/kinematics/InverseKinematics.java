@@ -1,11 +1,11 @@
-package frc.team88.swerve.kinematics;
+package frc.team88.swerve.motion.kinematics;
 
 import java.util.Objects;
 
+import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.motion.modifiers.MotionModifier;
 import frc.team88.swerve.motion.state.FullVelocityMotionState;
 import frc.team88.swerve.motion.state.MotionState;
-import frc.team88.swerve.swervemodule.SwerveModule;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
 import frc.team88.swerve.util.logging.DataLogger;

@@ -19,15 +19,15 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
-import frc.team88.swerve.swervemodule.SwerveModule;
-import frc.team88.swerve.swervemodule.motorsensor.CANifiedPWMEncoder;
-import frc.team88.swerve.swervemodule.motorsensor.PositionSensor;
-import frc.team88.swerve.swervemodule.motorsensor.SensorTransmission;
-import frc.team88.swerve.swervemodule.motorsensor.SwerveFalcon;
-import frc.team88.swerve.swervemodule.motorsensor.SwerveMotor;
-import frc.team88.swerve.swervemodule.motorsensor.SwerveNeo;
-import frc.team88.swerve.wrappers.gyro.Gyro;
-import frc.team88.swerve.wrappers.gyro.NavX;
+import frc.team88.swerve.gyro.NavX;
+import frc.team88.swerve.gyro.SwerveGyro;
+import frc.team88.swerve.module.SwerveModule;
+import frc.team88.swerve.module.motor.Falcon500;
+import frc.team88.swerve.module.motor.Neo;
+import frc.team88.swerve.module.motor.SwerveMotor;
+import frc.team88.swerve.module.sensor.PositionSensor;
+import frc.team88.swerve.module.sensor.CANifiedPWMEncoder;
+import frc.team88.swerve.module.sensor.SensorTransmission;
 
 /**
  * 
@@ -43,7 +43,7 @@ public class Configuration {
     private final Config configData;
 
     // The gyro from this configuration
-    private Gyro gyro;
+    private SwerveGyro gyro;
 
     // The swerve modules from this configuration
     private SwerveModule[] modules;
@@ -57,12 +57,11 @@ public class Configuration {
      * @param configPath The file path of the toml config. It can be a
      *                   relative path inside of the deploy directory or an
      *                   absolute path.
+     * @param gyro       The gyro to use. Will instantiate from config if null.
      */
-    public Configuration(final String configPath) {
+    public Configuration(final String configPath, SwerveGyro gyro) {
         Objects.requireNonNull(configPath);
-
         this.canifiers = new HashMap<>();
-
         ConfigParser<?> tomlParser = TomlFormat.instance().createParser();
 
         // Parse the base config file first
@@ -72,8 +71,24 @@ public class Configuration {
         tomlParser.parse(Filesystem.getDeployDirectory().toPath().resolve(configPath), this.configData, ParsingMode.MERGE, FileNotFoundAction.THROW_ERROR);
 
         // Create all of the objects and configs
-        this.instantiateGyro();
         this.instantiateModules();
+        if (Objects.nonNull(gyro)) {
+            this.gyro = gyro;
+        } else {
+            this.instantiateGyro();
+        }
+    }
+
+    /**
+     * Loads the base config and user config from the filesystem. Instantiates
+     * the gyro from the config.
+     * 
+     * @param configPath The file path of the toml config. It can be a
+     *                   relative path inside of the deploy directory or an
+     *                   absolute path.
+     */
+    public Configuration(final String configPath) {
+        this(configPath, null);
     }
 
     /**
@@ -81,7 +96,7 @@ public class Configuration {
      * 
      * @return The gyro object.
      */
-    public Gyro getGyro() {
+    public SwerveGyro getGyro() {
         return this.gyro;
     }
 
@@ -229,8 +244,8 @@ public class Configuration {
      * @param instanceConfig The config for the Falcon 500.
      * @return The falcon object.
      */
-    private SwerveFalcon instantiateFalcon500(Config instanceConfig) {
-        return new SwerveFalcon(instanceConfig.getInt("can-id"), new Falcon500Configuration(instanceConfig));
+    private Falcon500 instantiateFalcon500(Config instanceConfig) {
+        return new Falcon500(instanceConfig.getInt("can-id"), new Falcon500Configuration(instanceConfig));
     }
 
     /**
@@ -239,8 +254,8 @@ public class Configuration {
      * @param instanceConfig The config for the Neo.
      * @return The neo object.
      */
-    private SwerveNeo instantiateNeo(Config instanceConfig) {
-        return new SwerveNeo(instanceConfig.getInt("can-id"), new NeoConfiguration(instanceConfig));
+    private Neo instantiateNeo(Config instanceConfig) {
+        return new Neo(instanceConfig.getInt("can-id"), new NeoConfiguration(instanceConfig));
     }
 
     /**
