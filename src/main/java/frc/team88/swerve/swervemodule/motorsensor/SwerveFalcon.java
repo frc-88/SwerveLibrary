@@ -35,6 +35,7 @@ public class SwerveFalcon extends TalonFX implements SwerveMotor {
         this.config = Objects.requireNonNull(config);
 
         this.configFactoryDefault();
+        this.setInverted(config.isInverted());
         this.setNeutralMode(NeutralMode.Brake);
         this.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         this.configNeutralDeadband(0);
@@ -57,11 +58,11 @@ public class SwerveFalcon extends TalonFX implements SwerveMotor {
     }
 
     /**
-     * {@inheritDoc}
+     * Offsets the sensor position such that the current position becomes the
+     * given position.
      * 
      * @param position The position to set, in rotations
      */
-    @Override
     public void calibratePosition(double position) {
         this.offset = position - this.getPosition() + this.offset;
     }

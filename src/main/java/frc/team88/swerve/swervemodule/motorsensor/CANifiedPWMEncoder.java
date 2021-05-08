@@ -6,8 +6,6 @@ import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifierStatusFrame;
 import com.ctre.phoenix.CANifier.PWMChannel;
 
-import frc.team88.swerve.util.constants.DoublePreferenceConstant;
-
 /**
  * Represents a PWM-based encoder that is connected to a CANifier. Because there
  * isn't a great way to get the velocity here, a difference source is required.
@@ -20,9 +18,6 @@ public class CANifiedPWMEncoder implements PositionSensor {
     // The channel that the encoder is plugged into
     private PWMChannel channel;
 
-    // The offset to add to position values, in rotations.
-    private DoublePreferenceConstant offset;
-
     /**
      * Constructor.
      * 
@@ -34,11 +29,9 @@ public class CANifiedPWMEncoder implements PositionSensor {
      *                             The offset to add to position values, in
      *                             rotations
      */
-    public CANifiedPWMEncoder(CANifier canifier, PWMChannel channel,
-            DoublePreferenceConstant offset) {
+    public CANifiedPWMEncoder(CANifier canifier, PWMChannel channel) {
         this.canifier = canifier;
         this.channel = channel;
-        this.offset = offset;
         this.canifier.setStatusFramePeriod(CANifierStatusFrame.Status_3_PwmInputs0, 5);
         this.canifier.setStatusFramePeriod(CANifierStatusFrame.Status_4_PwmInputs1, 5);
         this.canifier.setStatusFramePeriod(CANifierStatusFrame.Status_5_PwmInputs2, 5);
@@ -49,12 +42,6 @@ public class CANifiedPWMEncoder implements PositionSensor {
     public double getPosition() {
         double[] dutyAndPeriod = new double[2];
         this.canifier.getPWMInput(channel, dutyAndPeriod);
-        return dutyAndPeriod[0] / dutyAndPeriod[1] + this.offset.getValue();
+        return dutyAndPeriod[0] / dutyAndPeriod[1];
     }
-
-    @Override
-    public void calibratePosition(double position) {
-        this.offset.setValue(position - this.getPosition() + this.offset.getValue());
-    }
-
 }

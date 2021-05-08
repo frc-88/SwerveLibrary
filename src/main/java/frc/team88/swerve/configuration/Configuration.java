@@ -1,9 +1,13 @@
 package frc.team88.swerve.configuration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
+import com.ctre.phoenix.CANifier;
+import com.ctre.phoenix.CANifier.PWMChannel;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.Config.Entry;
 import com.electronwill.nightconfig.core.file.FileNotFoundAction;
@@ -16,7 +20,9 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.team88.swerve.swervemodule.SwerveModule;
+import frc.team88.swerve.swervemodule.motorsensor.CANifiedPWMEncoder;
 import frc.team88.swerve.swervemodule.motorsensor.PositionSensor;
+import frc.team88.swerve.swervemodule.motorsensor.SensorTransmission;
 import frc.team88.swerve.swervemodule.motorsensor.SwerveFalcon;
 import frc.team88.swerve.swervemodule.motorsensor.SwerveMotor;
 import frc.team88.swerve.swervemodule.motorsensor.SwerveNeo;
@@ -41,6 +47,9 @@ public class Configuration {
 
     // The swerve modules from this configuration
     private SwerveModule[] modules;
+
+    // The canifiers used by sensors in this configuration
+    private final Map<Integer, CANifier> canifiers;
     
     /**
      * Loads the base config and user config from the filesystem.
@@ -51,6 +60,8 @@ public class Configuration {
      */
     public Configuration(final String configPath) {
         Objects.requireNonNull(configPath);
+
+        this.canifiers = new HashMap<>();
 
         ConfigParser<?> tomlParser = TomlFormat.instance().createParser();
 
@@ -72,6 +83,25 @@ public class Configuration {
      */
     public Gyro getGyro() {
         return this.gyro;
+    }
+
+    /**
+     * Gets the swerve modules specified by this config.
+     * 
+     * @return The modules array.
+     */
+    public SwerveModule[] getModules() {
+        return this.modules;
+    }
+
+    /**
+     * Gets a mapping from can IDs to canifiers instantiated by this
+     * configuration.
+     * 
+     * @return The mapping from can IDs to CANifiers.
+     */
+    public Map<Integer, CANifier> getCanifiers() {
+        return this.canifiers;
     }
 
     /**
@@ -140,6 +170,60 @@ public class Configuration {
     }
 
     /**
+     * Instantiates a PWM position sensor on a Canifier. Will create the
+     * Canifier object if it does not already exist.
+     * 
+     * @param instanceConfig The config for the canified pwm sensor.
+     * @return The canified pwm sensor object.
+     */
+    private SensorTransmission instantiateCanifiedPWM(Config instanceConfig) {
+        int canID = instanceConfig.getInt("can-id");
+        if (!this.canifiers.containsKey(canID)) {
+            this.canifiers.put(canID, new CANifier(canID));
+        }
+
+        int pwmChannel = instanceConfig.getInt("pwm-channel");
+        PWMChannel channel;
+        switch (pwmChannel) {
+            case 0:
+                channel = PWMChannel.PWMChannel0;
+                break;
+            case 1:
+                channel = PWMChannel.PWMChannel1;
+                break;
+            case 2:
+                channel = PWMChannel.PWMChannel2;
+                break;
+            case 3:
+                channel = PWMChannel.PWMChannel3;
+                break;
+            default:
+                throw new IllegalArgumentException(String.format("%d is not a valid PWM channel. It must be between 0 and 3, inclusive", pwmChannel));
+        }
+
+        CANifiedPWMEncoder rawSensor = new CANifiedPWMEncoder(this.canifiers.get(canID), channel);
+        return new SensorTransmission(rawSensor, new SensorTransmissionConfiguration(instanceConfig));
+    }
+
+    /**
+     * Instantiates a position sensor.
+     * 
+     * @param instanceConfig The config for the sensor.
+     * @return The sensor object.
+     */
+    private SensorTransmission instantiateSensor(Config instanceConfig) {
+        String template = instanceConfig.get("template");
+        Config sensorConfig = this.instantiateTemplateConfig(configData.get("sensor-templates." + template), instanceConfig);
+
+        switch (template) {
+            case "canified-pwm":
+                return this.instantiateCanifiedPWM(sensorConfig);
+            default:
+                throw new IllegalArgumentException(String.format("The template %s does not have a corresponding sensor class.", template));
+        }
+    }
+
+    /**
      * Instantiates a Falcon 500.
      * 
      * @param instanceConfig The config for the Falcon 500.
@@ -191,6 +275,8 @@ public class Configuration {
 
         SwerveMotor motors[] = new SwerveMotor[]{this.instantiateMotor(moduleConfig.get("motors.0")), this.instantiateMotor(moduleConfig.get("motors.1"))};
         PositionSensor azimuthSensor = this.instantiateSensor(moduleConfig.get("azimuth-sensor"));
+
+        return new SwerveModule(motors, azimuthSensor, new SwerveModuleConfiguration(moduleConfig));
     }
 
     /**

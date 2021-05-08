@@ -11,6 +11,21 @@
 
 
 ###########################################################
+# SENSOR TEMPLATES
+###########################################################
+
+#######################################
+# PWM Absolute Encoder on a Canifier
+#######################################
+
+[sensor-templates.canified-pwm]
+inverted = false
+ratio = 1
+offset = 0
+
+
+
+###########################################################
 # MOTOR TEMPLATES
 ###########################################################
 
@@ -45,13 +60,15 @@ differential-matrix = [
         [0.09722222, 0.069444444]
     ]
 wheel-diameter-inches = 3.5
+azimuth-sensor.template = "canified-pwm"
+azimuth-sensor.ratio = 0.0027778
 
-[module-designs.team88.diff-swerve-2021.beta.motors.0]
-design = "falcon500"
+[module-templates.team88.diff-swerve-2021.beta.motors.0]
+template = "falcon500"
 inverted = true
 
-[module-designs.team88.diff-swerve-2021.beta.motors.1]
-design = "falcon500"
+[module-templates.team88.diff-swerve-2021.beta.motors.1]
+template = "falcon500"
 inverted = true
 
 [module-templates.team88.diff-swerve-2021.beta.azimuth-controller]

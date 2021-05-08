@@ -33,6 +33,7 @@ public class SwerveNeo extends CANSparkMax implements SwerveMotor {
 
         this.restoreFactoryDefaults();
         this.setIdleMode(IdleMode.kBrake);
+        this.setInverted(config.isInverted());
     }
 
     /**
@@ -51,11 +52,11 @@ public class SwerveNeo extends CANSparkMax implements SwerveMotor {
     }
 
     /**
-     * {@inheritDoc}
+     * Offsets the sensor position such that the current position becomes the
+     * given position.
      * 
      * @param position The position to set, in rotations
      */
-    @Override
     public void calibratePosition(double position) {
         this.offset = position - this.getPosition() + this.offset;
     }
