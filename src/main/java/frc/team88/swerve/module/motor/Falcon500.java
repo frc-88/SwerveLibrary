@@ -5,7 +5,6 @@ import java.util.Objects;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import frc.team88.swerve.configuration.Falcon500Configuration;
@@ -39,7 +38,6 @@ public class Falcon500 extends TalonFX implements SwerveMotor {
         this.setNeutralMode(NeutralMode.Brake);
         this.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         this.configNeutralDeadband(0);
-        this.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 0));
     }
 
     /**

@@ -10,8 +10,10 @@ import frc.team88.swerve.gyro.SwerveGyro;
 import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.motion.kinematics.ForwardKinematics;
 import frc.team88.swerve.motion.kinematics.InverseKinematics;
+import frc.team88.swerve.motion.state.ModuleState;
 import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
+import frc.team88.swerve.util.WrappedAngle;
 import frc.team88.swerve.util.logging.DataLogger;
 
 /**
@@ -25,6 +27,9 @@ public class SwerveChassis {
 
     // The unmodified commanded target state.
     private VelocityState targetState = new VelocityState(0, 0, 0, false);
+
+    // The commanded velocity state that obeys all constraints.
+    private VelocityState constrainedState = this.targetState;
 
     // The inverse kinematics controller for this chassis.
     private InverseKinematics inverseKinematics;
@@ -54,7 +59,6 @@ public class SwerveChassis {
      * @param target The velocity state to set.
      */
     public void setTargetState(VelocityState target) {
-        this.holdMode = false;
         this.targetState = Objects.requireNonNull(target);
     }
 
@@ -67,8 +71,22 @@ public class SwerveChassis {
         return this.targetState;
     }
 
-    public void holdAzimuths() {
-        this.holdMode = true;
+    /**
+     * Gets the velocity state commanded after all constraints.
+     * 
+     * @return The constrained velocity state.
+     */
+    public VelocityState getConstrainedCommandState() {
+        return this.constrainedState;
+    }
+
+    /**
+     * Sets a hold on the current module azimuth targets.
+     * 
+     * @param hold True if there should be a hold, false otherwise.
+     */
+    public void holdAzimuths(boolean hold) {
+        this.holdMode = hold;
     }
 
     /**
@@ -79,19 +97,22 @@ public class SwerveChassis {
         // Update the forward kinematics and compute current pose
         this.forwardKinematics.update(getDt());
 
-        if (this.holdMode) {
-            return;
+        // Constrain the target state
+        VelocityState targetState = this.getTargetState();
+
+        // Must be robot-centric
+        this.constrainedState = this.makeRobotCentric(targetState);
+
+        // Command the modules
+        ModuleState moduleStates[] = this.inverseKinematics.calculate(constrainedState);
+        for (int idx = 0; idx < moduleStates.length; idx++) {
+            SwerveModule module = this.config.getModules()[idx];
+            if (this.holdMode && this.constrainedState.getTranslationSpeed() == 0 && this.constrainedState.getRotationVelocity() == 0) {
+                module.set(0, module.getAzimuthPosition());
+            } else {
+                module.set(moduleStates[idx].getWheelSpeed(), new WrappedAngle(moduleStates[idx].getAzimuthPosition()));
+            }
         }
-
-        VelocityState velocityState = this.getTargetState();
-
-        velocityState = this.makeRobotCentric(velocityState);
-
-        // Set the target state
-        this.inverseKinematics.setTargetState(velocityState);
-
-        // Update the inverse kinematics
-        this.inverseKinematics.update();
     }
 
     /**

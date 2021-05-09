@@ -58,12 +58,14 @@ public class SwerveController {
         VelocityState velocityState = this.getTargetVelocity();
         velocityState = velocityState.changeTranslationDirection(translationDirection).changeTranslationSpeed(translationSpeed).changeRotationVelocity(rotationVelocity).changeIsFieldCentric(fieldCentric);
         this.chassis.setTargetState(velocityState);
+        this.chassis.holdAzimuths(false);
     }
 
     public void holdDirection() {
         VelocityState velocityState = this.getTargetVelocity();
         velocityState = velocityState.changeTranslationSpeed(0).changeRotationVelocity(0);
         this.chassis.setTargetState(velocityState);
+        this.chassis.holdAzimuths(true);
     }
 
     public void setCenterOfRotation(double x, double y) {
@@ -71,13 +73,17 @@ public class SwerveController {
         velocityState = velocityState.changeCenterOfRotation(x, y);
         this.chassis.setTargetState(velocityState);
     }
+
+    public void setGyroYaw(double yaw) {
+        this.getGyro().calibrateYaw(yaw);
+    }
  
     public VelocityState getTargetVelocity() {
         return this.chassis.getTargetState();
     }
     
     public VelocityState getConstrainedVelocity() {
-
+        return this.chassis.getConstrainedCommandState();
     }
     
     public OdomState getOdometry() {
@@ -115,6 +121,6 @@ public class SwerveController {
     }
 
     public void disableNetworkTablesPublishing() {
-        
+
     }
 }

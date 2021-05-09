@@ -39,7 +39,7 @@ public class InverseKinematics {
     public ModuleState[] calculate(VelocityState target) {
         Objects.requireNonNull(target);
         if (target.isFieldCentric()) {
-            throw new IllegalArgumentException("Cannot give field centric velocity state to inverse kinematics");
+            throw new IllegalArgumentException("Cannot give field-centric velocity state to inverse kinematics");
         }
         
         // Get the translation vector, which is the same for all modules
