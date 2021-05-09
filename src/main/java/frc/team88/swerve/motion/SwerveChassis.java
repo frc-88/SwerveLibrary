@@ -95,7 +95,7 @@ public class SwerveChassis {
      */
     public void update() {
         // Update the forward kinematics and compute current pose
-        this.forwardKinematics.update(getDt());
+        this.forwardKinematics.update();
 
         // Constrain the target state
         VelocityState targetState = this.getTargetState();
@@ -138,13 +138,12 @@ public class SwerveChassis {
      * Sets the chassis odometry state.
      * (for setting chassis initial conditions)
      * 
-     * @param x The x position of the chassis.
-     * @param y The y position of the chassis.
+     * @param x The x position of the chassis, in feet.
+     * @param y The y position of the chassis, in feet.
      */
     public void setOdomState(double x, double y) {
         OdomState state = new OdomState();
-        state.x = x;
-        state.y = y;
+        state.setPosition(x, y);
         this.setOdomState(state);
     }
 
@@ -152,15 +151,14 @@ public class SwerveChassis {
      * Sets the chassis odometry state.
      * (for setting chassis initial conditions)
      * 
-     * @param x The x position of the chassis.
-     * @param y The y position of the chassis.
-     * @param theta The heading of the chasis.
+     * @param x The x position of the chassis, in feet.
+     * @param y The y position of the chassis, in feet.
+     * @param theta The heading of the chasis, in degrees.
      */
     public void setOdomState(double x, double y, double theta) {
         OdomState state = new OdomState();
-        state.x = x;
-        state.y = y;
-        state.t = theta;
+        state.setPosition(x, y);
+        state.setTheta(theta);
         this.setOdomState(state);
     }
 

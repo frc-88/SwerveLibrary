@@ -2,6 +2,7 @@ package frc.team88.swerve.motion.kinematics;
 
 import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.motion.state.OdomState;
+import frc.team88.swerve.util.RobotControllerWrapper;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
 
@@ -32,6 +33,9 @@ public class ForwardKinematics
     private RealMatrix poseTranslationMatrix;
     private RealMatrix poseVector;
     private RealMatrix deltaPoseVector;
+
+    // The last time the kinematics were calculated, in seconds.
+    private double previousTime_s = RobotControllerWrapper.getInstance().getFPGATime() * 1E6;
 
     public ForwardKinematics(SwerveModule... modules)
     {
@@ -98,8 +102,6 @@ public class ForwardKinematics
         SingularValueDecomposition svd = new SingularValueDecomposition(inverseKinematics);
         DecompositionSolver solver = svd.getSolver();
         forwardKinematics = solver.getInverse();
-
-        RealMatrixFormat TABLE_FORMAT = new RealMatrixFormat("", "", "", "\n", "", ", ");
     }
 
     private void calculateChassisVector()
@@ -116,9 +118,8 @@ public class ForwardKinematics
             moduleStatesMatrix.setEntry(idx * 2 + 1, 0, vx);
         }
         RealMatrix chassisVector = forwardKinematics.multiply(moduleStatesMatrix);
-        state.vy = chassisVector.getEntry(0, 0);
-        state.vx = chassisVector.getEntry(1, 0);
-        state.vt = chassisVector.getEntry(2, 0);
+        state.setVelocity(chassisVector.getEntry(1, 0), chassisVector.getEntry(0, 0));
+        state.setThetaVelocity(chassisVector.getEntry(2, 0));
         
     }
 
@@ -128,20 +129,23 @@ public class ForwardKinematics
      * Takes vx, vy, vt calculated in calculateChassisVector and stored in state.
      * Computes the next x, y, and t pose
      */
-    private void estimatePoseExponential(double dt)
+    private void estimatePoseExponential()
     {
-        if (dt <= 0.0) {
+        double currentTime_s = RobotControllerWrapper.getInstance().getFPGATime() * 1E6;
+        double dt = currentTime_s - previousTime_s;
+        if (dt > 1. || dt <= 0.) {
             return;
         }
-        double dx = state.vx * dt;
-        double dy = state.vy * dt;
-        double dtheta = -state.vt * dt;
+
+        double dx = state.getXVelocity() * dt;
+        double dy = state.getYVelocity() * dt;
+        double dtheta = -state.getThetaVelocity() * dt;
 
         double sin_dtheta = Math.sin(dtheta);
         double cos_dtheta = Math.cos(dtheta);
 
-        double sin_theta = Math.sin(state.t + dtheta);
-        double cos_theta = Math.cos(state.t + dtheta);
+        double sin_theta = Math.sin(state.getTheta() + dtheta);
+        double cos_theta = Math.cos(state.getTheta() + dtheta);
 
         double s;
         double c1;
@@ -188,15 +192,14 @@ public class ForwardKinematics
 
         deltaPoseVector = poseRotationMatrix.multiply(poseTranslationMatrix.multiply(poseVector));
 
-        state.x += deltaPoseVector.getEntry(0, 0);
-        state.y += deltaPoseVector.getEntry(1, 0);
-        state.t += deltaPoseVector.getEntry(2, 0);
+        state.addToPosition(deltaPoseVector.getEntry(0, 0), deltaPoseVector.getEntry(1, 0));
+        state.addToTheta(deltaPoseVector.getEntry(2, 0));
     }
 
-    public void update(double dt)
+    public void update()
     {
         calculateChassisVector();
-        estimatePoseExponential(dt);
+        estimatePoseExponential();
     }
 
     public OdomState getOdom() {

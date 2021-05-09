@@ -101,13 +101,10 @@ public class SwerveModule {
         // flip the wheel direction if necessary.
         Pair<Double, Boolean> distanceAndFlip = this.getAzimuthPosition().getSmallestDifferenceWithHalfAngle(azimuthPosition,
                 this.getAzimuthWrapBias());
-        if (distanceAndFlip.getValue1()) {
-            this.isWheelReversed = !this.isWheelReversed;
-        }
         double unwrappedAzimuthAngle = this.azimuthSensor.getPosition() + distanceAndFlip.getValue0();
 
         // Reverse the wheel if applicable.
-        double wheelVelocity = this.isWheelReversed ? -wheelSpeed : wheelSpeed;
+        double wheelVelocity = distanceAndFlip.getValue1() ? -wheelSpeed : wheelSpeed;
 
         // Get the azimuth velocity to command from the trapezoidal profile controller.
         this.azimuthPositionController.setTargetVelocity(azimuthVelocity);
@@ -116,9 +113,14 @@ public class SwerveModule {
                 this.azimuthSensor.getPosition(), this.getAzimuthVelocity());
 
         // Apply the pid to the wheel velocity.
-        wheelVelocity += this.wheelVelocityController.calculateOutput(this.getWheelVelocity(), wheelVelocity);
+        wheelVelocity += this.wheelVelocityController.calculateOutput(this.getWheelSpeed() * (this.isWheelReversed ? -1 : 1), wheelVelocity);
 
         this.setRawWheelVelocities(wheelVelocity, commandAzimuthVelocity);
+
+        // Set if the wheel direction is flipped
+        if (distanceAndFlip.getValue1()) {
+            this.isWheelReversed = !this.isWheelReversed;
+        }
     }
 
     /**
@@ -139,12 +141,12 @@ public class SwerveModule {
     }
 
     /**
-     * Gets the current wheel velocity.
+     * Gets the current wheel speed.
      * 
-     * @return The current wheel velocity, in feet per second.
+     * @return The current wheel speed, in feet per second.
      */
-    public double getWheelVelocity() {
-        return this.getDifferentialOutputs(Stream.of(motors).mapToDouble(SwerveMotor::getVelocity).toArray())[1] * wheelRotationsToFeet;
+    public double getWheelSpeed() {
+        return Math.abs(this.getDifferentialOutputs(Stream.of(motors).mapToDouble(SwerveMotor::getVelocity).toArray())[1] * wheelRotationsToFeet);
     }
 
     /**
@@ -269,7 +271,7 @@ public class SwerveModule {
      * @return The bias to use
      */
     private double getAzimuthWrapBias() {
-        double currentSpeed = Math.abs(this.getWheelVelocity());
+        double currentSpeed = this.getWheelSpeed();
         if (this.getAzimuthVelocity() > 30) {
             return 180;
         } else if (currentSpeed < 2.5) {
