@@ -11,6 +11,7 @@ import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.motion.kinematics.ForwardKinematics;
 import frc.team88.swerve.motion.kinematics.InverseKinematics;
 import frc.team88.swerve.motion.state.OdomState;
+import frc.team88.swerve.motion.state.VelocityState;
 import frc.team88.swerve.util.logging.DataLogger;
 
 /**
@@ -23,7 +24,7 @@ public class SwerveChassis {
     private Configuration config;
 
     // The unmodified commanded target state.
-    private MotionState targetState;
+    private VelocityState targetState = new VelocityState(0, 0, 0, false);
 
     // The inverse kinematics controller for this chassis.
     private InverseKinematics inverseKinematics;
@@ -31,24 +32,8 @@ public class SwerveChassis {
     // The forward kinematics controller for this chassis.
     private ForwardKinematics forwardKinematics;
 
-    // True if in field-centric mode, false if in robot-centric mode.
-    private boolean inFieldCentric = true;
-
-    // True if in hammer mode, false otherwise
-    private boolean inHammerMode = false;
-
-    // Modifier for field-centric mode
-    private ToRobotCentric fieldCentricModifier;
-
-    // Modifier for hammer mode
-    private ToHammerMode hammerModeModifier;
-
-    // Modifier for acceleration limiting
-    private LimitAcceleration accelerationLimitModifier;
-
-    // Timers for computing update rate
-    private double currentTime;
-    private double prevTime;
+    // A mode for holding wheel azimuths and setting speed to 0.
+    private boolean holdMode = true;;
 
     /**
      * Constructs the SwerveChassis from the config.
@@ -60,18 +45,30 @@ public class SwerveChassis {
 
         this.inverseKinematics = new InverseKinematics(this.config.getModules());
         this.forwardKinematics = new ForwardKinematics(this.config.getModules());
+    }
 
-        currentTime = 0.0;
-        prevTime = 0.0;
+    
+    /**
+     * Sets the target velocity state.
+     * 
+     * @param target The velocity state to set.
+     */
+    public void setTargetState(VelocityState target) {
+        this.holdMode = false;
+        this.targetState = Objects.requireNonNull(target);
+    }
 
-        this.targetState = inverseKinematics.getTargetState();
+    /**
+     * Gets the target velocity state.
+     * 
+     * @return The target velocity state.
+     */
+    public VelocityState getTargetState() {
+        return this.targetState;
+    }
 
-        fieldCentricModifier = new ToRobotCentric(gyro);
-        hammerModeModifier = new ToHammerMode(new DoublePreferenceConstant("Hammer Mode Angle", 70),
-                new LongPreferenceConstant("Hammer Mode Time", 1_000_000));
-        accelerationLimitModifier = new LimitAcceleration(new DoublePreferenceConstant("Translation Accel Limit", 100),
-                new DoublePreferenceConstant("Rotation Accel Limit", 1080), inverseKinematics::getTargetState,
-                expectedUpdateRate);
+    public void holdAzimuths() {
+        this.holdMode = true;
     }
 
     /**
@@ -79,51 +76,22 @@ public class SwerveChassis {
      * controls.
      */
     public void update() {
-        // Log Gyro State
-        class GyroInfo {
-            double yaw;
-            double yawRate;
-            public GyroInfo(SwerveGyro gyro) {
-                this.yaw = gyro.getYaw();
-                this.yawRate = gyro.getYawRate();
-            }
-        }
-        DataLogger.getInstance().addData("Gyro Info", new GyroInfo(this.gyro));
+        // Update the forward kinematics and compute current pose
+        this.forwardKinematics.update(getDt());
 
-        MotionState modifiedState = this.targetState;
-        DataLogger.getInstance().addData("Target State", modifiedState);
-
-        // Apply field-centric to translation if necessary
-        if (this.inFieldCentric()) {
-            modifiedState = fieldCentricModifier.apply(modifiedState);
+        if (this.holdMode) {
+            return;
         }
 
-        // Apply hammer mode if necessary
-        if (inHammerMode()) {
-            modifiedState = hammerModeModifier.apply(modifiedState);
-        }
+        VelocityState velocityState = this.getTargetState();
 
-        // Apply acceleration limits
-        modifiedState = accelerationLimitModifier.apply(modifiedState);
-
-        DataLogger.getInstance().addData("Modified State", modifiedState);
+        velocityState = this.makeRobotCentric(velocityState);
 
         // Set the target state
-        this.inverseKinematics.setTargetState(modifiedState);
+        this.inverseKinematics.setTargetState(velocityState);
 
         // Update the inverse kinematics
         this.inverseKinematics.update();
-
-        // Update the forward kinematics and compute current pose
-        this.forwardKinematics.update(getDt());
-    }
-
-    private double getDt()
-    {
-        currentTime = RobotController.getFPGATime() * 1E-6;
-        double dt = currentTime - prevTime;
-        prevTime = currentTime;
-        return dt;
     }
 
     /**
@@ -136,29 +104,6 @@ public class SwerveChassis {
     }
 
     /**
-     * Gets a module object
-     * 
-     * @param module_num The ID number for the module
-     * 
-     * @return A module object
-     */
-    public SwerveModule getModule(int module_num) {
-        if (module_num >= modules.size() || module_num < 0) {
-            throw new IllegalArgumentException(module_num + " exceeds module num bounds");
-        }
-        return modules.get(module_num);
-    }
-
-    /**
-     * Gets the number of modules
-     * 
-     * @return Number of modules
-     */
-    public int getNumModules() {
-        return modules.size();
-    }
-
-    /**
      * Sets the chassis odometry state.
      * (for setting chassis initial conditions)
      * 
@@ -167,12 +112,29 @@ public class SwerveChassis {
     public void setOdomState(OdomState state) {
         this.forwardKinematics.setOdom(state);
     }
+
+    /**
+     * Sets the chassis odometry state.
+     * (for setting chassis initial conditions)
+     * 
+     * @param x The x position of the chassis.
+     * @param y The y position of the chassis.
+     */
     public void setOdomState(double x, double y) {
         OdomState state = new OdomState();
         state.x = x;
         state.y = y;
         this.setOdomState(state);
     }
+
+    /**
+     * Sets the chassis odometry state.
+     * (for setting chassis initial conditions)
+     * 
+     * @param x The x position of the chassis.
+     * @param y The y position of the chassis.
+     * @param theta The heading of the chasis.
+     */
     public void setOdomState(double x, double y, double theta) {
         OdomState state = new OdomState();
         state.x = x;
@@ -182,99 +144,16 @@ public class SwerveChassis {
     }
 
     /**
-     * Sets the target motion state.
+     * Converts a velocity state to robot-centric using the gyro if it is field
+     * centric, otherwise returns it unmodified.
      * 
-     * @param target
-     *                   The motion state to set
+     * @param state The state to make robot-centric.
+     * @return A robot-centric state.
      */
-    public void setTargetState(MotionState target) {
-        this.targetState = Objects.requireNonNull(target);
-    }
-
-    /**
-     * Gets the target motion state.
-     * 
-     * @return The target motion state
-     */
-    public MotionState getTargetState() {
-        return this.targetState;
-    }
-
-    /**
-     * Sets the max wheel speed.
-     * 
-     * @param speed
-     *                  The maximum wheel speed, in feet per second
-     */
-    public void setMaxWheelSpeed(double speed) {
-        this.inverseKinematics.setMaxSpeed(speed);
-    }
-
-    /**
-     * Gets the max wheel speed.
-     * 
-     * @return The maximum wheel speed, in feet per second
-     */
-    public double getMaxWheelSpeed() {
-        return this.inverseKinematics.getMaxSpeed();
-    }
-
-    /**
-     * Enables field-centric mode, which means that all given translation angles are
-     * relative to gyro 0.
-     */
-    public void setFieldCentic() {
-        this.inFieldCentric = true;
-    }
-
-    /**
-     * Enables robot-centric mode, which means that all given translation angles are
-     * relative to the front of the robot.
-     */
-    public void setRobotCentic() {
-        this.inFieldCentric = false;
-    }
-
-    /**
-     * Is this chassis in field-centric mode?
-     * 
-     * @return True if in field-centric mode, false if in robot-centric mode
-     */
-    public boolean inFieldCentric() {
-        return this.inFieldCentric;
-    }
-
-    /**
-     * Enables hammer mode.
-     */
-    public void enableHammerMode() {
-        if (!inHammerMode()) {
-            this.inHammerMode = true;
-            hammerModeModifier.reset();
-            for (SwerveModule module : modules) {
-                module.setSwitchingMode(SwitchingMode.kAlwaysSwitch);
-            }
+    private VelocityState makeRobotCentric(VelocityState state) {
+        if (!state.isFieldCentric()) {
+            return state;
         }
-    }
-
-    /*
-     * Disables hammer mode.
-     */
-    public void disableHammerMode() {
-        if (inHammerMode()) {
-            this.inHammerMode = false;
-            for (SwerveModule module : modules) {
-                module.setSwitchingMode(SwitchingMode.kSmart);
-            }
-        }
-    }
-
-    /**
-     * Is this chassis in hammer mode?
-     * 
-     * @return True if in hammer mode, false otherwise
-     */
-    public boolean inHammerMode() {
-        return this.inHammerMode;
+        return state.changeTranslationDirection(state.getTranslationDirection() - this.config.getGyro().getYaw()).changeIsFieldCentric(false);
     }
 }

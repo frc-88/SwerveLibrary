@@ -7,8 +7,8 @@ import com.ctre.phoenix.CANifier;
 
 import frc.team88.swerve.configuration.Configuration;
 import frc.team88.swerve.gyro.SwerveGyro;
-import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.motion.state.VelocityState;
+import frc.team88.swerve.motion.SwerveChassis;
 import frc.team88.swerve.motion.state.OdomState;
 
 /**
@@ -18,6 +18,9 @@ public class SwerveController {
 
     // The configuration data
     private final Configuration config;
+
+    // The swerve chassis object being controlled
+    private final SwerveChassis chassis;
     
     /**
      * Constructs the SwerveController using the given toml config.
@@ -29,6 +32,7 @@ public class SwerveController {
     public SwerveController(final String configPath) {
         Objects.requireNonNull(configPath);
         this.config = new Configuration(configPath);
+        this.chassis = new SwerveChassis(this.config);
     }
 
     /**
@@ -43,26 +47,33 @@ public class SwerveController {
     public SwerveController(final String configPath, SwerveGyro gyro) {
         Objects.requireNonNull(configPath);
         this.config = new Configuration(configPath, gyro);
+        this.chassis = new SwerveChassis(this.config);
     }
 
     public void update() {
-
+        this.chassis.update();
     }
     
     public void setVelocity(double translationDirection, double translationSpeed, double rotationVelocity, boolean fieldCentric) {
-
+        VelocityState velocityState = this.getTargetVelocity();
+        velocityState = velocityState.changeTranslationDirection(translationDirection).changeTranslationSpeed(translationSpeed).changeRotationVelocity(rotationVelocity).changeIsFieldCentric(fieldCentric);
+        this.chassis.setTargetState(velocityState);
     }
 
     public void holdDirection() {
-
+        VelocityState velocityState = this.getTargetVelocity();
+        velocityState = velocityState.changeTranslationSpeed(0).changeRotationVelocity(0);
+        this.chassis.setTargetState(velocityState);
     }
 
     public void setCenterOfRotation(double x, double y) {
-
+        VelocityState velocityState = this.getTargetVelocity();
+        velocityState = velocityState.changeCenterOfRotation(x, y);
+        this.chassis.setTargetState(velocityState);
     }
  
     public VelocityState getTargetVelocity() {
-
+        return this.chassis.getTargetState();
     }
     
     public VelocityState getConstrainedVelocity() {
@@ -70,7 +81,7 @@ public class SwerveController {
     }
     
     public OdomState getOdometry() {
-
+        return this.chassis.getOdomState();
     }
     
     /**
@@ -80,15 +91,6 @@ public class SwerveController {
      */
     public SwerveGyro getGyro() {
         return this.config.getGyro();
-    }
-
-    /**
-     * Gets the swerve modules on this swerve.
-     * 
-     * @return An array of the swerve module objects, in no particular order.
-     */
-    public SwerveModule[] getModules() {
-        return this.config.getModules();
     }
 
     /**
