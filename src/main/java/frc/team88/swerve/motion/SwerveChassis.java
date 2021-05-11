@@ -1,12 +1,8 @@
 package frc.team88.swerve.motion;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
-import edu.wpi.first.wpilibj.RobotController;
 import frc.team88.swerve.configuration.Configuration;
-import frc.team88.swerve.gyro.SwerveGyro;
 import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.motion.kinematics.ForwardKinematics;
 import frc.team88.swerve.motion.kinematics.InverseKinematics;
@@ -14,7 +10,6 @@ import frc.team88.swerve.motion.state.ModuleState;
 import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
 import frc.team88.swerve.util.WrappedAngle;
-import frc.team88.swerve.util.logging.DataLogger;
 
 /**
  * Represents a complete swerve chassis, with high level operations for

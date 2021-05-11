@@ -65,7 +65,7 @@ public class Configuration {
         ConfigParser<?> tomlParser = TomlFormat.instance().createParser();
 
         // Parse the base config file first
-        this.configData = tomlParser.parse(getClass().getResourceAsStream("data/base_config.toml"));
+        this.configData = tomlParser.parse(getClass().getResourceAsStream("assets/base_config.toml"));
 
         // Append and overwrite with the user-supplied config file
         tomlParser.parse(Filesystem.getDeployDirectory().toPath().resolve(configPath), this.configData, ParsingMode.MERGE, FileNotFoundAction.THROW_ERROR);

@@ -16,6 +16,9 @@ public class Falcon500 extends TalonFX implements SwerveMotor {
 
     // The configuration data for this motor.
     private final Falcon500Configuration config;
+
+    // The last commanded velocity.
+    private double commandVelocity = 0;
     
     // The offset to add to position values, in rotations.
     private double offset = 0;
@@ -68,11 +71,27 @@ public class Falcon500 extends TalonFX implements SwerveMotor {
     @Override
     public void setVelocity(double velocity) {
         this.set(ControlMode.PercentOutput, velocity / this.getMaxVelocity());
+        this.commandVelocity = velocity;
     }
 
     @Override
     public double getMaxVelocity() {
         return this.config.getMaxSpeed();
+    }
+
+    @Override
+    public double getCurrentDraw() {
+        return this.getSupplyCurrent();
+    }
+
+    @Override
+    public double getCommandVoltage() {
+        return this.getMotorOutputVoltage();
+    }
+
+    @Override
+    public double getCommandVelocity() {
+        return this.commandVelocity;
     }
 
 }

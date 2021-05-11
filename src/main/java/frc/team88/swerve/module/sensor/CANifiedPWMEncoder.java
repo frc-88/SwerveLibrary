@@ -23,9 +23,6 @@ public class CANifiedPWMEncoder implements PositionSensor {
      *                             The CANifier that the encoder is plugged into
      * @param channel
      *                             The channel that the encoder is plugged into
-     * @param offset
-     *                             The offset to add to position values, in
-     *                             rotations
      */
     public CANifiedPWMEncoder(CANifier canifier, PWMChannel channel) {
         this.canifier = canifier;

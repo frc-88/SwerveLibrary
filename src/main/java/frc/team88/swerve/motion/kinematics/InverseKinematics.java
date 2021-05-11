@@ -34,7 +34,8 @@ public class InverseKinematics {
      * Sets the target motion state.
      * 
      * @param target
-     *                   The motion state to target. Robot-centric
+     *                   The motion state to target. Robot-centric.
+     * @return The calculated module states.
      */
     public ModuleState[] calculate(VelocityState target) {
         Objects.requireNonNull(target);

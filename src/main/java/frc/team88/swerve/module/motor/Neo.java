@@ -15,6 +15,9 @@ public class Neo extends CANSparkMax implements SwerveMotor {
     // The configuration data for this motor.
     private final NeoConfiguration config;
 
+    // The last commanded velocity.
+    private double commandVelocity = 0;
+
     // The offset to add to position values, in rotations.
     private double offset = 0;
 
@@ -64,11 +67,27 @@ public class Neo extends CANSparkMax implements SwerveMotor {
     @Override
     public void setVelocity(double velocity) {
         this.set(velocity / this.getMaxVelocity());
+        this.commandVelocity = velocity;
     }
 
     @Override
     public double getMaxVelocity() {
         return this.config.getMaxSpeed();
+    }
+
+    @Override
+    public double getCurrentDraw() {
+        return this.getCurrentDraw();
+    }
+
+    @Override
+    public double getCommandVoltage() {
+        return this.getAppliedOutput() * this.getBusVoltage();
+    }
+
+    @Override
+    public double getCommandVelocity() {
+        return this.commandVelocity;
     }
 
 }

@@ -1,4 +1,4 @@
-package frc.team88.swerve.util.logging;
+package frc.team88.swerve.data;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -24,8 +26,10 @@ public class DataLogger {
 
     private static DataLogger instance;
 
-    private static final Path LOGS_DIR = Filesystem.getOperatingDirectory().toPath().resolve("data/");
-    private static final Path LAST_LOG_PATH = LOGS_DIR.resolve("last_log_num.txt");
+    private final Path LOGS_DIR = Filesystem.getOperatingDirectory().toPath().resolve("data/");
+    private final Path LAST_LOG_PATH = LOGS_DIR.resolve("last_log_num.txt");
+
+    private final long MIN_DISK_SPACE = 50_000_000; // bytes
 
     private Path logPath;
 
@@ -41,7 +45,7 @@ public class DataLogger {
     }
 
     /**
-     * Gets the DataLogger singleton instance.
+     * Gets the DataLogger singleton instance. Will lazily instantiate.
      * 
      * @return The DataLogger singleton instance
      */
@@ -66,6 +70,19 @@ public class DataLogger {
     }
 
     /**
+     * POJO used for GSON serialization.
+     */
+    private static class LogItem {
+        private String label;
+        private Object data;
+
+        public LogItem(String label, Object data) {
+            this.label = label;
+            this.data = data;
+        }
+    }
+
+    /**
      * Writes all added data since the last call to a new line in the log file.
      */
     public void logData() {
@@ -73,17 +90,6 @@ public class DataLogger {
             System.err.println("Cannot write to log because the file failed to initialize.");
             this.dataToLog.clear();
             return;
-        }
-
-        // Create POJO for data representation.
-        class LogItem {
-            String label;
-            Object data;
-
-            public LogItem(String label, Object data) {
-                this.label = label;
-                this.data = data;
-            }
         }
 
         // Start with a timestamp object.
@@ -95,22 +101,23 @@ public class DataLogger {
             logItems.add(new LogItem(entry.getKey(), entry.getValue()));
         }
 
-        // Write line to log file.
+        // Write line to log file
         try {
-            Files.writeString(this.logPath, this.gson.toJson(logItems) + "/n");
+            Files.writeString(this.logPath, this.gson.toJson(logItems) + "\n");
         } catch (IOException err) {
             System.err.format("Encountered IO Exception when writing logs: %s%n", err);
         }
 
-        // Clear old data.
+        // Clear old data
         this.dataToLog.clear();
     }
 
     /**
-     * Initializes the data logger, opening a file to log data to.
+     * Initializes the data logger, opening a file to log data to and deleting
+     * old logs to make enough space.
      */
     private DataLogger() {
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = new GsonBuilder().create();
         this.dataToLog = new HashMap<>();
 
         // Ensure the data directory exists
@@ -121,6 +128,29 @@ public class DataLogger {
         } catch (IOException err) {
             System.err.format("Encountered IO Exception when ensuring existence of log directory %s: %s%n",
                     LOGS_DIR.toString(), err);
+            System.err.println("No logs will be generated.");
+            this.logPath = null;
+            return;
+        }
+
+        // Clear old logs to make disk space.
+        try {
+            LinkedList<Path> logDirFiles = Files.list(LOGS_DIR).filter(s -> Pattern.matches("\\d+\\.jsonl", s.getFileName().toString())).sorted().collect(Collectors.toCollection(LinkedList::new));
+            while (Files.getFileStore(LOGS_DIR).getUsableSpace() < MIN_DISK_SPACE) {
+                Path nextLogFile = logDirFiles.poll();
+                
+                if (Objects.isNull(nextLogFile)) {
+                    System.err.format("Not enough space on disk for a new log file. The minimum is %d bytes, but only %d bytes are available.%n", MIN_DISK_SPACE, Files.getFileStore(LOGS_DIR).getUsableSpace());
+                    System.err.println("No logs will be generated.");
+                    this.logPath = null;
+                    return;
+                }
+
+                Files.delete(nextLogFile);
+            }
+        } catch (IOException err) {
+            System.err.format("Encountered IO Exception when clearing log files in %s: %s%n", LOGS_DIR.toString(), err);
+            System.err.println("No logs will be generated.");
             this.logPath = null;
             return;
         }
@@ -139,6 +169,7 @@ public class DataLogger {
         } catch (IOException err) {
             System.err.format("Encountered IO Exception when getting/updating log number at %s: %s%n",
                     LAST_LOG_PATH.toString(), err);
+            System.err.println("No logs will be generated.");
             this.logPath = null;
             return;
         }
@@ -150,6 +181,7 @@ public class DataLogger {
         } catch (IOException err) {
             System.err.format("Encountered IO Exception when creating the log file %s: %s%n", LAST_LOG_PATH.toString(),
                     err);
+            System.err.println("No logs will be generated.");
             this.logPath = null;
             return;
         }

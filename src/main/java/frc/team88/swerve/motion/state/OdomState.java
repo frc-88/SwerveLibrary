@@ -1,10 +1,13 @@
 package frc.team88.swerve.motion.state;
 
+import edu.wpi.first.networktables.NetworkTable;
+import frc.team88.swerve.data.NetworkTablePopulator;
+
 /**
  * Represents the state of the robot as determined by the odometry, both
  * position and velocity.
  */
-public class OdomState {
+public class OdomState implements NetworkTablePopulator {
     private double xPosition = 0.0;
     private double yPosition = 0.0;
     private double theta = 0.0;
@@ -127,6 +130,16 @@ public class OdomState {
      */
     public void setThetaVelocity(double vtheta) {
         this.thetaVelocity = vtheta;
+    }
+
+    @Override
+    public void populateNetworkTable(NetworkTable table) {
+        table.getEntry("xPosition").setDouble(this.xPosition);
+        table.getEntry("yPosition").setDouble(this.yPosition);
+        table.getEntry("theta").setDouble(this.theta);
+        table.getEntry("xVelocity").setDouble(this.xVelocity);
+        table.getEntry("yVelocity").setDouble(this.yVelocity);
+        table.getEntry("thetaVelocity").setDouble(this.thetaVelocity);
     }
 
 }

@@ -8,7 +8,6 @@ import frc.team88.swerve.util.WrappedAngle;
 
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
-import org.apache.commons.math3.linear.RealMatrixFormat;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.DecompositionSolver;
@@ -107,8 +106,8 @@ public class ForwardKinematics
     private void calculateChassisVector()
     {
         for (int idx = 0; idx < modules.length; ++idx) {
-            WrappedAngle azimuth = modules[idx].getAzimuthPosition();
-            double wheel_speed = modules[idx].getWheelSpeed();
+            WrappedAngle azimuth = modules[idx].getAzimuthPositionFlipped();
+            double wheel_speed = Math.abs(modules[idx].getWheelVelocity());
 
             double azimuthRad = Math.toRadians(azimuth.asDouble());
 

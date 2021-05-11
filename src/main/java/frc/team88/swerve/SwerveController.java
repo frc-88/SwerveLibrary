@@ -6,6 +6,7 @@ import java.util.Objects;
 import com.ctre.phoenix.CANifier;
 
 import frc.team88.swerve.configuration.Configuration;
+import frc.team88.swerve.data.DataManager;
 import frc.team88.swerve.gyro.SwerveGyro;
 import frc.team88.swerve.motion.state.VelocityState;
 import frc.team88.swerve.motion.SwerveChassis;
@@ -21,6 +22,9 @@ public class SwerveController {
 
     // The swerve chassis object being controlled
     private final SwerveChassis chassis;
+
+    // The data manager
+    private final DataManager dataManager;
     
     /**
      * Constructs the SwerveController using the given toml config.
@@ -33,6 +37,7 @@ public class SwerveController {
         Objects.requireNonNull(configPath);
         this.config = new Configuration(configPath);
         this.chassis = new SwerveChassis(this.config);
+        this.dataManager = new DataManager(this.config, this.chassis);
     }
 
     /**
@@ -48,10 +53,12 @@ public class SwerveController {
         Objects.requireNonNull(configPath);
         this.config = new Configuration(configPath, gyro);
         this.chassis = new SwerveChassis(this.config);
+        this.dataManager = new DataManager(this.config, this.chassis);
     }
 
     public void update() {
         this.chassis.update();
+        this.dataManager.update();
     }
     
     public void setVelocity(double translationDirection, double translationSpeed, double rotationVelocity, boolean fieldCentric) {
@@ -109,18 +116,18 @@ public class SwerveController {
     }
 
     public void enableLoggingOnRIO() {
-
+        this.dataManager.setEnableDataLogging(true);
     }
 
     public void disableLoggingOnRIO() {
-
+        this.dataManager.setEnableDataLogging(false);
     }
 
     public void enableNetworkTablesPublishing() {
-
+        this.dataManager.setEnableNetworkTablesPublishing(true);
     }
 
     public void disableNetworkTablesPublishing() {
-
+        this.dataManager.setEnableNetworkTablesPublishing(false);
     }
 }

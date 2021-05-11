@@ -29,4 +29,25 @@ public interface SwerveMotor extends PositionSensor {
      */
     public double getMaxVelocity();
 
+    /**
+     * Get the current draw from this motor.
+     * 
+     * @return The current draw, in amps.
+     */
+    public double getCurrentDraw();
+
+    /**
+     * Get the voltage commanded to this motor.
+     * 
+     * @return The command voltage, in volts.
+     */
+    public double getCommandVoltage();
+
+    /**
+     * The velocity commanded to this motor.
+     * 
+     * @return The command velocity, in rotations per second.
+     */
+    public double getCommandVelocity();
+
 }

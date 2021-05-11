@@ -1,12 +1,14 @@
 package frc.team88.swerve.motion.state;
 
+import edu.wpi.first.networktables.NetworkTable;
+import frc.team88.swerve.data.NetworkTablePopulator;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
 
 /**
  * Represents a desired state of motion, including the translational velocity.
  */
-public class VelocityState {
+public class VelocityState implements NetworkTablePopulator {
     
     private final double translationDirection;
     private final double translationSpeed;
@@ -41,7 +43,7 @@ public class VelocityState {
     }
 
     /**
-     * Constructs this velocity state assuming a center of rotation of <0, 0>.
+     * Constructs this velocity state assuming a center of rotation of [0, 0].
      * 
      * @param translationDirection The direction to translate, in degrees
      *                             counting counterclockise from forwards.
@@ -185,5 +187,15 @@ public class VelocityState {
      */
     public VelocityState changeIsFieldCentric(boolean isFieldCentric) {
         return new VelocityState(this.translationDirection, this.translationSpeed, this.rotationVelocity, this.centerOfRotationX, this.centerOfRotationY, isFieldCentric);
+    }
+
+    @Override
+    public void populateNetworkTable(NetworkTable table) {
+        table.getEntry("translationDirection").setDouble(this.translationDirection);
+        table.getEntry("translationSpeed").setDouble(this.translationSpeed);
+        table.getEntry("rotationVelocity").setDouble(this.rotationVelocity);
+        table.getEntry("centerOfRotationX").setDouble(this.centerOfRotationX);
+        table.getEntry("centerOfRotationY").setDouble(this.centerOfRotationY);
+        table.getEntry("isFieldCentric").setBoolean(this.isFieldCentric);
     }
 }

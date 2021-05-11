@@ -40,13 +40,13 @@ public class TrapezoidalProfileController {
      * 
      * @param maxSpeed
      *                            The maximum speed value that can be both commanded
-     *                            and output, in units per second
+     *                            and output, in units per second.
      * @param maxAcceleration
      *                            The maximum acceleration for the trapezoidal
      *                            profile, in units per second^2
      * @param positionPID
      *                            The position controller used to adjust the
-     *                            velocity
+     *                            velocity.
      */
     public TrapezoidalProfileController(double maxSpeed, double maxAcceleration, SyncPIDController positionPID) {
         if (maxSpeed <= 0) {
@@ -65,7 +65,7 @@ public class TrapezoidalProfileController {
      * 
      * @param maxSpeed
      *                     The maximum speed value that can be both commanded and
-     *                     output, in units per second
+     *                     output, in units per second.
      */
     public void setMaxSpeed(double maxSpeed) {
         if (maxSpeed <= 0) {
@@ -93,7 +93,7 @@ public class TrapezoidalProfileController {
      * 
      * @param velocity
      *                     The target velocity which is a setpoint for this
-     *                     controller, in units per second
+     *                     controller, in units per second.
      */
     public void setTargetVelocity(double velocity) {
         this.targetVelocity = velocity;
@@ -104,7 +104,7 @@ public class TrapezoidalProfileController {
      * 
      * @param position
      *                     The target position which is a setpoint for this
-     *                     controller
+     *                     controller.
      */
     public void setTargetPosition(double position) {
         this.targetPosition = position;
@@ -114,7 +114,7 @@ public class TrapezoidalProfileController {
      * Gets the max speed limit.
      * 
      * @return The maximum speed value that can be both commanded and output, in
-     *         units per second
+     *         units per second.
      */
     public double getMaxSpeed() {
         return this.maxSpeed;
@@ -134,7 +134,7 @@ public class TrapezoidalProfileController {
      * Gets the target velocity.
      * 
      * @return The target velocity which is a setpoint for this controller, in units
-     *         per second
+     *         per second.
      */
     public double getTargetVelocity() {
         return this.targetVelocity;
@@ -143,7 +143,7 @@ public class TrapezoidalProfileController {
     /**
      * Gets the target position.
      * 
-     * @return The target position which is a setpoint for this controller
+     * @return The target position which is a setpoint for this controller.
      */
     public double getTargetPosition() {
         return this.targetPosition;
@@ -152,16 +152,25 @@ public class TrapezoidalProfileController {
     /**
      * Gets the last commanded position.
      * 
-     * @return The last commanded position
+     * @return The last commanded position.
      */
     public double getLastCommandedPosition() {
         return this.lastCommandedPosition;
     }
 
     /**
+     * Gets the last commanded velocity.
+     * 
+     * @return The last commanded velocity.
+     */
+    public double getLastCommandedVelocity() {
+        return this.lastCommandedVelocity;
+    }
+
+    /**
      * Gets the position PID controller.
      * 
-     * @return The position controller used to adjust the velocity
+     * @return The position controller used to adjust the velocity.
      */
     public SyncPIDController getPositionPID() {
         return this.positionPID;
@@ -172,7 +181,7 @@ public class TrapezoidalProfileController {
      * Should be called after this controller hasn't been used for a long time.
      * 
      * @param currentPosition
-     *                            The current positon
+     *                            The current positon.
      */
     public void reset(double currentPosition) {
         this.lastCalculationTime = RobotControllerWrapper.getInstance().getFPGATime();
@@ -184,10 +193,10 @@ public class TrapezoidalProfileController {
      * Calculates the velocity output following the trapezoidal profile.
      * 
      * @param currentPosition
-     *                            The current position as an input
+     *                            The current position as an input.
      * @param currentVelocity
      *                            The current velocity as an input, in units per
-     *                            second
+     *                            second.
      * @return The velocity value to command as the output, in units per second
      */
     public double calculateCommandVelocity(double currentPosition, double currentVelocity) {
@@ -232,12 +241,12 @@ public class TrapezoidalProfileController {
      * acceleration.
      * 
      * @param currentVelocity
-     *                            The current velocity, in units per second
+     *                            The current velocity, in units per second.
      * @param forwards
      *                            True if the value returned should be greater than
      *                            the current velocity, false if it should be
-     *                            smaller
-     * @return The calculated command velocity, in units per second
+     *                            smaller.
+     * @return The calculated command velocity, in units per second.
      */
     protected double calculateAcceleratedVelocity(double currentVelocity, boolean forwards) {
         double sign = forwards ? 1 : -1;
@@ -250,8 +259,8 @@ public class TrapezoidalProfileController {
      * Limits the command velocity such that it does not exceed the max speed limit.
      * 
      * @param commandVelocity
-     *                            The command velocity to limit, in units per second
-     * @return The limited velocity, in units per second
+     *                            The command velocity to limit, in units per second.
+     * @return The limited velocity, in units per second.
      */
     protected double applyMaxSpeedLimit(double commandVelocity) {
         return Math.min(maxSpeed, Math.max(-maxSpeed, commandVelocity));
@@ -262,9 +271,9 @@ public class TrapezoidalProfileController {
      * target at the right velocity.
      * 
      * @param commandVelocity
-     *                            The command velocity to limit, in units per second
+     *                            The command velocity to limit, in units per second.
      * @param forwards Whether we are moving forwards or backwards.
-     * @return The limited velocity, in units per second
+     * @return The limited velocity, in units per second.
      */
     protected double applyDeccelerationLimit(double commandVelocity, boolean forwards) {
         // v^2 = v0^2 + 2ax -> v0 = sqrt(v^2 - 2ax)
@@ -284,8 +293,8 @@ public class TrapezoidalProfileController {
      * 
      * @param commandVelocity
      *                            The currently commanded velocity, in units per
-     *                            second
-     * @return The position to command
+     *                            second.
+     * @return The position to command.
      */
     protected double calculateCommandPosition(double commandVelocity) {
         return lastCommandedPosition

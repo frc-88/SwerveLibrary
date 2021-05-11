@@ -46,6 +46,12 @@ public class SwerveModule {
     // The conversion factor from wheel rotations to feet.
     private final double wheelRotationsToFeet;
 
+    // The last wheel velocity commanded by the controller.
+    private double commandedWheelVelocity = 0;
+
+    // The last wheel velocity set as a target for the controller.
+    private double targetWheelVelocity = 0;
+
     /**
      * Constructor.
      * 
@@ -104,7 +110,7 @@ public class SwerveModule {
         double unwrappedAzimuthAngle = this.azimuthSensor.getPosition() + distanceAndFlip.getValue0();
 
         // Reverse the wheel if applicable.
-        double wheelVelocity = distanceAndFlip.getValue1() ? -wheelSpeed : wheelSpeed;
+        this.targetWheelVelocity = distanceAndFlip.getValue1() ? -wheelSpeed : wheelSpeed;
 
         // Get the azimuth velocity to command from the trapezoidal profile controller.
         this.azimuthPositionController.setTargetVelocity(azimuthVelocity);
@@ -113,9 +119,9 @@ public class SwerveModule {
                 this.azimuthSensor.getPosition(), this.getAzimuthVelocity());
 
         // Apply the pid to the wheel velocity.
-        wheelVelocity += this.wheelVelocityController.calculateOutput(this.getWheelSpeed() * (this.isWheelReversed ? -1 : 1), wheelVelocity);
+        this.commandedWheelVelocity = this.targetWheelVelocity + this.wheelVelocityController.calculateOutput(this.getWheelVelocity(), this.targetWheelVelocity);
 
-        this.setRawWheelVelocities(wheelVelocity, commandAzimuthVelocity);
+        this.setRawWheelVelocities(this.commandedWheelVelocity, commandAzimuthVelocity);
 
         // Set if the wheel direction is flipped
         if (distanceAndFlip.getValue1()) {
@@ -141,12 +147,12 @@ public class SwerveModule {
     }
 
     /**
-     * Gets the current wheel speed.
+     * Gets the current velocity of the wheel.
      * 
-     * @return The current wheel speed, in feet per second.
+     * @return The velocity of the wheel, in feet per second.
      */
-    public double getWheelSpeed() {
-        return Math.abs(this.getDifferentialOutputs(Stream.of(motors).mapToDouble(SwerveMotor::getVelocity).toArray())[1] * wheelRotationsToFeet);
+    public double getWheelVelocity() {
+        return this.getDifferentialOutputs(Stream.of(motors).mapToDouble(SwerveMotor::getVelocity).toArray())[1] * wheelRotationsToFeet;
     }
 
     /**
@@ -155,9 +161,18 @@ public class SwerveModule {
      * @return The current azimuth position, in degrees.
      */
     public WrappedAngle getAzimuthPosition() {
+        return new WrappedAngle(this.azimuthSensor.getPosition());
+    }
+
+    /**
+     * Gets the current azimuth position, accounting for wheel reversal.
+     * 
+     * @return The current azimuth position, in degrees.
+     */
+    public WrappedAngle getAzimuthPositionFlipped() {
         WrappedAngle azimuth = new WrappedAngle(this.azimuthSensor.getPosition());
-        if (isWheelReversed) {
-            azimuth = azimuth.plus(180.);
+        if (this.getWheelVelocity() < 0) {
+            azimuth.plus(180);
         }
         return azimuth;
     }
@@ -172,12 +187,57 @@ public class SwerveModule {
     }
 
     /**
+     * Gets the current commanded wheel velocity output by the PID controller.
+     * 
+     * @return The commanded wheel velocity, in feet per second.
+     */
+    public double getCommandedWheelVelocity() {
+        return this.commandedWheelVelocity;
+    }
+
+    /**
      * Gets the current commanded azimuth position from the trapezoidal profile.
      * 
-     * @return The current commanded azimuth position.
+     * @return The current commanded azimuth position, in degrees.
      */
     public WrappedAngle getCommandedAzimuthPosition() {
         return new WrappedAngle(this.azimuthPositionController.getLastCommandedPosition());
+    }
+
+    /**
+     * Gets the current commanded azimuth velocity from the trapezoidal controller.
+     * 
+     * @return The commanded azimuth velocity, in degrees per second.
+     */
+    public double getCommandedAzimuthVelocity() {
+        return this.azimuthPositionController.getLastCommandedVelocity();
+    }
+
+    /**
+     * Gets the wheel velocity set as the target for the wheel controller.
+     * 
+     * @return The target wheel velocity, in feet per second.
+     */
+    public double getTargetWheelVelocity() {
+        return this.targetWheelVelocity;
+    }
+
+    /**
+     * Gets the azimuth position set as the target for the azimuth controller.
+     * 
+     * @return The target azimuth position, in degrees.
+     */
+    public WrappedAngle getTargetAzimuthPosition() {
+        return new WrappedAngle(this.azimuthPositionController.getTargetPosition());
+    }
+
+    /**
+     * Gets the azimuth velocity set as the target for the azimuth controller.
+     * 
+     * @return The target azimuth velocity, in degrees per second.
+     */
+    public double getTargetAzimuthVelocity() {
+        return this.azimuthPositionController.getTargetVelocity();
     }
 
     /**
@@ -188,6 +248,15 @@ public class SwerveModule {
      */
     public Vector2D getLocation() {
         return this.config.getLocation();
+    }
+
+    /**
+     * Gets the motors used by this module.
+     * 
+     * @return The motors used by this module.
+     */
+    public SwerveMotor[] getMotors() {
+        return this.motors;
     }
 
     /**
@@ -271,7 +340,7 @@ public class SwerveModule {
      * @return The bias to use
      */
     private double getAzimuthWrapBias() {
-        double currentSpeed = this.getWheelSpeed();
+        double currentSpeed = Math.abs(this.getWheelVelocity());
         if (this.getAzimuthVelocity() > 30) {
             return 180;
         } else if (currentSpeed < 2.5) {
