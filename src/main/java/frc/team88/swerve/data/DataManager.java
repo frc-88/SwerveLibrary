@@ -13,6 +13,9 @@ import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
 import frc.team88.swerve.util.RobotControllerWrapper;
 
+/**
+ * Handles the collection and logging/publishing of data.
+ */
 public class DataManager {
     
     // The overall configuration for the swerve drive.
