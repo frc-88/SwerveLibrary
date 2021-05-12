@@ -56,8 +56,8 @@ max-speed-rps = 90.0
 
 [module-templates.team88.diff-swerve-2021.beta]
 differential-matrix = [
-        [-0.041666666, 0.041666666],
-        [0.09722222, 0.069444444]
+        [0.041666666, -0.041666666],
+        [0.069444444, 0.09722222]
     ]
 wheel-diameter-inches = 3.5
 azimuth-sensor.template = "canified-pwm"
@@ -65,11 +65,9 @@ azimuth-sensor.ratio = 0.0027778
 
 [module-templates.team88.diff-swerve-2021.beta.motors.0]
 template = "falcon500"
-inverted = true
 
 [module-templates.team88.diff-swerve-2021.beta.motors.1]
 template = "falcon500"
-inverted = true
 
 [module-templates.team88.diff-swerve-2021.beta.azimuth-controller]
 kP = 10.0
