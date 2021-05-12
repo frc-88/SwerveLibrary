@@ -26,15 +26,10 @@ public class DataLogger {
 
     private static DataLogger instance;
 
-<<<<<<< HEAD:src/main/java/frc/team88/swerve/data/DataLogger.java
     private final Path LOGS_DIR = Filesystem.getOperatingDirectory().toPath().resolve("data/");
     private final Path LAST_LOG_PATH = LOGS_DIR.resolve("last_log_num.txt");
 
     private final long MIN_DISK_SPACE = 50_000_000; // bytes
-=======
-    private static final Path LOGS_DIR = Paths.get("/home/lvuser/data/");
-    private static final Path LAST_LOG_PATH = LOGS_DIR.resolve("last_log_num.txt");
->>>>>>> master:src/main/java/frc/team88/swerve/util/logging/DataLogger.java
 
     private Path logPath;
 
