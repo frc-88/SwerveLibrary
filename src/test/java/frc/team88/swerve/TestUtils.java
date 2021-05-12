@@ -2,7 +2,7 @@ package frc.team88.swerve;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import frc.team88.swerve.motion.state.MotionState;
+import frc.team88.swerve.motion.state.VelocityState;
 import frc.team88.swerve.util.Vector2D;
 
 /**
@@ -39,7 +39,7 @@ public class TestUtils {
     }
 
     /**
-     * Junit assert equals for motion states, with default floating point tolerance.
+     * Junit assert equals for velocity states, with default floating point tolerance.
      * Compares field-centricitiy, translation velocity, rotation velocity, and
      * center of rotation
      * 
@@ -48,11 +48,12 @@ public class TestUtils {
      * @param actual
      *                     The actual value
      */
-    public static void assertMotionStateEquals(MotionState expected, MotionState actual) {
+    public static void assertVelocityStateEquals(VelocityState expected, VelocityState actual) {
         assertEquals(expected.isFieldCentric(), actual.isFieldCentric());
-        assertVectorEquals(expected.getTranslationVelocity(), actual.getTranslationVelocity());
+        assertDoubleEquals(expected.getTranslationDirection(), actual.getTranslationDirection());
+        assertDoubleEquals(expected.getTranslationSpeed(), actual.getTranslationSpeed());
         assertDoubleEquals(expected.getRotationVelocity(), actual.getRotationVelocity());
-        assertVectorEquals(expected.getCenterOfRotation(), actual.getCenterOfRotation());
+        assertVectorEquals(expected.getCenterOfRotationVector(), actual.getCenterOfRotationVector());
     }
 
 }

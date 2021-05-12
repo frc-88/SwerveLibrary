@@ -73,7 +73,10 @@ public class DataLogger {
      * POJO used for GSON serialization.
      */
     private static class LogItem {
+        @SuppressWarnings("unused") // Seen by GSON serialization
         private String label;
+
+        @SuppressWarnings("unused") // Seen by GSON serialization
         private Object data;
 
         public LogItem(String label, Object data) {

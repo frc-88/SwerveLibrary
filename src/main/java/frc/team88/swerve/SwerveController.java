@@ -143,7 +143,7 @@ public class SwerveController {
      * Gets the odometry readings, which estimate the robot's position and
      * velocity based on measured wheel speed and angle.
      * 
-     * @return
+     * @return The current odometry state.
      */
     public OdomState getOdometry() {
         return this.chassis.getOdomState();
