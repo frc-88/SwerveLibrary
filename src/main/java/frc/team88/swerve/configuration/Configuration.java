@@ -29,9 +29,6 @@ import frc.team88.swerve.module.sensor.PositionSensor;
 import frc.team88.swerve.module.sensor.CANifiedPWMEncoder;
 import frc.team88.swerve.module.sensor.SensorTransmission;
 
-/**
- * 
- */
 
 /**
  * Parses a swerve configuration file, generates objects from it, and provides
@@ -63,9 +60,9 @@ public class Configuration {
         Objects.requireNonNull(configPath);
         this.canifiers = new HashMap<>();
         ConfigParser<?> tomlParser = TomlFormat.instance().createParser();
-
+        
         // Parse the base config file first
-        this.configData = tomlParser.parse(getClass().getResourceAsStream("assets/base_config.toml"));
+        this.configData = tomlParser.parse(getClass().getResourceAsStream("/base_config.toml"));
 
         // Append and overwrite with the user-supplied config file
         tomlParser.parse(Filesystem.getDeployDirectory().toPath().resolve(configPath), this.configData, ParsingMode.MERGE, FileNotFoundAction.THROW_ERROR);
