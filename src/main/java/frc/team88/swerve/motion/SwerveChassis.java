@@ -1,6 +1,7 @@
 package frc.team88.swerve.motion;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import frc.team88.swerve.configuration.Configuration;
 import frc.team88.swerve.module.SwerveModule;
@@ -9,6 +10,7 @@ import frc.team88.swerve.motion.kinematics.InverseKinematics;
 import frc.team88.swerve.motion.state.ModuleState;
 import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
+import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
 
 /**
@@ -155,6 +157,42 @@ public class SwerveChassis {
         state.setPosition(x, y);
         state.setTheta(theta);
         this.setOdomState(state);
+    }
+
+    /**
+     * Sets all motors to coast mode.
+     */
+    public void setCoast() {
+        Stream.of(this.config.getModules()).forEach(m -> m.setCoast());
+    }
+
+    /**
+     * Sets all motors to brake mode.
+     */
+    public void setBrake() {
+        Stream.of(this.config.getModules()).forEach(m -> m.setBrake());
+    }
+
+    /**
+     * Gets the maximum translation speed if the drive is doing nothing else.
+     * 
+     * @return The maximum translation speed, in feet per second.
+     */
+    public double getMaxTranslationSpeed() {
+        return Stream.of(this.config.getModules()).map(m -> m.getMaxWheelSpeed()).min(Double::compare).get();
+    }
+
+    /**
+     * Gets the maximum rotation speed if the drive is doing nothing else.
+     * 
+     * @return The maximum rotation speed, in feet per second.
+     */
+    public double getMaxRotationSpeed() {
+        return Stream.of(this.config.getModules()).map(module -> {
+            Vector2D centerOfRotation = this.getTargetState().getCenterOfRotationVector();
+            double distanceToCenter = module.getLocation().plus(centerOfRotation.times(-1)).getMagnitude();
+            return (module.getMaxWheelSpeed() / (2. * distanceToCenter * Math.PI)) * 360.;
+        }).min(Double::compare).get();
     }
 
     /**

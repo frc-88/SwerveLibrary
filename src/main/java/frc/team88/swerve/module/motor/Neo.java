@@ -90,4 +90,14 @@ public class Neo extends CANSparkMax implements SwerveMotor {
         return this.commandVelocity;
     }
 
+    @Override
+    public void setCoast() {
+        this.setIdleMode(IdleMode.kCoast);
+    }
+
+    @Override
+    public void setBrake() {
+        this.setIdleMode(IdleMode.kBrake);
+    }
+
 }

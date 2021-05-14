@@ -50,4 +50,14 @@ public interface SwerveMotor extends PositionSensor {
      */
     public double getCommandVelocity();
 
+    /**
+     * Sets the motor to coast mode.
+     */
+    public void setCoast();
+
+    /**
+     * Sets the motor to brake mode.
+     */
+    public void setBrake();
+
 }

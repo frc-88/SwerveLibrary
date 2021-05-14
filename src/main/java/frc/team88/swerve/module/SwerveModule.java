@@ -147,6 +147,20 @@ public class SwerveModule {
     }
 
     /**
+     * Sets both motors on this module to coast mode.
+     */
+    public void setCoast() {
+        Stream.of(this.motors).forEach(m -> m.setCoast());
+    }
+
+    /**
+     * Sets both motors on this module to brake mode.
+     */
+    public void setBrake() {
+        Stream.of(this.motors).forEach(m -> m.setCoast());
+    }
+
+    /**
      * Gets the current velocity of the wheel.
      * 
      * @return The velocity of the wheel, in feet per second.
@@ -257,6 +271,25 @@ public class SwerveModule {
      */
     public SwerveMotor[] getMotors() {
         return this.motors;
+    }
+
+    /**
+     * Gets the maximum speed that can be commanded to the wheel within the
+     * limits of the motor.
+     * 
+     * @return The max speed, in feet per second.
+     */
+    public double getMaxWheelSpeed() {
+        // Need to check both moving motors in the same direction and moving
+        // them in opposite directions, and take the lower of the forwards and
+        // backwards wheel speed.
+        double positivePositive = this.getDifferentialOutputs(new double[]{motors[0].getMaxVelocity(), motors[1].getMaxVelocity()})[1];
+        double positiveNegative = this.getDifferentialOutputs(new double[]{motors[0].getMaxVelocity(), -motors[1].getMaxVelocity()})[1];
+        double negativePositive = this.getDifferentialOutputs(new double[]{-motors[0].getMaxVelocity(), motors[1].getMaxVelocity()})[1];
+        double negativeNegative = this.getDifferentialOutputs(new double[]{-motors[0].getMaxVelocity(), -motors[1].getMaxVelocity()})[1];
+        double maxForwards = Math.max(positivePositive, Math.max(positiveNegative, Math.max(negativePositive, negativeNegative)));
+        double maxReverse = -Math.min(positivePositive, Math.min(positiveNegative, Math.min(negativePositive, negativeNegative)));
+        return Math.min(maxForwards, maxReverse) * wheelRotationsToFeet;
     }
 
     /**

@@ -94,4 +94,14 @@ public class Falcon500 extends TalonFX implements SwerveMotor {
         return this.commandVelocity;
     }
 
+    @Override
+    public void setCoast() {
+        this.setNeutralMode(NeutralMode.Coast);
+    }
+
+    @Override
+    public void setBrake() {
+        this.setNeutralMode(NeutralMode.Brake);
+    }
+
 }

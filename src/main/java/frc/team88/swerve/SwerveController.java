@@ -117,6 +117,41 @@ public class SwerveController {
     public void setGyroYaw(double yaw) {
         this.getGyro().calibrateYaw(yaw);
     }
+
+    /**
+     * Gets the maximum translation speed if the drive is doing nothing else.
+     * 
+     * @return The maximum translation speed, in feet per second.
+     */
+    public double getMaxTranslationSpeed() {
+        return this.chassis.getMaxTranslationSpeed();
+    }
+
+    /**
+     * Gets the maximum rotation speed if the drive is doing nothing else.
+     * 
+     * @return The maximum rotation speed, in feet per second.
+     */
+    public double getMaxRotationSpeed() {
+        return this.chassis.getMaxTranslationSpeed();
+    }
+
+    /**
+     * Sets all motors on the swerve drive to coast. This is not recommended
+     * during driving, and is only provided the for ease of moving the modules
+     * while disabled.
+     */
+    public void setCoast() {
+        this.chassis.setCoast();
+    }
+
+    /**
+     * Sets all motors on the swerve drive to brake. This is the default
+     * behavior.
+     */
+    public void setBrake() {
+        this.chassis.setBrake();
+    }
  
     /**
      * Gets the velocity state that this controller is trying to achieve.
