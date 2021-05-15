@@ -39,7 +39,7 @@ public class SwerveModuleConfiguration {
         this.forwardMatrix = new Array2DRowRealMatrix(convertObjectListTo2DDoubleArray(instantiatedConfig.get("differential-matrix")), true);
         this.inverseMatrix = MatrixUtils.inverse(this.forwardMatrix);
         
-        this.wheelDiameter = instantiatedConfig.get("wheel-diameter-inches");
+        this.wheelDiameter = (double) instantiatedConfig.get("wheel-diameter-inches");
         this.azimuthControllerConfig = new AzimuthControllerConfiguration(instantiatedConfig.get("azimuth-controller"));
         this.wheelControllerConfig = new PIDConfiguration(instantiatedConfig.get("wheel-controller"));
     }
@@ -128,7 +128,7 @@ public class SwerveModuleConfiguration {
                     throw new IllegalArgumentException("Differential matrix contains a non-double element.");
                 }
                 Double value = (Double)(innerItem);
-                arr[col][row] = value.doubleValue();
+                arr[row][col] = value.doubleValue();
             }
         }
         return arr;
@@ -153,8 +153,8 @@ public class SwerveModuleConfiguration {
         public AzimuthControllerConfiguration(Config config) {
             Objects.requireNonNull(config);
             this.pidConfig = new PIDConfiguration(config);
-            this.maxSpeed = config.get("max-speed");
-            this.maxAcceleration = config.get("max-acceleration");
+            this.maxSpeed = (double) config.get("max-speed");
+            this.maxAcceleration = (double) config.get("max-acceleration");
         }
 
         /**

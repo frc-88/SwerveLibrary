@@ -28,7 +28,7 @@ public class SensorTransmission implements PositionSensor {
 
     @Override
     public double getPosition() {
-        return applyTransmissionForwards(inputSensor.getPosition()) - this.config.getOffset();
+        return applyTransmissionForwards(inputSensor.getPosition());
     }
 
     /**

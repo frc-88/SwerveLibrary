@@ -21,7 +21,7 @@ public class Falcon500Configuration {
     public Falcon500Configuration(Config config) {
         Objects.requireNonNull(config);
         this.inverted = config.get("inverted");
-        this.maxSpeed = config.get("max-speed-rps");
+        this.maxSpeed = (double) config.get("max-speed-rps");
     }
     
     /**

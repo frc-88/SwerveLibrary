@@ -22,8 +22,8 @@ public class SensorTransmissionConfiguration {
     public SensorTransmissionConfiguration(Config config) {
         Objects.requireNonNull(config);
         this.inverted = config.get("inverted");
-        this.ratio = config.get("ratio");
-        this.offset = config.get("offset");
+        this.ratio = (double) config.get("ratio");
+        this.offset = (double) config.get("offset");
     }
 
     /**
