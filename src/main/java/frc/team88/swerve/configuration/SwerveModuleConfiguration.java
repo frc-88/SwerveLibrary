@@ -1,5 +1,7 @@
 package frc.team88.swerve.configuration;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.electronwill.nightconfig.core.Config;
@@ -32,8 +34,11 @@ public class SwerveModuleConfiguration {
         Objects.requireNonNull(instantiatedConfig);
         this.location = Vector2D.createCartesianCoordinates((double) instantiatedConfig.get("location-inches.x"),
                 (double) instantiatedConfig.get("location-inches.x"));
-        this.forwardMatrix = new Array2DRowRealMatrix(instantiatedConfig.get("differential-matrix"), true);
+
+        // Convert 2D list to 2D array
+        this.forwardMatrix = new Array2DRowRealMatrix(convertObjectListTo2DDoubleArray(instantiatedConfig.get("differential-matrix")), true);
         this.inverseMatrix = MatrixUtils.inverse(this.forwardMatrix);
+        
         this.wheelDiameter = instantiatedConfig.get("wheel-diameter-inches");
         this.azimuthControllerConfig = new AzimuthControllerConfiguration(instantiatedConfig.get("azimuth-controller"));
         this.wheelControllerConfig = new PIDConfiguration(instantiatedConfig.get("wheel-controller"));
@@ -95,6 +100,38 @@ public class SwerveModuleConfiguration {
      */
     public PIDConfiguration getWheelControllerConfig() {
         return this.wheelControllerConfig;
+    }
+
+    private double[][] convertObjectListTo2DDoubleArray(List<?> list) {
+        double arr[][] = new double[2][2];
+        if (!(list instanceof List<?>)) {
+            throw new IllegalArgumentException("Differential matrix is not a list.");
+        }
+        List<Object> outerList = new ArrayList<Object>(list);
+        if (outerList.size() != 2) {
+            throw new IllegalArgumentException("Differential matrix does not have height 2.");
+        }
+        
+        for (int row = 0; row < 2; row++) {
+            Object outerItem = outerList.get(row);
+            if (!(outerItem instanceof List<?>)) {
+                throw new IllegalArgumentException("Differential matrix is not a list of lists.");
+            }
+            List<Object> innerList = new ArrayList<Object>((List<?>)outerItem);
+            if (innerList.size() != 2) {
+                throw new IllegalArgumentException("Differential matrix does not have width 2.");
+            }
+
+            for (int col = 0; col < 2; col++) {
+                Object innerItem = innerList.get(col);
+                if (!(innerItem instanceof Double)) {
+                    throw new IllegalArgumentException("Differential matrix contains a non-double element.");
+                }
+                Double value = (Double)(innerItem);
+                arr[col][row] = value.doubleValue();
+            }
+        }
+        return arr;
     }
 
     /**

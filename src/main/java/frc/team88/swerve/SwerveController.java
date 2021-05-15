@@ -84,14 +84,38 @@ public class SwerveController {
     }
 
     /**
-     * Sets the robot to stop moving and hold it's current swerve module
-     * positions.
+     * Sets the translation speed and rotation velocity of the robot. Does not
+     * modify translation direction or center of rotation.
+     * 
+     * @param translationSpeed The speed for the robot to move, in feet per
+     *                         second.
+     * @param rotationVelocity The velocity for the robot to spin about the
+     *                         the center of rotation, independent of
+     *                         translation, in degrees per second.
      */
-    public void holdDirection() {
+    public void setVelocity(double translationSpeed, double rotationVelocity) {
         VelocityState velocityState = this.getTargetVelocity();
-        velocityState = velocityState.changeTranslationSpeed(0).changeRotationVelocity(0);
+        velocityState = velocityState.changeTranslationSpeed(translationSpeed).changeRotationVelocity(rotationVelocity);
         this.chassis.setTargetState(velocityState);
-        this.chassis.holdAzimuths(true);
+        this.chassis.holdAzimuths(false);
+    }
+
+    /**
+     * Sets the translation direction of the robot.
+     * 
+     * @param translationDirection The direction for the robot to move, in
+     *                             degrees counterclockwise from forwards.
+     * @param fieldCentric If true, the given translation direction will be
+     *                     interpretted relative to the gyro's zero point,
+     *                     which should be consistently facing away from the
+     *                     driver. If false, it will be interpretted relative
+     *                     to the front of the robot.
+     */
+    public void setTranslationDirection(double translationDirection, boolean fieldCentric) {
+        VelocityState velocityState = this.getTargetVelocity();
+        velocityState = velocityState.changeTranslationDirection(translationDirection).changeIsFieldCentric(fieldCentric);
+        this.chassis.setTargetState(velocityState);
+        this.chassis.holdAzimuths(false);
     }
 
     /**
@@ -106,6 +130,17 @@ public class SwerveController {
         VelocityState velocityState = this.getTargetVelocity();
         velocityState = velocityState.changeCenterOfRotation(x, y);
         this.chassis.setTargetState(velocityState);
+    }
+
+    /**
+     * Sets the robot to stop moving and hold it's current swerve module
+     * positions.
+     */
+    public void holdDirection() {
+        VelocityState velocityState = this.getTargetVelocity();
+        velocityState = velocityState.changeTranslationSpeed(0).changeRotationVelocity(0);
+        this.chassis.setTargetState(velocityState);
+        this.chassis.holdAzimuths(true);
     }
 
     /**

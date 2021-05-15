@@ -120,7 +120,7 @@ public class DataLogger {
      * old logs to make enough space.
      */
     private DataLogger() {
-        this.gson = new GsonBuilder().create();
+        this.gson = new GsonBuilder().serializeSpecialFloatingPointValues().create();
         this.dataToLog = new HashMap<>();
 
         // Ensure the data directory exists

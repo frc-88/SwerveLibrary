@@ -26,13 +26,13 @@ public class PIDConfiguration {
      */
     public PIDConfiguration(Config config) {
         Objects.requireNonNull(config);
-        this.kP = config.getOrElse("kP", 0);
-        this.kI = config.getOrElse("kI", 0);
-        this.kD = config.getOrElse("kD", 0);
-        this.kF = config.getOrElse("kF", 0);
-        this.iZone = config.getOrElse("i-zone", 0);
-        this.iMax = config.getOrElse("i-max", 0);
-        this.tolerance = config.getOrElse("tolerance", 0);
+        this.kP = config.getOrElse("kP", 0.);
+        this.kI = config.getOrElse("kI", 0.);
+        this.kD = config.getOrElse("kD", 0.);
+        this.kF = config.getOrElse("kF", 0.);
+        this.iZone = config.getOrElse("i-zone", 0.);
+        this.iMax = config.getOrElse("i-max", 0.);
+        this.tolerance = config.getOrElse("tolerance", 0.);
     }
 
     /**

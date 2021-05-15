@@ -87,6 +87,15 @@ public class SwerveChassis {
     }
 
     /**
+     * Gets if the chassis is in hold azimuth mode.
+     * 
+     * @return True if the chassis is in hold azimuth mode, false otherwise.
+     */
+    public boolean inHoldAzimuthMode() {
+        return this.holdMode;
+    }
+
+    /**
      * Updates all periodic processes in the swerve chassis, such as setting module
      * controls.
      */

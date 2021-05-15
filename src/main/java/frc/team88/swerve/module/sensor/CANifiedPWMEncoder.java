@@ -37,6 +37,10 @@ public class CANifiedPWMEncoder implements PositionSensor {
     public double getPosition() {
         double[] dutyAndPeriod = new double[2];
         this.canifier.getPWMInput(channel, dutyAndPeriod);
+        if (dutyAndPeriod[1] == 0.) {
+            // Sensor is unplugged
+            return 0;
+        }
         return dutyAndPeriod[0] / dutyAndPeriod[1];
     }
 }

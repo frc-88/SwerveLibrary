@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.team88.swerve.configuration.Configuration;
+import frc.team88.swerve.data.representations.ChassisData;
 import frc.team88.swerve.data.representations.GyroData;
 import frc.team88.swerve.data.representations.SwerveModuleData;
 import frc.team88.swerve.motion.SwerveChassis;
@@ -44,7 +45,8 @@ public class DataManager {
         }
 
         GyroData gyroData = new GyroData(this.config.getGyro());
-        SwerveModuleData moduleData[] = (SwerveModuleData[])Stream.of(this.config.getModules()).map(m -> new SwerveModuleData(m)).toArray();
+        SwerveModuleData moduleData[] = Stream.of(this.config.getModules()).map(m -> new SwerveModuleData(m)).toArray(SwerveModuleData[]::new);
+        ChassisData chassisData = new ChassisData(this.chassis);
         VelocityState targetState = this.chassis.getTargetState();
         VelocityState constrainedCommandState = this.chassis.getConstrainedCommandState();
         OdomState odometryState = this.chassis.getOdomState();
@@ -52,6 +54,7 @@ public class DataManager {
         if (enableDataLogging) {
             DataLogger.getInstance().addData("gyro", gyroData);
             DataLogger.getInstance().addData("modules", moduleData);
+            DataLogger.getInstance().addData("chassis", chassisData);
             DataLogger.getInstance().addData("targetState", targetState);
             DataLogger.getInstance().addData("constrainedCommandState", constrainedCommandState);
             DataLogger.getInstance().addData("odometryState", odometryState);
@@ -64,6 +67,7 @@ public class DataManager {
             for (int idx = 0; idx < moduleData.length; idx++) {
                 moduleData[idx].populateNetworkTable(mainTable.getSubTable("modules").getSubTable(Integer.toString(idx)));
             }
+            chassisData.populateNetworkTable(mainTable.getSubTable("chassis"));
             targetState.populateNetworkTable(mainTable.getSubTable("targetState"));
             constrainedCommandState.populateNetworkTable(mainTable.getSubTable("constrainedCommandState"));
             odometryState.populateNetworkTable(mainTable.getSubTable("odometryState"));

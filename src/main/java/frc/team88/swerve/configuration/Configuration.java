@@ -1,5 +1,8 @@
 package frc.team88.swerve.configuration;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +65,7 @@ public class Configuration {
         ConfigParser<?> tomlParser = TomlFormat.instance().createParser();
         
         // Parse the base config file first
-        this.configData = tomlParser.parse(getClass().getResourceAsStream("/base_config.toml"));
+        this.configData = tomlParser.parse(getClass().getResourceAsStream("base_config.toml"));
 
         // Append and overwrite with the user-supplied config file
         tomlParser.parse(Filesystem.getDeployDirectory().toPath().resolve(configPath), this.configData, ParsingMode.MERGE, FileNotFoundAction.THROW_ERROR);
@@ -117,31 +120,71 @@ public class Configuration {
     }
 
     /**
+     * Does a deep copy on the given config, to the level of making new
+     * inner config and list objects, into the target config.
+     * 
+     * @param configToCopy The config to copy from.
+     * @param targetConfig The config to copy into. If it isn't empty, it will
+     *                     retain its contents, unless they are overwritten
+     *                     by a value in the config being copied.
+     */
+    private void deepCopyConfig(Config configToCopy, Config targetConfig) {
+        for (Entry entry : configToCopy.entrySet()) {
+            Object value = entry.getValue();
+            String key = entry.getKey();
+            if (value instanceof List<?>) {
+                List<?> valueAsList = (List<?>)value;
+                List<Object> newList;
+                if (targetConfig.contains(key)) {
+                    if (!(targetConfig.get(key) instanceof List)) {
+                        throw new IllegalArgumentException(String.format("Cannot combine configs because the value of %s is a list in one but not the other.", key));
+                    }
+                    List<?> targetList =  (List<?>)targetConfig.get(key);
+                    if (valueAsList.size() != targetList.size()) {
+                        throw new IllegalArgumentException(String.format("Cannot combine configs because %s contains lists of different lengths", key));
+                    }
+                    newList = new ArrayList<Object>(targetList);
+                } else {
+                    newList = new ArrayList<Object>();
+                }
+                for (Object subValue : valueAsList) {
+                    if (subValue instanceof Config) {
+                        Config subConfig = Config.inMemory();
+                        deepCopyConfig((Config)subValue, subConfig);
+                        newList.add(subConfig);
+                    } else {
+                        newList.add(subValue);
+                    }
+                }
+                targetConfig.set(key, newList);
+            } else if (value instanceof Config) {
+                Config subConfig;
+                if (targetConfig.contains(key)) {
+                    if (!(targetConfig.get(key) instanceof Config)) {
+                        throw new IllegalArgumentException(String.format("Cannot combine configs because the value of %s is a config in one but not the other.", key));
+                    }
+                    subConfig = targetConfig.get(key);
+                } else {
+                    subConfig = Config.inMemory();
+                }
+                deepCopyConfig((Config)value, subConfig);
+                targetConfig.set(entry.getKey(), subConfig);
+            } else {
+                targetConfig.set(entry.getKey(), value);
+            }
+        }
+    }
+
+    /**
      * Instantiates a template's config by apppending and overwritting the design
      * with an instance-specific config.
      */
     private Config instantiateTemplateConfig(Config templateConfig, Config instanceConfig) {
-        instanceConfig = Config.copy(instanceConfig, TomlFormat.instance());
-        Config instantiatedConfig = Config.copy(templateConfig, TomlFormat.instance());
-
-        for (Entry entry : instanceConfig.entrySet()) {
-            Object value = entry.getValue();
-            if (value instanceof List<?>) {
-                List<Object> newList = new ArrayList<Object>();
-                for (Object subvalue : (List<?>)value) {
-                    if (subvalue instanceof Config) {
-                        newList.add(this.instantiateTemplateConfig(templateConfig.get(entry.getKey()), (Config)value));
-                    } else {
-                        newList.add(subvalue);
-                    }
-                }
-                value = newList;
-            } else if (value instanceof Config) {
-                value = this.instantiateTemplateConfig(templateConfig.get(entry.getKey()), (Config)value);
-            }
-            instantiatedConfig.set(entry.getKey(), value);
-        }
-
+        Config instantiatedConfig = Config.inMemory();
+        // By copying the instance config second, it will overwrite values in
+        // the template config.
+        this.deepCopyConfig(templateConfig, instantiatedConfig);
+        this.deepCopyConfig(instanceConfig, instantiatedConfig);
         return instantiatedConfig;
     }
 
