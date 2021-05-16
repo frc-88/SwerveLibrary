@@ -355,10 +355,10 @@ public class SwerveModule {
         double m1_max = motors[1].getMaxVelocity();
         double m1_min = -m1_max;
 
-        double w_m0_minimized = w0*-m0_min + w1*((a - a0*m0_min) / a1);
-        double w_m0_maximized = w0*-m0_max + w1*((a - a0*m0_max) / a1);
-        double w_m1_minimized = w1*-m1_min + w0*((a - a1*m1_min) / a0);
-        double w_m1_maximized = w1*-m1_max + w0*((a - a1*m1_max) / a0);
+        double w_m0_minimized = w0*m0_min + w1*((a - a0*m0_min) / a1);
+        double w_m0_maximized = w0*m0_max + w1*((a - a0*m0_max) / a1);
+        double w_m1_minimized = w1*m1_min + w0*((a - a1*m1_min) / a0);
+        double w_m1_maximized = w1*m1_max + w0*((a - a1*m1_max) / a0);
 
         // The motor velocity being minimized might mean the wheel velocity
         // is maximized, and vice versa, so can't assume which is min vs. max.
