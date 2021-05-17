@@ -1,0 +1,18 @@
+[[package]]
+name = "pynetworktables"
+version = "2021.0.0"
+description = "A pure Python implementation of NetworkTables, used for robot communications in the FIRST Robotics Competition."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[metadata]
+lock-version = "1.1"
+python-versions = "^3.7"
+content-hash = "2cd98beecf2ef0e5ea971b5eda1333c99dbfb7c6d0448765149d0db2679ff0d2"
+
+[metadata.files]
+pynetworktables = [
+    {file = "pynetworktables-2021.0.0-py3-none-any.whl", hash = "sha256:54604b1993515c43890be058263f158c1d168c69bedd802f0de644964cf3840d"},
+    {file = "pynetworktables-2021.0.0.tar.gz", hash = "sha256:91167948e66c29d5c90f85f3e249403f4d2ebf11368b93f9b968ef315388c73c"},
+]

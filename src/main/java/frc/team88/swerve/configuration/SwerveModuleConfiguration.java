@@ -33,7 +33,7 @@ public class SwerveModuleConfiguration {
     public SwerveModuleConfiguration(Config instantiatedConfig) {
         Objects.requireNonNull(instantiatedConfig);
         this.location = Vector2D.createCartesianCoordinates((double) instantiatedConfig.get("location-inches.x"),
-                (double) instantiatedConfig.get("location-inches.x"));
+                (double) instantiatedConfig.get("location-inches.y"));
 
         // Convert 2D list to 2D array
         this.forwardMatrix = new Array2DRowRealMatrix(convertObjectListTo2DDoubleArray(instantiatedConfig.get("differential-matrix")), true);

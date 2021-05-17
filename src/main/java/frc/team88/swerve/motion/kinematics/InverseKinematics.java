@@ -50,7 +50,7 @@ public class InverseKinematics {
         for (int idx = 0; idx < this.modules.length; ++idx) {
             Vector2D rotationVector = calculateModuleRotationVectors(target, modules[idx]);
             Vector2D combinedVector = translationVector.plus(rotationVector);
-            if (translationVector.getMagnitude() == 0) {
+            if (combinedVector.getMagnitude() == 0) {
                 moduleStates[idx] = new ModuleState(target.getTranslationDirection(), 0);
             } else {
                 moduleStates[idx] = new ModuleState(combinedVector.getAngle().asDouble(), combinedVector.getMagnitude());
