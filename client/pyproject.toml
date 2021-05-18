@@ -7,8 +7,10 @@ authors = ["Paul Terrasi <paul.a.terrasi@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.7"
 pynetworktables = "^2021.0.0"
+dearpygui = "^0.6.415"
 
 [tool.poetry.dev-dependencies]
+black = "^21.5b1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

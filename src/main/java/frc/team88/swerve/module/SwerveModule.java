@@ -370,7 +370,7 @@ public class SwerveModule {
      * Gets the curerent biasTo360 to use for determing how to get to the next
      * angle, depending on the swithing mode.
      * 
-     * @return The bias to use
+     * @return The bias to use.
      */
     private double getAzimuthWrapBias() {
         double currentSpeed = Math.abs(this.getWheelVelocity());
