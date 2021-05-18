@@ -50,6 +50,9 @@ public class DataManager {
 
         if (enableNetworkTablesPublishing) {
             NetworkTable mainTable = NetworkTableInstance.getDefault().getTable("swerveLibrary");
+
+            this.config.populateNetworkTable(mainTable.getSubTable("configuration"));
+
             gyroData.populateNetworkTable(mainTable.getSubTable("gyro"));
             for (int idx = 0; idx < moduleData.length; idx++) {
                 moduleData[idx].populateNetworkTable(mainTable.getSubTable("modules").getSubTable(Integer.toString(idx)));

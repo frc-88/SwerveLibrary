@@ -4,15 +4,20 @@ import java.util.Objects;
 
 import com.electronwill.nightconfig.core.Config;
 
+import edu.wpi.first.networktables.NetworkTable;
+import frc.team88.swerve.data.NetworkTablePopulator;
+
 /**
  * Captures all of the configuration information about a position sensor.
  */
-public class SensorTransmissionConfiguration {
+public class SensorTransmissionConfiguration implements NetworkTablePopulator {
 
     // Configuration values. See getters for documentation.
-    private final boolean inverted;
-    private final double ratio;
-    private final double offset;
+    private boolean inverted;
+    private double ratio;
+    private double offset;
+
+    private transient boolean firstNetworkTableCall = true;
 
     /**
      * Constructs this configuration from a position sensor config.
@@ -62,5 +67,19 @@ public class SensorTransmissionConfiguration {
      */
     public double getOffset() {
         return this.offset;
+    }
+
+    @Override
+    public void populateNetworkTable(NetworkTable table) {
+        if (this.firstNetworkTableCall) {
+            this.firstNetworkTableCall = false;
+            table.getEntry("inverted").setBoolean(this.inverted);
+            table.getEntry("ratio").setDouble(this.ratio);
+            table.getEntry("offset").setDouble(this.offset);
+        } else {
+            this.inverted = table.getEntry("inverted").getBoolean(this.inverted);
+            this.ratio = table.getEntry("ratio").getDouble(this.ratio);
+            this.offset = table.getEntry("offset").getDouble(this.offset);
+        }
     }
 }

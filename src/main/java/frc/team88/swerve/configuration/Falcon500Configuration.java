@@ -4,14 +4,20 @@ import java.util.Objects;
 
 import com.electronwill.nightconfig.core.Config;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import frc.team88.swerve.data.NetworkTablePopulator;
+
 /**
  * Captures all of the configuration information about a Falcon 500.
  */
-public class Falcon500Configuration {
+public class Falcon500Configuration implements NetworkTablePopulator {
 
     // Configuration values. See getters for documentation.
-    private final boolean inverted;
-    private final double maxSpeed;
+    private boolean inverted;
+    private double maxSpeed;
+
+    private transient boolean firstNetworkTableCall = true;
 
     /**
      * Constructs this configuration from a falcon 500 config.
@@ -49,5 +55,17 @@ public class Falcon500Configuration {
      */
     public double getMaxSpeed() {
         return this.maxSpeed;
+    }
+
+    @Override
+    public void populateNetworkTable(NetworkTable table) {
+        if (this.firstNetworkTableCall) {
+            this.firstNetworkTableCall = false;
+            table.getEntry("inverted").setBoolean(this.inverted);
+            table.getEntry("maxSpeed").setDouble(this.maxSpeed);
+        } else {
+            this.inverted = table.getEntry("inverted").getBoolean(this.inverted);
+            this.maxSpeed = table.getEntry("maxSpeed").getDouble(this.maxSpeed);
+        }
     }
 }

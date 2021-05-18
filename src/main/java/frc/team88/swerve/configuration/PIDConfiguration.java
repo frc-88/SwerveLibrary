@@ -4,19 +4,24 @@ import java.util.Objects;
 
 import com.electronwill.nightconfig.core.Config;
 
+import edu.wpi.first.networktables.NetworkTable;
+import frc.team88.swerve.data.NetworkTablePopulator;
+
 /**
  * Contains PID values pulled from a config file.
  */
-public class PIDConfiguration {
+public class PIDConfiguration implements NetworkTablePopulator {
 
     // Configuration values. See getters for documentation.
-    private final double kP;
-    private final double kI;
-    private final double kD;
-    private final double kF;
-    private final double iZone;
-    private final double iMax;
-    private final double tolerance;
+    private double kP;
+    private double kI;
+    private double kD;
+    private double kF;
+    private double iZone;
+    private double iMax;
+    private double tolerance;
+
+    private transient boolean firstNetworkTableCall = true;
     
     /**
      * Constructs from a raw configuration containing some of the appropriate
@@ -98,5 +103,25 @@ public class PIDConfiguration {
         return this.tolerance;
     }
 
-    
+    @Override
+    public void populateNetworkTable(NetworkTable table) {
+        if (this.firstNetworkTableCall) {
+            this.firstNetworkTableCall = false;
+            table.getEntry("kP").setDouble(this.kP);
+            table.getEntry("kI").setDouble(this.kI);
+            table.getEntry("kD").setDouble(this.kD);
+            table.getEntry("kF").setDouble(this.kF);
+            table.getEntry("iZone").setDouble(this.iZone);
+            table.getEntry("iMax").setDouble(this.iMax);
+            table.getEntry("tolerance").setDouble(this.tolerance);
+        } else {
+            this.kP = table.getEntry("kP").getDouble(this.kP);
+            this.kI = table.getEntry("kI").getDouble(this.kI);
+            this.kD = table.getEntry("kD").getDouble(this.kD);
+            this.kF = table.getEntry("kF").getDouble(this.kF);
+            this.iZone = table.getEntry("iZone").getDouble(this.iZone);
+            this.iMax = table.getEntry("iMax").getDouble(this.iMax);
+            this.tolerance = table.getEntry("tolerance").getDouble(this.tolerance);
+        }
+    }
 }

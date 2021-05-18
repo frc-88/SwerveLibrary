@@ -43,9 +43,6 @@ public class SwerveModule {
     // The conversion factor from azimuth rotations to degrees.
     private final double azimuthRotationsToDegrees = 360.;
 
-    // The conversion factor from wheel rotations to feet.
-    private final double wheelRotationsToFeet;
-
     // The last wheel velocity commanded by the controller.
     private double commandedWheelVelocity = 0;
 
@@ -74,8 +71,6 @@ public class SwerveModule {
         this.azimuthPositionController.reset(this.getAzimuthPosition().asDouble());
 
         this.wheelVelocityController = new SyncPIDController(config.getWheelControllerConfig());
-        
-        this.wheelRotationsToFeet = (config.getWheelDiameter() / 12.) * Math.PI;
     }
 
     /**
@@ -136,7 +131,7 @@ public class SwerveModule {
      * @param azimuthVelocity The azimuth velocity to set, in degrees per second.
      */
     public void setRawWheelVelocities(double wheelVelocity, double azimuthVelocity) {
-        double[] rotationsPerSecondVelocities = new double[]{azimuthVelocity / azimuthRotationsToDegrees, wheelVelocity / wheelRotationsToFeet};
+        double[] rotationsPerSecondVelocities = new double[]{azimuthVelocity / azimuthRotationsToDegrees, wheelVelocity / getWheelRotationsToFeet()};
 
         rotationsPerSecondVelocities[1] = this.reduceWheelVelocityForAzimuth(rotationsPerSecondVelocities[1], rotationsPerSecondVelocities[0]);
 
@@ -166,7 +161,7 @@ public class SwerveModule {
      * @return The velocity of the wheel, in feet per second.
      */
     public double getWheelVelocity() {
-        return this.getDifferentialOutputs(Stream.of(motors).mapToDouble(SwerveMotor::getVelocity).toArray())[1] * wheelRotationsToFeet;
+        return this.getDifferentialOutputs(Stream.of(motors).mapToDouble(SwerveMotor::getVelocity).toArray())[1] * getWheelRotationsToFeet();
     }
 
     /**
@@ -289,7 +284,16 @@ public class SwerveModule {
         double negativeNegative = this.getDifferentialOutputs(new double[]{-motors[0].getMaxVelocity(), -motors[1].getMaxVelocity()})[1];
         double maxForwards = Math.max(positivePositive, Math.max(positiveNegative, Math.max(negativePositive, negativeNegative)));
         double maxReverse = -Math.min(positivePositive, Math.min(positiveNegative, Math.min(negativePositive, negativeNegative)));
-        return Math.min(maxForwards, maxReverse) * wheelRotationsToFeet;
+        return Math.min(maxForwards, maxReverse) * getWheelRotationsToFeet();
+    }
+
+    /**
+     * Gets the conversion factor from wheel rotations to feet traveled.
+     * 
+     * @return The conversion factor.
+     */
+    private double getWheelRotationsToFeet() {
+        return (config.getWheelDiameter() / 12.) * Math.PI;
     }
 
     /**

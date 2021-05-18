@@ -9,16 +9,17 @@ import java.util.Objects;
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.PWMChannel;
 import com.electronwill.nightconfig.core.Config;
-import com.electronwill.nightconfig.core.Config.Entry;
 import com.electronwill.nightconfig.core.file.FileNotFoundAction;
 import com.electronwill.nightconfig.core.io.ConfigParser;
 import com.electronwill.nightconfig.core.io.ParsingMode;
 import com.electronwill.nightconfig.toml.TomlFormat;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
+import frc.team88.swerve.data.NetworkTablePopulator;
 import frc.team88.swerve.gyro.NavX;
 import frc.team88.swerve.gyro.SwerveGyro;
 import frc.team88.swerve.module.SwerveModule;
@@ -34,7 +35,7 @@ import frc.team88.swerve.module.sensor.SensorTransmission;
  * Parses a swerve configuration file, generates objects from it, and provides
  * access to all of its contents.
  */
-public class Configuration {
+public class Configuration implements NetworkTablePopulator {
 
     // The loaded config data
     private final Config configData;
@@ -47,6 +48,10 @@ public class Configuration {
 
     // The canifiers used by sensors in this configuration
     private final Map<Integer, CANifier> canifiers;
+
+    // The configurations that will be placed in NetworkTables to allow for
+    // modification, with the keys being the table key.
+    private final Map<String, NetworkTablePopulator> networkTableConfigs;
     
     /**
      * Loads the base config and user config from the filesystem.
@@ -59,6 +64,8 @@ public class Configuration {
     public Configuration(final String configPath, SwerveGyro gyro) {
         Objects.requireNonNull(configPath);
         this.canifiers = new HashMap<>();
+        this.networkTableConfigs = new HashMap<>();
+        
         ConfigParser<?> tomlParser = TomlFormat.instance().createParser();
         
         // Parse the base config file first
@@ -126,7 +133,7 @@ public class Configuration {
      *                     by a value in the config being copied.
      */
     private void deepCopyConfig(Config configToCopy, Config targetConfig) {
-        for (Entry entry : configToCopy.entrySet()) {
+        for (Config.Entry entry : configToCopy.entrySet()) {
             Object value = entry.getValue();
             String key = entry.getKey();
             if (value instanceof List<?>) {
@@ -226,9 +233,10 @@ public class Configuration {
      * Canifier object if it does not already exist.
      * 
      * @param instanceConfig The config for the canified pwm sensor.
+     * @param networkTable The key to use for the network table.
      * @return The canified pwm sensor object.
      */
-    private SensorTransmission instantiateCanifiedPWM(Config instanceConfig) {
+    private SensorTransmission instantiateCanifiedPWM(Config instanceConfig, String networkTable) {
         int canID = instanceConfig.getInt("can-id");
         if (!this.canifiers.containsKey(canID)) {
             this.canifiers.put(canID, new CANifier(canID));
@@ -253,23 +261,27 @@ public class Configuration {
                 throw new IllegalArgumentException(String.format("%d is not a valid PWM channel. It must be between 0 and 3, inclusive", pwmChannel));
         }
 
+        SensorTransmissionConfiguration sensorConfig = new SensorTransmissionConfiguration(instanceConfig);
+        this.networkTableConfigs.put(networkTable, sensorConfig);
+
         CANifiedPWMEncoder rawSensor = new CANifiedPWMEncoder(this.canifiers.get(canID), channel);
-        return new SensorTransmission(rawSensor, new SensorTransmissionConfiguration(instanceConfig));
+        return new SensorTransmission(rawSensor, sensorConfig);
     }
 
     /**
      * Instantiates a position sensor.
      * 
      * @param instanceConfig The config for the sensor.
+     * @param networkTable The key to use for the network table.
      * @return The sensor object.
      */
-    private SensorTransmission instantiateSensor(Config instanceConfig) {
+    private SensorTransmission instantiateSensor(Config instanceConfig, String networkTable) {
         String template = instanceConfig.get("template");
         Config sensorConfig = this.instantiateTemplateConfig(configData.get("sensor-templates." + template), instanceConfig);
 
         switch (template) {
             case "canified-pwm":
-                return this.instantiateCanifiedPWM(sensorConfig);
+                return this.instantiateCanifiedPWM(sensorConfig, networkTable);
             default:
                 throw new IllegalArgumentException(String.format("The template %s does not have a corresponding sensor class.", template));
         }
@@ -279,37 +291,44 @@ public class Configuration {
      * Instantiates a Falcon 500.
      * 
      * @param instanceConfig The config for the Falcon 500.
+     * @param networkTable The key to use for the network table.
      * @return The falcon object.
      */
-    private Falcon500 instantiateFalcon500(Config instanceConfig) {
-        return new Falcon500(instanceConfig.getInt("can-id"), new Falcon500Configuration(instanceConfig));
+    private Falcon500 instantiateFalcon500(Config instanceConfig, String networkTable) {
+        Falcon500Configuration falconConfig = new Falcon500Configuration(instanceConfig);
+        this.networkTableConfigs.put(networkTable, falconConfig);
+        return new Falcon500(instanceConfig.getInt("can-id"), falconConfig);
     }
 
     /**
      * Instantiates a Neo.
      * 
      * @param instanceConfig The config for the Neo.
+     * @param networkTable The key to use for the network table.
      * @return The neo object.
      */
-    private Neo instantiateNeo(Config instanceConfig) {
-        return new Neo(instanceConfig.getInt("can-id"), new NeoConfiguration(instanceConfig));
+    private Neo instantiateNeo(Config instanceConfig, String networkTable) {
+        NeoConfiguration neoConfig = new NeoConfiguration(instanceConfig);
+        this.networkTableConfigs.put(networkTable, neoConfig);
+        return new Neo(instanceConfig.getInt("can-id"), neoConfig);
     }
 
     /**
      * Instantiates a motor.
      * 
      * @param instanceConfig The instance config for this motor.
+     * @param networkTable The key to use for the network table.
      * @return The motor object.
      */
-    private SwerveMotor instantiateMotor(Config instanceConfig) {
+    private SwerveMotor instantiateMotor(Config instanceConfig, String networkTable) {
         String template = instanceConfig.get("template");
         Config motorConfig = this.instantiateTemplateConfig(configData.get("motor-templates." + template), instanceConfig);
 
         switch (template) {
             case "falcon500":
-                return this.instantiateFalcon500(motorConfig);
+                return this.instantiateFalcon500(motorConfig, networkTable);
             case "neo":
-                return this.instantiateNeo(motorConfig);
+                return this.instantiateNeo(motorConfig, networkTable);
             default:
                 throw new IllegalArgumentException(String.format("The template %s does not have a corresponding motor class.", template));
         }
@@ -319,14 +338,15 @@ public class Configuration {
      * Instantiates an individual module.
      * 
      * @param instanceConfig The instance config for this module.
+     * @param networkTable The key to use for the network table.
      * @return The module object.
      */
-    private SwerveModule instantiateModule(Config instanceConfig) {
+    private SwerveModule instantiateModule(Config instanceConfig, String networkTable) {
         String template = instanceConfig.get("template");
         Config moduleConfig = this.instantiateTemplateConfig(configData.get("module-templates." + template), instanceConfig);
 
-        SwerveMotor motors[] = new SwerveMotor[]{this.instantiateMotor(moduleConfig.get("motors.0")), this.instantiateMotor(moduleConfig.get("motors.1"))};
-        PositionSensor azimuthSensor = this.instantiateSensor(moduleConfig.get("azimuth-sensor"));
+        SwerveMotor motors[] = new SwerveMotor[]{this.instantiateMotor(moduleConfig.get("motors.0"), networkTable + "/motors/0"), this.instantiateMotor(moduleConfig.get("motors.1"), networkTable + "/motors/1")};
+        PositionSensor azimuthSensor = this.instantiateSensor(moduleConfig.get("azimuth-sensor"), networkTable + "/sensor");
 
         return new SwerveModule(motors, azimuthSensor, new SwerveModuleConfiguration(moduleConfig));
     }
@@ -339,7 +359,14 @@ public class Configuration {
         this.modules = new SwerveModule[moduleConfigs.size()];
 
         for (int moduleIndex = 0; moduleIndex < moduleConfigs.size(); moduleIndex++) {
-            this.modules[moduleIndex] = this.instantiateModule(moduleConfigs.get(moduleIndex));
+            this.modules[moduleIndex] = this.instantiateModule(moduleConfigs.get(moduleIndex), "/modules/" + moduleIndex);
+        }
+    }
+
+    @Override
+    public void populateNetworkTable(NetworkTable table) {
+        for (Map.Entry<String, NetworkTablePopulator> entry : this.networkTableConfigs.entrySet()) {
+            entry.getValue().populateNetworkTable(table.getSubTable(entry.getKey()));
         }
     }
 }

@@ -10,20 +10,24 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
+import edu.wpi.first.networktables.NetworkTable;
+import frc.team88.swerve.data.NetworkTablePopulator;
 import frc.team88.swerve.util.Vector2D;
 
 /**
  * Captures all of the configuration information about a SwerveModule.
  */
-public class SwerveModuleConfiguration {
+public class SwerveModuleConfiguration implements NetworkTablePopulator {
 
     // Configuration values. See getters for documentation.
-    private final Vector2D location;
+    private Vector2D location;
     private final RealMatrix forwardMatrix;
     private final RealMatrix inverseMatrix;
-    private final double wheelDiameter;
+    private double wheelDiameter;
     private final AzimuthControllerConfiguration azimuthControllerConfig;
     private final PIDConfiguration wheelControllerConfig;
+
+    private transient boolean firstNetworkTableCall = true;
 
     /**
      * Constructs this configuration from an instantiated module template.
@@ -102,6 +106,28 @@ public class SwerveModuleConfiguration {
         return this.wheelControllerConfig;
     }
 
+    @Override
+    public void populateNetworkTable(NetworkTable table) {
+        this.wheelControllerConfig.populateNetworkTable(table.getSubTable("wheelController"));
+        this.azimuthControllerConfig.populateNetworkTable(table.getSubTable("azimuthController"));
+        if (this.firstNetworkTableCall) {
+            this.firstNetworkTableCall = false;
+            table.getEntry("wheelDiameter").setDouble(this.wheelDiameter);
+            table.getEntry("locationX").setDouble(this.location.getX());
+            table.getEntry("locationY").setDouble(this.location.getY());
+        } else {
+            this.wheelDiameter = table.getEntry("wheelDiameter").getDouble(this.wheelDiameter);
+            this.location = Vector2D.createCartesianCoordinates(table.getEntry("locationX").getDouble(this.location.getX()), table.getEntry("locationY").getDouble(this.location.getY()));
+        }
+    }
+
+    /**
+     * Converts a 2D list of Doubles typed as Object into a 2D double array.
+     * 
+     * @param list A 2x2 nested list of Objects which will be casted to Double
+     *             objects.
+     * @return A 2x2 double array.
+     */
     private double[][] convertObjectListTo2DDoubleArray(List<?> list) {
         double arr[][] = new double[2][2];
         if (!(list instanceof List<?>)) {
@@ -138,12 +164,14 @@ public class SwerveModuleConfiguration {
      * Captures all of the configuration information about a SwerveModule's azimuth
      * controller.
      */
-    public class AzimuthControllerConfiguration {
+    public class AzimuthControllerConfiguration implements NetworkTablePopulator {
 
         // Configuration values. See getters for documentation.
         private final PIDConfiguration pidConfig;
-        private final double maxSpeed;
-        private final double maxAcceleration;
+        private double maxSpeed;
+        private double maxAcceleration;
+
+        private transient boolean firstNetworkTableCall = true;
 
         /**
          * Constructs from a raw configuration.
@@ -182,6 +210,19 @@ public class SwerveModuleConfiguration {
          */
         public double getMaxAcceleration() {
             return this.maxAcceleration;
+        }
+
+        @Override
+        public void populateNetworkTable(NetworkTable table) {
+            this.pidConfig.populateNetworkTable(table);
+            if (this.firstNetworkTableCall) {
+                this.firstNetworkTableCall = false;
+                table.getEntry("maxSpeed").setDouble(this.maxSpeed);
+                table.getEntry("maxAcceleration").setDouble(this.maxAcceleration);
+            } else {
+                this.maxSpeed = table.getEntry("maxSpeed").getDouble(this.maxSpeed);
+                this.maxAcceleration = table.getEntry("maxAcceleration").getDouble(this.maxAcceleration);
+            }
         }
     }
 }
