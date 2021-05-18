@@ -25,9 +25,6 @@ public class DataManager {
     // The swerve chassis generating data.
     private final SwerveChassis chassis;
 
-    // If the data should be logged to a JSONL file.
-    private boolean enableDataLogging = true;
-
     // If the data should be published to NetworkTables.
     private boolean enableNetworkTablesPublishing = true;
 
@@ -37,10 +34,10 @@ public class DataManager {
     }
 
     /**
-     * Updates JSONL logs and publishes to NetworkTables, if enabled.
+     * Publishes to NetworkTables, if enabled.
      */
     public void update() {
-        if (!enableDataLogging && !enableNetworkTablesPublishing) {
+        if (!enableNetworkTablesPublishing) {
             return;
         }
 
@@ -50,16 +47,6 @@ public class DataManager {
         VelocityState targetState = this.chassis.getTargetState();
         VelocityState constrainedCommandState = this.chassis.getConstrainedCommandState();
         OdomState odometryState = this.chassis.getOdomState();
-
-        if (enableDataLogging) {
-            DataLogger.getInstance().addData("gyro", gyroData);
-            DataLogger.getInstance().addData("modules", moduleData);
-            DataLogger.getInstance().addData("chassis", chassisData);
-            DataLogger.getInstance().addData("targetState", targetState);
-            DataLogger.getInstance().addData("constrainedCommandState", constrainedCommandState);
-            DataLogger.getInstance().addData("odometryState", odometryState);
-            DataLogger.getInstance().logData();
-        }
 
         if (enableNetworkTablesPublishing) {
             NetworkTable mainTable = NetworkTableInstance.getDefault().getTable("swerveLibrary");
@@ -73,34 +60,6 @@ public class DataManager {
             odometryState.populateNetworkTable(mainTable.getSubTable("odometryState"));
             mainTable.getEntry("timestamp").setDouble(RobotControllerWrapper.getInstance().getFPGATime());
         }
-    }
-
-    /**
-     * Is JSONL data logging enabled?
-     * 
-     * @return True if JSONL data logging is enabled, false if it is disabled.
-     */
-    public boolean isEnableDataLogging() {
-        return this.enableDataLogging;
-    }
-
-    /**
-     * Is JSONL data logging enabled?
-     * 
-     * @return True if JSONL data logging is enabled, false if it is disabled.
-     */
-    public boolean getEnableDataLogging() {
-        return this.enableDataLogging;
-    }
-
-    /**
-     * Set if JSONL data logging should be enabled.
-     * 
-     * @param enable True if JSONL data logging should be enabled, false if it
-     *               should be disabled.
-     */
-    public void setEnableDataLogging(boolean enable) {
-        this.enableDataLogging = enable;
     }
 
     /**

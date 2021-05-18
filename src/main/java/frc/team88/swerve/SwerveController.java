@@ -238,20 +238,6 @@ public class SwerveController {
     }
 
     /**
-     * Enables logging swerve data to a JSONL file on the RoboRIO.
-     */
-    public void enableLoggingOnRIO() {
-        this.dataManager.setEnableDataLogging(true);
-    }
-
-    /**
-     * Disables logging swerve data to a JSONL file on the RoboRIO.
-     */
-    public void disableLoggingOnRIO() {
-        this.dataManager.setEnableDataLogging(false);
-    }
-
-    /**
      * Enables publishing swerve data to NetworkTables.
      */
     public void enableNetworkTablesPublishing() {
