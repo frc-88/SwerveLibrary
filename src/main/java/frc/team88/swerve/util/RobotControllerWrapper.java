@@ -49,5 +49,4 @@ public class RobotControllerWrapper {
     public long getFPGATime() {
         return RobotController.getFPGATime();
     }
-
 }

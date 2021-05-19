@@ -9,6 +9,7 @@ import frc.team88.swerve.configuration.Configuration;
 import frc.team88.swerve.data.DataManager;
 import frc.team88.swerve.gyro.SwerveGyro;
 import frc.team88.swerve.motion.state.VelocityState;
+import frc.team88.swerve.tuning.TuningManager;
 import frc.team88.swerve.motion.SwerveChassis;
 import frc.team88.swerve.motion.state.OdomState;
 
@@ -19,6 +20,7 @@ public class SwerveController {
 
     private final Configuration config;
     private final SwerveChassis chassis;
+    private final TuningManager tuningManager;
     private final DataManager dataManager;
     
     /**
@@ -32,6 +34,7 @@ public class SwerveController {
         Objects.requireNonNull(configPath);
         this.config = new Configuration(configPath);
         this.chassis = new SwerveChassis(this.config);
+        this.tuningManager = new TuningManager(this.config);
         this.dataManager = new DataManager(this.config, this.chassis);
     }
 
@@ -48,6 +51,7 @@ public class SwerveController {
         Objects.requireNonNull(configPath);
         this.config = new Configuration(configPath, gyro);
         this.chassis = new SwerveChassis(this.config);
+        this.tuningManager = new TuningManager(this.config);
         this.dataManager = new DataManager(this.config, this.chassis);
     }
 
@@ -56,7 +60,10 @@ public class SwerveController {
      * this SwerveController.
      */
     public void update() {
-        this.chassis.update();
+        this.tuningManager.update();
+        if (!this.tuningManager.isEnabled()) {
+            this.chassis.update();
+        }
         this.dataManager.update();
     }
     
