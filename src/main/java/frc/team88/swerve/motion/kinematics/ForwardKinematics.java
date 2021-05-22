@@ -14,6 +14,9 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 // import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 // import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 
+/**
+ * Does the calculation to convert for sensed module state to robot position/velocity.
+ */
 public class ForwardKinematics {
   // The modules being controlled.
   private SwerveModule[] modules;
@@ -31,6 +34,11 @@ public class ForwardKinematics {
   // The last time the kinematics were calculated, in seconds.
   private double previousTime_s = RobotControllerWrapper.getInstance().getFPGATime() * 1E6;
 
+  /**
+   * Constructor.
+   * 
+   * @param modules The modules on this swerve drive.
+   */
   public ForwardKinematics(SwerveModule... modules) {
     if (modules.length < 2) {
       throw new IllegalArgumentException("Cannot do forward kinematics with less than 2 modules");
@@ -97,6 +105,35 @@ public class ForwardKinematics {
     forwardKinematics = solver.getInverse();
   }
 
+  /**
+   * Update the current robot pose.
+   */
+  public void update() {
+    calculateChassisVector();
+    estimatePoseExponential();
+  }
+
+  /**
+   * Get the current robot pose.
+   * 
+   * @return The current robot pose.
+   */
+  public OdomState getOdom() {
+    return state;
+  }
+
+  /**
+   * Set the current robot pose.
+   * 
+   * @param state The current robot pose.
+   */
+  public void setOdom(OdomState state) {
+    this.state = state;
+  }
+
+  /**
+   * Calculate the velocities of the chassis.
+   */
   private void calculateChassisVector() {
     for (int idx = 0; idx < modules.length; ++idx) {
       WrappedAngle azimuth = modules[idx].getAzimuthPositionFlipped();
@@ -115,6 +152,8 @@ public class ForwardKinematics {
   }
 
   /**
+   * Calculate the position of the robot.
+   *  
    * See https://file.tavsys.net/control/controls-engineering-in-frc.pdf Section 10.2 "Pose
    * exponential" for the theory and derivation Takes vx, vy, vt calculated in
    * calculateChassisVector and stored in state. Computes the next x, y, and t pose
@@ -183,18 +222,5 @@ public class ForwardKinematics {
 
     state.addToPosition(deltaPoseVector.getEntry(0, 0), deltaPoseVector.getEntry(1, 0));
     state.addToTheta(deltaPoseVector.getEntry(2, 0));
-  }
-
-  public void update() {
-    calculateChassisVector();
-    estimatePoseExponential();
-  }
-
-  public OdomState getOdom() {
-    return state;
-  }
-
-  public void setOdom(OdomState state) {
-    this.state = state;
   }
 }
