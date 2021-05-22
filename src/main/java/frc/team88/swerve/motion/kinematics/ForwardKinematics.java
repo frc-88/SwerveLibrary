@@ -14,9 +14,7 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 // import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 // import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 
-/**
- * Does the calculation to convert for sensed module state to robot position/velocity.
- */
+/** Does the calculation to convert for sensed module state to robot position/velocity. */
 public class ForwardKinematics {
   // The modules being controlled.
   private SwerveModule[] modules;
@@ -36,7 +34,7 @@ public class ForwardKinematics {
 
   /**
    * Constructor.
-   * 
+   *
    * @param modules The modules on this swerve drive.
    */
   public ForwardKinematics(SwerveModule... modules) {
@@ -105,9 +103,7 @@ public class ForwardKinematics {
     forwardKinematics = solver.getInverse();
   }
 
-  /**
-   * Update the current robot pose.
-   */
+  /** Update the current robot pose. */
   public void update() {
     calculateChassisVector();
     estimatePoseExponential();
@@ -115,7 +111,7 @@ public class ForwardKinematics {
 
   /**
    * Get the current robot pose.
-   * 
+   *
    * @return The current robot pose.
    */
   public OdomState getOdom() {
@@ -124,16 +120,14 @@ public class ForwardKinematics {
 
   /**
    * Set the current robot pose.
-   * 
+   *
    * @param state The current robot pose.
    */
   public void setOdom(OdomState state) {
     this.state = state;
   }
 
-  /**
-   * Calculate the velocities of the chassis.
-   */
+  /** Calculate the velocities of the chassis. */
   private void calculateChassisVector() {
     for (int idx = 0; idx < modules.length; ++idx) {
       WrappedAngle azimuth = modules[idx].getAzimuthPositionFlipped();
@@ -153,8 +147,8 @@ public class ForwardKinematics {
 
   /**
    * Calculate the position of the robot.
-   *  
-   * See https://file.tavsys.net/control/controls-engineering-in-frc.pdf Section 10.2 "Pose
+   *
+   * <p>See https://file.tavsys.net/control/controls-engineering-in-frc.pdf Section 10.2 "Pose
    * exponential" for the theory and derivation Takes vx, vy, vt calculated in
    * calculateChassisVector and stored in state. Computes the next x, y, and t pose
    */
