@@ -35,7 +35,7 @@ offset = 0
 
 [motor-templates.falcon500]
 inverted = false
-max-speed-rps = 100.0
+max-speed-rps = 101.0
 
 #######################################
 # Neo
@@ -70,18 +70,18 @@ template = "falcon500"
 template = "falcon500"
 
 [module-templates.team88.diff-swerve-2021.beta.azimuth-controller]
-kP = 10.0
+kP = 30.0
 kI = 0.0
-kD = 0.0
+kD = 15.0
 kF = 0.0
 i-zone = 0.0
 i-max = 0.0
-max-speed = 1080.0
-max-acceleration = 750.0
+max-speed = 540.0
+max-acceleration = 720.0
 
 [module-templates.team88.diff-swerve-2021.beta.wheel-controller]
 kP = 0.0
-kI = 0.0
-kD = 0.0
-i-zone = 0.0
+kI = 0.1
+kD = 0.5
+i-zone = 1.5
 i-max = 0.0

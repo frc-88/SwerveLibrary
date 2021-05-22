@@ -148,7 +148,9 @@ public class SyncPIDController {
      */
     protected double calculateI(double error) {
 
-        if (getIZone() <= EPSILON || Math.abs(error) < getIZone()) {
+        if (getIZone() <= EPSILON) {
+            m_accum = 0;
+        } else if (Math.abs(error) < getIZone()) {
             m_accum += error;
         }
 
