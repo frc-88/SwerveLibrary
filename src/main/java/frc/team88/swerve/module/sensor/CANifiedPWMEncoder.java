@@ -5,8 +5,7 @@ import com.ctre.phoenix.CANifier.PWMChannel;
 import com.ctre.phoenix.CANifierStatusFrame;
 
 /**
- * Represents a PWM-based encoder that is connected to a CANifier. Because there isn't a great way
- * to get the velocity here, a difference source is required.
+ * Represents a PWM-based encoder that is connected to a CANifier.
  */
 public class CANifiedPWMEncoder implements PositionSensor {
 

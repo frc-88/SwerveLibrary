@@ -22,6 +22,8 @@ import frc.team88.swerve.module.motor.SwerveMotor;
 import frc.team88.swerve.module.sensor.CANifiedPWMEncoder;
 import frc.team88.swerve.module.sensor.PositionSensor;
 import frc.team88.swerve.module.sensor.SensorTransmission;
+import frc.team88.swerve.module.sensor.SwerveCANcoder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -282,6 +284,23 @@ public class Configuration implements NetworkTablePopulator {
   }
 
   /**
+   * Instantiates a CANCoder.
+   *
+   * @param instanceConfig The config for the CANCoder.
+   * @param networkTable The key to use for the network table.
+   * @return The CANCoder object.
+   */
+  private SensorTransmission instantiateCANCoder(Config instanceConfig, String networkTable) {
+
+    SensorTransmissionConfiguration sensorConfig =
+        new SensorTransmissionConfiguration(instanceConfig);
+    this.networkTableConfigs.put(networkTable, sensorConfig);
+
+    SwerveCANcoder rawSensor = new SwerveCANcoder(instanceConfig.getInt("can-id"));
+    return new SensorTransmission(rawSensor, sensorConfig);
+  }
+
+  /**
    * Instantiates a position sensor.
    *
    * @param instanceConfig The config for the sensor.
@@ -297,6 +316,8 @@ public class Configuration implements NetworkTablePopulator {
     switch (template) {
       case "canified-pwm":
         return this.instantiateCanifiedPWM(sensorConfig, networkTable);
+      case "cancoder":
+        return this.instantiateCANCoder(sensorConfig, networkTable);
       default:
         throw new IllegalArgumentException(
             String.format("The template %s does not have a corresponding sensor class.", template));

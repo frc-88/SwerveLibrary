@@ -8,7 +8,10 @@ import frc.team88.swerve.configuration.Falcon500Configuration;
 import java.util.Objects;
 
 /** SwerveMotor implementation for the Falcon 500. */
-public class Falcon500 extends TalonFX implements SwerveMotor {
+public class Falcon500 implements SwerveMotor {
+
+  // The TalonFX that this is wrapping.
+  private final TalonFX talon;
 
   // The configuration data for this motor.
   private final Falcon500Configuration config;
@@ -26,15 +29,15 @@ public class Falcon500 extends TalonFX implements SwerveMotor {
    * @param config The config data for this motor.
    */
   public Falcon500(int canID, Falcon500Configuration config) {
-    super(canID);
+    talon = new TalonFX(canID);
 
     this.config = Objects.requireNonNull(config);
 
-    this.configFactoryDefault();
-    this.setInverted(config.isInverted());
-    this.setNeutralMode(NeutralMode.Brake);
-    this.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    this.configNeutralDeadband(0);
+    this.talon.configFactoryDefault();
+    this.talon.setInverted(config.isInverted());
+    this.talon.setNeutralMode(NeutralMode.Brake);
+    this.talon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    this.talon.configNeutralDeadband(0);
   }
 
   /**
@@ -44,12 +47,12 @@ public class Falcon500 extends TalonFX implements SwerveMotor {
    */
   @Override
   public double getPosition() {
-    return this.getSelectedSensorPosition() / 2048 + offset;
+    return this.talon.getSelectedSensorPosition() / 2048 + offset;
   }
 
   @Override
   public double getVelocity() {
-    return this.getSelectedSensorVelocity() * 10. / 2048.;
+    return this.talon.getSelectedSensorVelocity() * 10. / 2048.;
   }
 
   /**
@@ -63,7 +66,7 @@ public class Falcon500 extends TalonFX implements SwerveMotor {
 
   @Override
   public void setVelocity(double velocity) {
-    this.set(ControlMode.PercentOutput, velocity / this.getMaxVelocity());
+    this.talon.set(ControlMode.PercentOutput, velocity / this.getMaxVelocity());
     this.commandVelocity = velocity;
   }
 
@@ -74,12 +77,12 @@ public class Falcon500 extends TalonFX implements SwerveMotor {
 
   @Override
   public double getCurrentDraw() {
-    return this.getSupplyCurrent();
+    return this.talon.getSupplyCurrent();
   }
 
   @Override
   public double getCommandVoltage() {
-    return this.getMotorOutputVoltage();
+    return this.talon.getMotorOutputVoltage();
   }
 
   @Override
@@ -89,11 +92,11 @@ public class Falcon500 extends TalonFX implements SwerveMotor {
 
   @Override
   public void setCoast() {
-    this.setNeutralMode(NeutralMode.Coast);
+    this.talon.setNeutralMode(NeutralMode.Coast);
   }
 
   @Override
   public void setBrake() {
-    this.setNeutralMode(NeutralMode.Brake);
+    this.talon.setNeutralMode(NeutralMode.Brake);
   }
 }
