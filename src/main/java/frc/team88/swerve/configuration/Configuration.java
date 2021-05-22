@@ -348,7 +348,10 @@ public class Configuration implements NetworkTablePopulator {
         SwerveMotor motors[] = new SwerveMotor[]{this.instantiateMotor(moduleConfig.get("motors.0"), networkTable + "/motors/0"), this.instantiateMotor(moduleConfig.get("motors.1"), networkTable + "/motors/1")};
         PositionSensor azimuthSensor = this.instantiateSensor(moduleConfig.get("azimuth-sensor"), networkTable + "/sensor");
 
-        return new SwerveModule(motors, azimuthSensor, new SwerveModuleConfiguration(moduleConfig));
+        SwerveModuleConfiguration swerveModuleConfig = new SwerveModuleConfiguration(moduleConfig);
+        this.networkTableConfigs.put(networkTable, swerveModuleConfig);
+
+        return new SwerveModule(motors, azimuthSensor, swerveModuleConfig);
     }
 
     /**

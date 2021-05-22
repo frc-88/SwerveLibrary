@@ -53,8 +53,8 @@ public class ModuleControlMode implements TuningMode {
             this.firstRun = false;
         }
         for (int idx = 0; idx < this.modules.length; idx++) {
-            table.getEntry("modules/" + idx + "/azimuthPosition").getDouble(azimuthPositions[idx]);
-            table.getEntry("modules/" + idx + "/wheelSpeed").getDouble(azimuthPositions[idx]);
+            azimuthPositions[idx] = table.getEntry("modules/" + idx + "/azimuthPosition").getDouble(azimuthPositions[idx]);
+            wheelSpeeds[idx] = table.getEntry("modules/" + idx + "/wheelSpeed").getDouble(wheelSpeeds[idx]);
         }
     }
 }

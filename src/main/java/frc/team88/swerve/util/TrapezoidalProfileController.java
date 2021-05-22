@@ -2,6 +2,8 @@ package frc.team88.swerve.util;
 
 import java.util.Objects;
 
+import frc.team88.swerve.configuration.TrapezoidalControllerConfiguration;
+
 /**
  * Class that performs the math of a trapezoidal profile controller. Calculates
  * the required speed to follow the profile live. Handles a combined position
@@ -9,15 +11,11 @@ import java.util.Objects;
  */
 public class TrapezoidalProfileController {
 
-    // The maximum speed value that can be both commanded and output, in units per
-    // second.
-    private double maxSpeed;
-
-    // The maximum acceleration for the trapezoidal profile, in units per second^2.
-    private double maxAcceleration;
+    // The config for this trapezoidal controller.
+    private final TrapezoidalControllerConfiguration config;
 
     // The position controller used to adjust the velocity.
-    private SyncPIDController positionPID;
+    private final SyncPIDController positionPID;
 
     // The target velocity which is a setpoint for this controller, in units per
     // second.
@@ -38,54 +36,11 @@ public class TrapezoidalProfileController {
     /**
      * Constructor.
      * 
-     * @param maxSpeed
-     *                            The maximum speed value that can be both commanded
-     *                            and output, in units per second.
-     * @param maxAcceleration
-     *                            The maximum acceleration for the trapezoidal
-     *                            profile, in units per second^2
-     * @param positionPID
-     *                            The position controller used to adjust the
-     *                            velocity.
+     * @param config The configuration for this controller.
      */
-    public TrapezoidalProfileController(double maxSpeed, double maxAcceleration, SyncPIDController positionPID) {
-        if (maxSpeed <= 0) {
-            throw new IllegalArgumentException("Max speed must be positive");
-        }
-        if (maxAcceleration <= 0) {
-            throw new IllegalArgumentException("Max acceleration must be positive");
-        }
-        this.maxSpeed = maxSpeed;
-        this.maxAcceleration = maxAcceleration;
-        this.positionPID = Objects.requireNonNull(positionPID);
-    }
-
-    /**
-     * Sets the max speed limit.
-     * 
-     * @param maxSpeed
-     *                     The maximum speed value that can be both commanded and
-     *                     output, in units per second.
-     */
-    public void setMaxSpeed(double maxSpeed) {
-        if (maxSpeed <= 0) {
-            throw new IllegalArgumentException("Max speed must be positive");
-        }
-        this.maxSpeed = maxSpeed;
-    }
-
-    /**
-     * Sets the max acceleration limit.
-     * 
-     * @param maxAcceleration
-     *                            The maximum acceleration for the trapezoidal
-     *                            profile, in units per second^2
-     */
-    public void setMaxAcceleration(double maxAcceleration) {
-        if (maxAcceleration <= 0) {
-            throw new IllegalArgumentException("Max acceleration must be positive");
-        }
-        this.maxAcceleration = maxAcceleration;
+    public TrapezoidalProfileController(TrapezoidalControllerConfiguration config) {
+        this.config = Objects.requireNonNull(config);
+        this.positionPID = new SyncPIDController(config.getPIDConfig());
     }
 
     /**
@@ -117,7 +72,7 @@ public class TrapezoidalProfileController {
      *         units per second.
      */
     public double getMaxSpeed() {
-        return this.maxSpeed;
+        return this.config.getMaxSpeed();
     }
 
     /**
@@ -127,7 +82,7 @@ public class TrapezoidalProfileController {
      *         second^2
      */
     public double getMaxAcceleration() {
-        return this.maxAcceleration;
+        return this.config.getMaxAcceleration();
     }
 
     /**
@@ -263,7 +218,7 @@ public class TrapezoidalProfileController {
      * @return The limited velocity, in units per second.
      */
     protected double applyMaxSpeedLimit(double commandVelocity) {
-        return Math.min(maxSpeed, Math.max(-maxSpeed, commandVelocity));
+        return Math.min(getMaxSpeed(), Math.max(-getMaxSpeed(), commandVelocity));
     }
 
     /**
@@ -278,7 +233,7 @@ public class TrapezoidalProfileController {
     protected double applyDeccelerationLimit(double commandVelocity, boolean forwards) {
         // v^2 = v0^2 + 2ax -> v0 = sqrt(v^2 - 2ax)
         double limitVelocity = MathUtils.signedPow(targetVelocity, 2)
-                + 2 * this.maxAcceleration * (this.targetPosition - lastCommandedPosition);
+                + 2 * getMaxAcceleration() * (this.targetPosition - lastCommandedPosition);
         limitVelocity = Math.signum(limitVelocity) * Math.sqrt(Math.abs(limitVelocity));
         if (forwards) {
             return Math.min(limitVelocity, commandVelocity);

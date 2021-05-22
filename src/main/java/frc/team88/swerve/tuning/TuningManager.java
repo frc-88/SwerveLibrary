@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Map.Entry;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.team88.swerve.configuration.Configuration;
 import frc.team88.swerve.data.NetworkTablePopulator;
@@ -19,7 +20,7 @@ public class TuningManager implements NetworkTablePopulator {
     private final Map<String, TuningMode> modes;
 
     private Optional<String> activeMode;
-    private Optional<String> queuedActiveMode;
+    private boolean newActiveMode = false;
 
     private boolean firstNetworkTableCall = true;
 
@@ -33,9 +34,9 @@ public class TuningManager implements NetworkTablePopulator {
 
         modes = new HashMap<>();
         modes.put("motorControl", new MotorControlMode(config.getModules()));
+        modes.put("moduleControl", new ModuleControlMode(config.getModules()));
 
         this.activeMode = Optional.empty();
-        this.queuedActiveMode = Optional.empty();
     }
 
     /**
@@ -46,19 +47,15 @@ public class TuningManager implements NetworkTablePopulator {
         // Disable all modes if robot is disabled.
         if (DriverStation.getInstance().isDisabled()) {
             this.activeMode = Optional.empty();
-            this.queuedActiveMode = Optional.empty();
+            this.newActiveMode = false;
             return;
         }
 
-        // Set the new mode if one is queued.
-        if (queuedActiveMode.isPresent()) {
-            this.activeMode = Optional.of(queuedActiveMode.get());
-            this.queuedActiveMode = Optional.empty();
-
-            this.modes.get(activeMode.get()).init();
-        }
-
         if (activeMode.isPresent()) {
+            if (newActiveMode) {
+                this.modes.get(activeMode.get()).init();
+                this.newActiveMode = false;
+            }
             this.modes.get(activeMode.get()).run();
         }
     }
@@ -84,18 +81,41 @@ public class TuningManager implements NetworkTablePopulator {
             this.firstNetworkTableCall = false;
         } else {
             for (Entry<String, TuningMode> entry : modes.entrySet()) {
-                NetworkTable modeTable = table.getSubTable(entry.getKey());
+                NetworkTableEntry enabledEntry = table.getSubTable(entry.getKey()).getEntry("enable");
+                String mode = entry.getKey();
+
+                // Check if this is the active mode and was disabled.
+                if (this.isActiveMode(mode) && !enabledEntry.getBoolean(false)) {
+                    this.activeMode = Optional.empty();
+                }
+
                 // Queue the mode if set to enabled.
-                if (modeTable.getEntry("enable").getBoolean(false)) {
-                    this.queuedActiveMode = Optional.of(entry.getKey());
+                if (!this.isActiveMode(mode) && enabledEntry.getBoolean(false) && DriverStation.getInstance().isEnabled()) {
+                    if (this.activeMode.isPresent()) {
+                        table.getSubTable(this.activeMode.get()).getEntry("enable").setBoolean(false);
+                        this.activeMode = Optional.empty();
+                    }
+                    this.activeMode = Optional.of(mode);
+                    this.newActiveMode = true;
                 }
+
                 // Only the enabled mode should show as such.
-                if (!(activeMode.isPresent() && activeMode.get().equals(entry.getKey()))) {
-                    modeTable.getEntry("enable").setBoolean(false);
-                }
-                entry.getValue().populateNetworkTable(modeTable);
+                enabledEntry.setBoolean(this.isActiveMode(mode));
+
+                entry.getValue().populateNetworkTable(table.getSubTable(mode));
             }
         }
+    }
+
+    /**
+     * Determines if the given mode is the active mode.
+     * 
+     * @param mode The mode to check.
+     * @return True if the given mode is active, false if another mode is
+     *         active or if no modes are active.
+     */
+    private boolean isActiveMode(String mode) {
+        return this.activeMode.isPresent() && this.activeMode.get().equals(mode);
     }
 
 }

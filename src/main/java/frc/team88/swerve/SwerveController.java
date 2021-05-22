@@ -35,7 +35,7 @@ public class SwerveController {
         this.config = new Configuration(configPath);
         this.chassis = new SwerveChassis(this.config);
         this.tuningManager = new TuningManager(this.config);
-        this.dataManager = new DataManager(this.config, this.chassis);
+        this.dataManager = new DataManager(this.config, this.chassis, this.tuningManager);
     }
 
     /**
@@ -52,7 +52,7 @@ public class SwerveController {
         this.config = new Configuration(configPath, gyro);
         this.chassis = new SwerveChassis(this.config);
         this.tuningManager = new TuningManager(this.config);
-        this.dataManager = new DataManager(this.config, this.chassis);
+        this.dataManager = new DataManager(this.config, this.chassis, this.tuningManager);
     }
 
     /**

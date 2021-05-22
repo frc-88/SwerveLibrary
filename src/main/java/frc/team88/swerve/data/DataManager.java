@@ -12,6 +12,7 @@ import frc.team88.swerve.data.representations.SwerveModuleData;
 import frc.team88.swerve.motion.SwerveChassis;
 import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
+import frc.team88.swerve.tuning.TuningManager;
 import frc.team88.swerve.util.RobotControllerWrapper;
 
 /**
@@ -25,12 +26,16 @@ public class DataManager {
     // The swerve chassis generating data.
     private final SwerveChassis chassis;
 
+    // The tuning manager for the swerve drive.
+    private final TuningManager tuningManager;
+
     // If the data should be published to NetworkTables.
     private boolean enableNetworkTablesPublishing = true;
 
-    public DataManager(Configuration config, SwerveChassis chassis) {
+    public DataManager(Configuration config, SwerveChassis chassis, TuningManager tuningManager) {
         this.config = Objects.requireNonNull(config);
         this.chassis = Objects.requireNonNull(chassis);
+        this.tuningManager = tuningManager;
     }
 
     /**
@@ -52,6 +57,7 @@ public class DataManager {
             NetworkTable mainTable = NetworkTableInstance.getDefault().getTable("swerveLibrary");
 
             this.config.populateNetworkTable(mainTable.getSubTable("configuration"));
+            this.tuningManager.populateNetworkTable(mainTable.getSubTable("tuning"));
 
             gyroData.populateNetworkTable(mainTable.getSubTable("gyro"));
             for (int idx = 0; idx < moduleData.length; idx++) {

@@ -65,9 +65,7 @@ public class SwerveModule {
         this.azimuthSensor = Objects.requireNonNull(azimuthSensor);
         this.config = Objects.requireNonNull(config);
 
-        SyncPIDController azimuthPID = new SyncPIDController(config.getAzimuthControllerConfig().getPIDConfig());
-        this.azimuthPositionController = new TrapezoidalProfileController(config.getAzimuthControllerConfig().getMaxSpeed(),
-                config.getAzimuthControllerConfig().getMaxAcceleration(), azimuthPID);
+        this.azimuthPositionController = new TrapezoidalProfileController(config.getAzimuthControllerConfig());
         this.azimuthPositionController.reset(this.getAzimuthPosition().asDouble());
 
         this.wheelVelocityController = new SyncPIDController(config.getWheelControllerConfig());
@@ -266,6 +264,15 @@ public class SwerveModule {
      */
     public SwerveMotor[] getMotors() {
         return this.motors;
+    }
+
+    /**
+     * Gets the config for this module.
+     * 
+     * @return This module's config.
+     */
+    public SwerveModuleConfiguration getConfig() {
+        return this.config;
     }
 
     /**

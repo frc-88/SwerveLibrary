@@ -10,73 +10,13 @@ import frc.team88.swerve.configuration.PIDConfiguration;
  */
 public class SyncPIDController {
 
-    private double kP;
-    private double kI;
-    private double kD;
-    private double kF;
-    private double iZone;
-    private double iMax;
-    private double tolerance;
-
-    private boolean enableIZone;
-    private boolean enableIMax;
+    private PIDConfiguration config;
 
     private double m_accum = 0;
     private double m_prevError = 0;
     private long m_lastLoopTime = 0; // us
 
-    /**
-     * Constructor which specifies all parameters.
-     * 
-     * @param kP
-     *                  The proportional gain
-     * @param kI
-     *                  The integral gain
-     * @param kD
-     *                  The differential gain
-     * @param kF
-     *                  The feedforward gain
-     * @param iZone
-     *                  The integral will only accumulate while the current error is
-     *                  less than this value
-     * @param iMax
-     *                  The maximum absolute value that the integral error will
-     *                  accumulate
-     * 
-     * @param tolerance
-     *                  The tolerance for when the controller will consider
-     *                  itself on target and output 0.
-     */
-    public SyncPIDController(double kP, double kI, double kD, double kF, double iZone, double iMax, double tolerance) {
-
-        this.kP = kP;
-        this.kI = kI;
-        this.kD = kD;
-        this.kF = kF;
-        this.iZone = iZone;
-        this.iMax = iMax;
-        this.tolerance = tolerance;
-
-        this.enableIZone = iZone > 0.000001;
-        this.enableIMax = iMax > 0.000001;
-    }
-
-    /**
-     * Constructor with only the basic parameters.
-     * 
-     * @param kP
-     *               The proportional gain
-     * @param kI
-     *               The integral gain
-     * @param kD
-     *               The differential gain
-     */
-    public SyncPIDController(double kP, double kI, double kD) {
-        this(kP, kI, kD, 0, 0, 0, 0);
-
-        this.enableIZone = false;
-        this.enableIMax = false;
-    }
+    private static final double EPSILON = 0.00000001;
 
     /**
      * Constructor that uses a PIDConfiguration object.
@@ -86,178 +26,70 @@ public class SyncPIDController {
      *                      controller
      */
     public SyncPIDController(final PIDConfiguration constants) {
-        this(Objects.requireNonNull(constants).getKP(), constants.getKI(), constants.getKD(),
-                constants.getKF(), constants.getIZone(), constants.getIMax(),
-                constants.getTolerance());
-    }
-
-    /**
-     * Sets the proportial constant for the PID.
-     * 
-     * @param kP
-     *               The proportional gain
-     */
-    public void setKP(double kP) {
-        this.kP = kP;
-    }
-
-    /**
-     * Sets the integral constant for the PID.
-     * 
-     * @param kI
-     *               The integral gain
-     */
-    public void setKI(double kI) {
-        this.kI = kI;
-    }
-
-    /**
-     * Sets the differential constant for the PID.
-     * 
-     * @param kD
-     *               The differential gain
-     */
-    public void setKD(double kD) {
-        this.kD = kD;
-    }
-
-    /**
-     * Sets the feedforward constant for the PID.
-     * 
-     * @param kF
-     *               The feedforward gain
-     */
-    public void setKF(double kF) {
-        this.kF = kF;
-    }
-
-    /**
-     * Sets the maximum error for the integral to accumulate, and enable the iZone
-     * functionality
-     * 
-     * @param iZone
-     *                  the maximum error for integral accumulation
-     */
-    public void setIZone(double iZone) {
-        this.iZone = iZone;
-        this.enableIZone = true;
-    }
-
-    /**
-     * Disables the iZone functionality.
-     */
-    public void disableIZone() {
-        this.enableIZone = false;
-    }
-
-    /**
-     * Sets the maximum error the integral will accumulate, and enable the iMax
-     * functionality
-     * 
-     * @param iMax
-     *                 The maximum accumulated error
-     */
-    public void setIMax(double iMax) {
-        this.iMax = iMax;
-        this.enableIMax = true;
-    }
-
-    /**
-     * Disables the iZone functionality.
-     */
-    public void disableIMax() {
-        this.enableIMax = false;
+        this.config = Objects.requireNonNull(constants);
     }
 
     /**
      * Gets the proportial constant for the PID.
      * 
-     * @return The proportional gain
+     * @return The proportional gain.
      */
     public double getKP() {
-        return this.kP;
+        return this.config.getKP();
     }
 
     /**
      * Gets the integral constant for the PID.
      * 
-     * @return The integral gain
+     * @return The integral gain.
      */
     public double getKI() {
-        return this.kI;
+        return this.config.getKI();
     }
 
     /**
      * Gets the derivative constant for the PID.
      * 
-     * @return The differential gain
+     * @return The differential gain.
      */
     public double getKD() {
-        return this.kD;
+        return this.config.getKF();
     }
 
     /**
      * Gets the feedforward constant for the PID.
      * 
-     * @return the feedforward gain
+     * @return the feedforward gain.
      */
     public double getkF() {
-        return this.kF;
+        return this.config.getKF();
     }
 
     /**
      * Gets the iZone constant for the PID.
      * 
-     * @return the maximum error for integral accumulation
+     * @return the maximum error for integral accumulation.
      */
     public double getIZone() {
-        return this.iZone;
-    }
-
-    /**
-     * Gets if iZone functionality is enabled.
-     * 
-     * @return True if iZone functionality is enabled, false otherwise
-     */
-    public boolean isIZoneEnabled() {
-        return this.enableIZone;
+        return this.config.getIZone();
     }
 
     /**
      * Gets the iMax constant for the PID.
      * 
-     * @return The maximum accumulated error
+     * @return The maximum accumulated error.
      */
     public double getIMax() {
-        return this.iMax;
-    }
-
-    /**
-     * Gets if iMax functionality is enabled.
-     * 
-     * @return True if iMax functionality is enabled, false otherwise
-     */
-    public boolean isIMaxEnabled() {
-        return this.enableIMax;
+        return this.config.getIMax();
     }
 
     /**
      * Gets the tolerance for the PID.
      * 
-     * @return The max error to consider the PID on target
+     * @return The max error to consider the PID on target.
      */
     public double getTolerance() {
-        return this.tolerance;
-    }
-
-    /**
-     * Set the tolerance for the PID.
-     * 
-     * @param tolerance
-     *                      The max error to consider the PID on target
-     */
-    public void setTolerance(double tolerance) {
-        this.tolerance = tolerance;
+        return this.config.getTolerance();
     }
 
     /**
@@ -283,7 +115,7 @@ public class SyncPIDController {
     public double calculateOutput(double input, double setpoint) {
         double error = setpoint - input;
 
-        if (Math.abs(error) < tolerance) {
+        if (Math.abs(error) < getTolerance()) {
             return 0;
         }
 
@@ -304,7 +136,7 @@ public class SyncPIDController {
      * @return The proportional output
      */
     protected double calculateP(double error) {
-        return kP * error;
+        return getKP() * error;
     }
 
     /**
@@ -316,19 +148,19 @@ public class SyncPIDController {
      */
     protected double calculateI(double error) {
 
-        if (!enableIZone || Math.abs(error) < iZone) {
+        if (getIZone() <= EPSILON || Math.abs(error) < getIZone()) {
             m_accum += error;
         }
 
-        if (enableIMax) {
+        if (getIMax() > EPSILON) {
             if (m_accum > 0) {
-                m_accum = Math.min(m_accum, iMax / kI);
+                m_accum = Math.min(m_accum, getIMax() / getKI());
             } else {
-                m_accum = Math.max(m_accum, -iMax / kI);
+                m_accum = Math.max(m_accum, -getIMax() / getKI());
             }
         }
 
-        return kI * m_accum;
+        return getKI() * m_accum;
     }
 
     /**
@@ -342,7 +174,7 @@ public class SyncPIDController {
 
         long curTime = RobotControllerWrapper.getInstance().getFPGATime();
 
-        double ret = kD * (error - m_prevError) / ((curTime - m_lastLoopTime) / 1e6);
+        double ret = getKD() * (error - m_prevError) / ((curTime - m_lastLoopTime) / 1e6);
 
         m_prevError = error;
         m_lastLoopTime = curTime;
@@ -359,6 +191,6 @@ public class SyncPIDController {
      * @return The feedforward output
      */
     protected double calculateF(double setpoint) {
-        return kF * setpoint;
+        return getkF() * setpoint;
     }
 }

@@ -5,7 +5,6 @@ import java.util.Objects;
 import com.electronwill.nightconfig.core.Config;
 
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import frc.team88.swerve.data.NetworkTablePopulator;
 
 /**
