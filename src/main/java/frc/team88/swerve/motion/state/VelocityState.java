@@ -23,9 +23,9 @@ public class VelocityState implements NetworkTablePopulator {
    * @param translationSpeed The speed to translate, in feet per second.
    * @param rotationVelocity The angular velocity to rotate, in degrees per second.
    * @param centerOfRotationX The x component of the point to rotate about relative to the robot's
-   *     origin, in feet.
+   *     origin, in feet. The positive x-axis points forwards on the robot.
    * @param centerOfRotationY The y component of the point to rotate about relative to the robot's
-   *     origin, in feet.
+   *     origin, in feet. The positive y-axis points left on the robot.
    * @param isFieldCentric True if this state is field-centric, false if it is robot-centric.
    */
   public VelocityState(
@@ -98,7 +98,8 @@ public class VelocityState implements NetworkTablePopulator {
   }
 
   /**
-   * Gets the x component of the center of rotation.
+   * Gets the x component of the center of rotation. The positive x-axis points forwards on the
+   * robot.
    *
    * @return The x component of the center of rotation, in feet.
    */
@@ -107,7 +108,7 @@ public class VelocityState implements NetworkTablePopulator {
   }
 
   /**
-   * Gets the y component of the center of rotation.
+   * Gets the y component of the center of rotation. The positive y-axis points left on the robot.
    *
    * @return The y component of the center of rotation, in feet.
    */
@@ -116,7 +117,8 @@ public class VelocityState implements NetworkTablePopulator {
   }
 
   /**
-   * Gets the center of rotation as a vector.
+   * Gets the center of rotation as a vector. The positive x-axis points forwards on the robot,
+   * while the positive y-axis points left.
    *
    * @return The center of rotation, in feet.
    */
@@ -188,8 +190,10 @@ public class VelocityState implements NetworkTablePopulator {
    * Creates a new velocity state that is the same as this one, except with the given center of
    * rotation.
    *
-   * @param x The x component of the center of rotation, in feet.
-   * @param y The y component of the center of rotation, in feet.
+   * @param x The x component of the center of rotation, in feet. The positive x-axis points
+   * forwards on the robot.
+   * @param y The y component of the center of rotation, in feet. The positive y-axis points left
+   * on the robot.
    * @return The new velocity state.
    */
   public VelocityState changeCenterOfRotation(double x, double y) {

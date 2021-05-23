@@ -1,12 +1,10 @@
 package frc.team88.swerve.util;
 
 /**
- * Represents a 2D vector with many math utility functions. Immutable. Follows our reference frame
- * convention, which is as follows:
- *
- * <p>"An angle of 0 degrees is defined as pointing in the direction of the positive y-axis,
- * increasing positively in the counter-clockwise direction and negatively in the clockwise
- * direction. The positive x-axis is at -90 degrees."
+ * Represents a 2D vector with many math utility functions. Immutable. Follows the standard
+ * cartesian frame of reference, with angle 0 on the positive x axis and increasing
+ * counterclockwise. On the robot, the positive x axis is pointing forwards, while the positive
+ * y axis is pointing to the left.
  */
 public class Vector2D {
 
@@ -61,7 +59,7 @@ public class Vector2D {
    * @return The angle
    */
   public WrappedAngle getAngle() {
-    return new WrappedAngle(Math.toDegrees(Math.atan2(-x, y)));
+    return new WrappedAngle(Math.toDegrees(Math.atan2(y, x)));
   }
 
   /**
@@ -88,7 +86,7 @@ public class Vector2D {
     }
     double angleRad = Math.toRadians(angle.asDouble());
     return createCartesianCoordinates(
-        magnitude * -Math.sin(angleRad), magnitude * Math.cos(angleRad));
+        magnitude * Math.cos(angleRad), magnitude * Math.sin(angleRad));
   }
 
   /**

@@ -127,7 +127,7 @@ public class SwerveController {
   /**
    * Sets the point that the robot will rotate around, relative to the origin used to define the
    * location of the swerve modules in the config. It does not need to be within the robot's frame
-   * perimeter.
+   * perimeter. Positive x corresponds to robot forwards, positive y corresponds to robot left.
    *
    * @param x The x component, in feet.
    * @param y The y component, in feet.

@@ -13,6 +13,11 @@ public class MotorData implements NetworkTablePopulator {
   private final double commandVoltage;
   private final double currentDraw;
 
+  /**
+   * Constructor.
+   * 
+   * @param motor The motor to collect data from.
+   */
   public MotorData(SwerveMotor motor) {
     Objects.requireNonNull(motor);
     this.velocity = motor.getVelocity();
