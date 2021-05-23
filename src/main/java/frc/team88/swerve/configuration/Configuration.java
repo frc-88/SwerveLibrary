@@ -22,6 +22,9 @@ import frc.team88.swerve.module.motor.SwerveMotor;
 import frc.team88.swerve.module.sensor.CANifiedPWMEncoder;
 import frc.team88.swerve.module.sensor.PositionSensor;
 import frc.team88.swerve.module.sensor.SensorTransmission;
+import frc.team88.swerve.commandmux.CommandMux;
+import frc.team88.swerve.commandmux.CommandMuxEntry;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +45,9 @@ public class Configuration implements NetworkTablePopulator {
 
   // The swerve modules from this configuration
   private SwerveModule[] modules;
+
+  // The command multiplexers from this configuration
+  private CommandMux commandMux;
 
   // The canifiers used by sensors in this configuration
   private final Map<Integer, CANifier> canifiers;
@@ -81,6 +87,7 @@ public class Configuration implements NetworkTablePopulator {
     } else {
       this.instantiateGyro();
     }
+    instantiateCommandMuxs();
   }
 
   /**
@@ -119,6 +126,15 @@ public class Configuration implements NetworkTablePopulator {
    */
   public Map<Integer, CANifier> getCanifiers() {
     return this.canifiers;
+  }
+
+  /**
+   * Gets the command mux specified by this config.
+   *
+   * @return The command mux.
+   */
+  public CommandMux getCommandMux() {
+    return this.commandMux;
   }
 
   /**
@@ -187,7 +203,7 @@ public class Configuration implements NetworkTablePopulator {
   }
 
   /**
-   * Instantiates a template's config by apppending and overwritting the design with an
+   * Instantiates a template's config by appending and overwritting the design with an
    * instance-specific config.
    */
   private Config instantiateTemplateConfig(Config templateConfig, Config instanceConfig) {
@@ -234,6 +250,27 @@ public class Configuration implements NetworkTablePopulator {
       default:
         throw new IllegalArgumentException(
             String.format("The template %s does not have a corresponding gyro class.", template));
+    }
+  }
+
+  private CommandMuxEntry instantiateCommandMux(Config instanceConfig, String networkTable) {
+    String template = instanceConfig.get("template");
+    Config config =
+        this.instantiateTemplateConfig(
+            configData.get("command-mux-templates." + template), instanceConfig);
+
+    networkTable += "/mux/" + config.get("id");
+    CommandMuxConfiguration muxConfig = new CommandMuxConfiguration(config);
+    this.networkTableConfigs.put(networkTable, muxConfig);
+    return new CommandMuxEntry(muxConfig);
+  }
+
+  /** Instantiates the command mux objects from the config. */
+  private void instantiateCommandMuxs() {
+    List<Config> muxConfigs = this.configData.get("command-mux");
+    this.commandMux = new CommandMux(muxConfigs);
+    for (int index = 0; index < muxConfigs.size(); index++) {
+      this.commandMux.instantiateMux(index, this.instantiateCommandMux(muxConfigs.get(index), "/commands"));
     }
   }
 

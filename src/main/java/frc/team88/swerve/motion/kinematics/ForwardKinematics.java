@@ -96,9 +96,7 @@ public class ForwardKinematics {
       inverseKinematics.setEntry(idx * 2, 2, -module_loc.getY());
       inverseKinematics.setEntry(idx * 2 + 1, 0, 0);
       inverseKinematics.setEntry(idx * 2 + 1, 1, 1);
-      inverseKinematics.setEntry(
-          idx * 2 + 1, 2, -module_loc.getX()); // flipping X to match SwerveLibrary convention
-      // inverseKinematics.setEntry(idx * 2 + 1, 2, module_loc.getX());
+      inverseKinematics.setEntry(idx * 2 + 1, 2, module_loc.getX());
     }
     SingularValueDecomposition svd = new SingularValueDecomposition(inverseKinematics);
     DecompositionSolver solver = svd.getSolver();

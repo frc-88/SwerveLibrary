@@ -1,5 +1,6 @@
 package frc.team88.swerve.data;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.team88.swerve.configuration.Configuration;
@@ -29,10 +30,19 @@ public class DataManager {
   // If the data should be published to NetworkTables.
   private boolean enableNetworkTablesPublishing = true;
 
-  public DataManager(Configuration config, SwerveChassis chassis, TuningManager tuningManager) {
+  // Callback object for NetworkTable entry listener
+  private final NetworkTableCommandListener ntCommandListener;
+
+  // Root table for all Swerve Library data;
+  NetworkTable mainTable;
+
+  public DataManager(Configuration config, SwerveChassis chassis, TuningManager tuningManager, NetworkTableCommandListener ntCommandListener) {
     this.config = Objects.requireNonNull(config);
     this.chassis = Objects.requireNonNull(chassis);
     this.tuningManager = tuningManager;
+    this.ntCommandListener = Objects.requireNonNull(ntCommandListener);
+    mainTable = NetworkTableInstance.getDefault().getTable("swerveLibrary");
+    setupCallbacks();
   }
 
   /** Publishes to NetworkTables, if enabled. */
@@ -52,8 +62,6 @@ public class DataManager {
     OdomState odometryState = this.chassis.getOdomState();
 
     if (enableNetworkTablesPublishing) {
-      NetworkTable mainTable = NetworkTableInstance.getDefault().getTable("swerveLibrary");
-
       this.config.populateNetworkTable(mainTable.getSubTable("configuration"));
       this.tuningManager.populateNetworkTable(mainTable.getSubTable("tuning"));
 
@@ -69,6 +77,19 @@ public class DataManager {
       odometryState.populateNetworkTable(mainTable.getSubTable("odometryState"));
       mainTable.getEntry("timestamp").setDouble(RobotControllerWrapper.getInstance().getFPGATime());
     }
+  }
+
+  /**
+   * Sets up callbacks for commands sent via network tables.
+   * Only listens for swerveLibrary/commands/timestamp.
+   * The callback assumes if this entry has updated, then 
+   * the other command entries have update too
+   */
+  private void setupCallbacks()
+  {
+    NetworkTable commandTable = mainTable.getSubTable("commands");
+    ntCommandListener.setTable(commandTable);
+    commandTable.addEntryListener("timestamp", ntCommandListener, EntryListenerFlags.kUpdate);
   }
 
   /**
