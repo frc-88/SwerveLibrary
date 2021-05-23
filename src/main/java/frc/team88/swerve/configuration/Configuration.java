@@ -261,7 +261,7 @@ public class Configuration implements NetworkTablePopulator {
             configData.get("command-mux-templates." + template), instanceConfig);
 
     networkTable += "/mux/" + config.get("id");
-    CommandMuxConfiguration muxConfig = new CommandMuxConfiguration(config);
+    CommandMuxConfiguration muxConfig = new CommandMuxConfiguration(config, template);
     this.networkTableConfigs.put(networkTable, muxConfig);
     return new CommandMuxEntry(muxConfig);
   }
@@ -269,6 +269,10 @@ public class Configuration implements NetworkTablePopulator {
   /** Instantiates the command mux objects from the config. */
   private void instantiateCommandMuxs() {
     List<Config> muxConfigs = this.configData.get("command-mux");
+    if (!Objects.nonNull(muxConfigs) || muxConfigs.size() == 0) {
+      this.commandMux = new CommandMux();
+      return;
+    }
     this.commandMux = new CommandMux(muxConfigs);
     for (int index = 0; index < muxConfigs.size(); index++) {
       this.commandMux.instantiateMux(index, this.instantiateCommandMux(muxConfigs.get(index), "/commands"));

@@ -26,10 +26,16 @@ offset = 0
 ###########################################################
 # COMMAND MUX TEMPLATES
 ###########################################################
-[command-mux-templates.template]
-priority = 1
+[command-mux-templates.basic]
 id = 0
+priority = 1
 timeout = 0.0
+
+[command-mux-templates.networktables]
+id = 888888
+priority = 1
+timeout = 1.0
+
 #######################################
 # CANCoder
 #######################################

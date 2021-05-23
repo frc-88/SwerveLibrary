@@ -21,6 +21,7 @@ public class SwerveController {
   private final TuningManager tuningManager;
   private final DataManager dataManager;
   private final NetworkTableCommandListener ntCommandListener;
+  private int lastActivatedMux = -1;
 
   /**
    * Constructs the SwerveController using the given toml config.
@@ -35,7 +36,7 @@ public class SwerveController {
     this.tuningManager = new TuningManager(this.config);
     this.ntCommandListener = new NetworkTableCommandListener(this.config);
     this.dataManager = new DataManager(this.config, this.chassis, this.tuningManager, this.ntCommandListener);
-    activateMux(-1);  // disable command mux by default
+    activateMuxId(-1);  // disable command mux by default
   }
 
   /**
@@ -52,7 +53,7 @@ public class SwerveController {
     this.tuningManager = new TuningManager(this.config);
     this.ntCommandListener = new NetworkTableCommandListener(this.config);
     this.dataManager = new DataManager(this.config, this.chassis, this.tuningManager, this.ntCommandListener);
-    activateMux(-1);  // disable command mux by default
+    activateMuxId(-1);  // disable command mux by default
   }
 
   /**
@@ -66,7 +67,8 @@ public class SwerveController {
     this.dataManager.update();
   }
 
-  public void activateMux(int muxId) {
+  public void activateMuxId(int muxId) {
+    lastActivatedMux = muxId;
     this.config.getCommandMux().activate(muxId);
   }
 
@@ -75,11 +77,7 @@ public class SwerveController {
   }
 
   public boolean isMuxActive() {
-    return this.config.getCommandMux().getActive() == this.config.getCommandMux().getLastActivated();
-  }
-
-  public void setNtMuxId(int muxId) {
-    this.ntCommandListener.setMuxId(muxId);
+    return isMuxActive(lastActivatedMux);
   }
 
   public void controlFromNt() {
