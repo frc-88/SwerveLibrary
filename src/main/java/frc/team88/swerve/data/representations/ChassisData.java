@@ -8,6 +8,11 @@ import frc.team88.swerve.motion.SwerveChassis;
 public class ChassisData implements NetworkTablePopulator {
   private final boolean inHoldAzimuthMode;
 
+  /**
+   * Constructor.
+   * 
+   * @param chassis The chassis to collect data from.
+   */
   public ChassisData(SwerveChassis chassis) {
     this.inHoldAzimuthMode = chassis.inHoldAzimuthMode();
   }

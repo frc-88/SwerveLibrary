@@ -11,6 +11,11 @@ public class GyroData implements NetworkTablePopulator {
   private final double yaw;
   private final double yawRate;
 
+  /**
+   * Constructor.
+   * 
+   * @param gyro The gyro to collect data from.
+   */
   public GyroData(SwerveGyro gyro) {
     Objects.requireNonNull(gyro);
     this.yaw = gyro.getYaw();
