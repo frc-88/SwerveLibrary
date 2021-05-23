@@ -45,7 +45,7 @@ public class InverseKinematicsTest {
     Vector2D result =
         ik.calculateModuleRotationVectors(new VelocityState(0, 0, 180, 1, 0, false), module1);
     assertDoubleEquals(180. * Math.sqrt(8.) * (2. * Math.PI) / 360., result.getMagnitude());
-    assertDoubleEquals(45., result.getAngle().asDouble());
+    assertDoubleEquals(135., result.getAngle().asDouble());
   }
 
   @Test

@@ -26,6 +26,11 @@ public class SwerveModuleData implements NetworkTablePopulator {
   private final double locationX;
   private final double locationY;
 
+  /**
+   * Constructor.
+   * 
+   * @param module The swerve module to collect data from.
+   */
   public SwerveModuleData(SwerveModule module) {
     Objects.requireNonNull(module);
 
