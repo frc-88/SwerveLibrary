@@ -1,6 +1,6 @@
 package frc.team88.swerve.module;
 
-import frc.team88.swerve.configuration.SwerveModuleConfiguration;
+import frc.team88.swerve.configuration.subconfig.SwerveModuleConfiguration;
 import frc.team88.swerve.module.motor.SwerveMotor;
 import frc.team88.swerve.module.sensor.PositionSensor;
 import frc.team88.swerve.util.MathUtils;

@@ -4,7 +4,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import frc.team88.swerve.configuration.NeoConfiguration;
+import frc.team88.swerve.configuration.subconfig.NeoConfiguration;
+
 import java.util.Objects;
 
 /** SwerveMotor implementation for the NEO. */

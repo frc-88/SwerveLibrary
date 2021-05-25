@@ -1,7 +1,10 @@
-package frc.team88.swerve.configuration;
+package frc.team88.swerve.configuration.subconfig;
 
 import com.electronwill.nightconfig.core.Config;
 import edu.wpi.first.networktables.NetworkTable;
+import frc.team88.swerve.configuration.Configuration;
+import frc.team88.swerve.configuration.exceptions.InvalidConfigValueException;
+import frc.team88.swerve.configuration.exceptions.SwerveConfigException;
 import frc.team88.swerve.data.NetworkTablePopulator;
 import java.util.Objects;
 
@@ -23,16 +26,17 @@ public class PIDConfiguration implements NetworkTablePopulator {
    * Constructs from a raw configuration containing some of the appropriate fields.
    *
    * @param config The raw configuration.
+   * @throws SwerveConfigException If the user provided config is incorrect.
    */
   public PIDConfiguration(Config config) {
     Objects.requireNonNull(config);
-    this.kP = config.getOrElse("kP", 0.);
-    this.kI = config.getOrElse("kI", 0.);
-    this.kD = config.getOrElse("kD", 0.);
-    this.kF = config.getOrElse("kF", 0.);
-    this.iZone = config.getOrElse("i-zone", 0.);
-    this.iMax = config.getOrElse("i-max", 0.);
-    this.tolerance = config.getOrElse("tolerance", 0.);
+    this.kP = getPIDConstant(config, "kP");
+    this.kI = getPIDConstant(config, "kI");
+    this.kD = getPIDConstant(config, "kD");
+    this.kF = getPIDConstant(config, "kF");
+    this.iZone = getPIDConstant(config, "i-zone");
+    this.iMax = getPIDConstant(config, "i-max");
+    this.tolerance = getPIDConstant(config, "tolerance");
   }
 
   /**
@@ -118,5 +122,21 @@ public class PIDConfiguration implements NetworkTablePopulator {
       this.iMax = table.getEntry("iMax").getDouble(this.iMax);
       this.tolerance = table.getEntry("tolerance").getDouble(this.tolerance);
     }
+  }
+
+  /**
+   * If the field exists, check that it's a positive number then return it as a double. Otherwise, return 0.
+   * 
+   * @param config The config to get value from.
+   * @param key The key of the field to get.
+   * @return The value of the field, or 0.
+   * @throws SwerveConfigException If the user provided config is incorrect.
+   */
+  private static double getPIDConstant(Config config, String key) {
+    double value = Configuration.configCheckAndGetDoubleOrElse(config, key, 0.);
+    if (value < 0) {
+      throw new InvalidConfigValueException(String.format("Field %s contains %f, but PID constant values must be non-negative.", key, value));
+    }
+    return value;
   }
 }

@@ -1,7 +1,10 @@
-package frc.team88.swerve.configuration;
+package frc.team88.swerve.configuration.subconfig;
 
 import com.electronwill.nightconfig.core.Config;
 import edu.wpi.first.networktables.NetworkTable;
+import frc.team88.swerve.configuration.Configuration;
+import frc.team88.swerve.configuration.exceptions.InvalidConfigValueException;
+import frc.team88.swerve.configuration.exceptions.SwerveConfigException;
 import frc.team88.swerve.data.NetworkTablePopulator;
 import java.util.Objects;
 
@@ -18,11 +21,15 @@ public class Falcon500Configuration implements NetworkTablePopulator {
    * Constructs this configuration from a falcon 500 config.
    *
    * @param config The instantiated falcon 500 template.
+   * @throws SwerveConfigException If the user provided config is incorrect.
    */
   public Falcon500Configuration(Config config) {
     Objects.requireNonNull(config);
-    this.inverted = config.get("inverted");
-    this.maxSpeed = (double) config.get("max-speed-rps");
+    this.inverted = Configuration.configCheckAndGet(config, "inverted", Boolean.class);
+    this.maxSpeed = Configuration.configCheckAndGetDouble(config, "max-speed-rps");
+    if (this.maxSpeed <= 0) {
+      throw new InvalidConfigValueException("Max speed must be positive.");
+    }
   }
 
   /**
