@@ -96,9 +96,7 @@ public class ForwardKinematics {
       inverseKinematics.setEntry(idx * 2, 2, -module_loc.getY());
       inverseKinematics.setEntry(idx * 2 + 1, 0, 0);
       inverseKinematics.setEntry(idx * 2 + 1, 1, 1);
-      inverseKinematics.setEntry(
-          idx * 2 + 1, 2, -module_loc.getX()); // flipping X to match SwerveLibrary convention
-      // inverseKinematics.setEntry(idx * 2 + 1, 2, module_loc.getX());
+      inverseKinematics.setEntry(idx * 2 + 1, 2, module_loc.getX());
     }
     SingularValueDecomposition svd = new SingularValueDecomposition(inverseKinematics);
     DecompositionSolver solver = svd.getSolver();
@@ -132,18 +130,18 @@ public class ForwardKinematics {
   /** Calculate the velocities of the chassis. */
   private void calculateChassisVector() {
     for (int idx = 0; idx < modules.length; idx++) {
-      WrappedAngle azimuth = modules[idx].getAzimuthPositionFlipped();
-      double wheel_speed = Math.abs(modules[idx].getWheelVelocity());
+      WrappedAngle azimuth = modules[idx].getAzimuthPosition();
+      double wheel_speed = modules[idx].getWheelVelocity();
 
       double azimuthRad = Math.toRadians(azimuth.asDouble());
 
       double vx = wheel_speed * Math.cos(azimuthRad);
       double vy = wheel_speed * Math.sin(azimuthRad);
-      moduleStatesMatrix.setEntry(idx * 2, 0, vy);
-      moduleStatesMatrix.setEntry(idx * 2 + 1, 0, vx);
+      moduleStatesMatrix.setEntry(idx * 2, 0, vx);
+      moduleStatesMatrix.setEntry(idx * 2 + 1, 0, vy);
     }
     RealMatrix chassisVector = forwardKinematics.multiply(moduleStatesMatrix);
-    m_state.setVelocity(chassisVector.getEntry(1, 0), chassisVector.getEntry(0, 0));
+    m_state.setVelocity(chassisVector.getEntry(0, 0), chassisVector.getEntry(1, 0));
     m_state.setThetaVelocity(Math.toDegrees(chassisVector.getEntry(2, 0)));
   }
 
@@ -164,7 +162,7 @@ public class ForwardKinematics {
 
     double dx = m_state.getXVelocity() * dt;
     double dy = m_state.getYVelocity() * dt;
-    double dtheta = Math.toRadians(m_state.getThetaVelocity() * dt);
+    double dtheta = Math.toRadians(m_state.getThetaVelocity()) * dt;
     
     double sin_dtheta = Math.sin(dtheta);
     double cos_dtheta = Math.cos(dtheta);

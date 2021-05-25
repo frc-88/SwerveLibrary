@@ -38,8 +38,8 @@ public class SwerveModuleConfiguration implements NetworkTablePopulator {
     Objects.requireNonNull(config);
     this.location =
         Vector2D.createCartesianCoordinates(
-          Configuration.configCheckAndGetDouble(config, "location-inches.x"),
-          Configuration.configCheckAndGetDouble(config, "location-inches.y"));
+          Configuration.configCheckAndGetDouble(config, "location-inches.x") / 12.0,
+          Configuration.configCheckAndGetDouble(config, "location-inches.y") / 12.0);
 
     // Convert 2D list to 2D array
     if (!config.contains("differential-matrix")) {
@@ -50,7 +50,7 @@ public class SwerveModuleConfiguration implements NetworkTablePopulator {
             convertObjectListTo2DDoubleArray(config.get("differential-matrix")), true);
     this.inverseMatrix = MatrixUtils.inverse(this.forwardMatrix);
 
-    this.wheelDiameter = Configuration.configCheckAndGetDouble(config, "wheel-diameter-inches");
+    this.wheelDiameter = Configuration.configCheckAndGetDouble(config, "wheel-diameter-inches") / 12.0;
     if (this.wheelDiameter <= 0) {
       throw new InvalidConfigValueException(String.format("Wheel diameter is %d, but it should be positive.", this.wheelDiameter));
     }
@@ -62,7 +62,7 @@ public class SwerveModuleConfiguration implements NetworkTablePopulator {
   /**
    * Gets the location of the swerve module.
    *
-   * @return The location of the swerve module in inches.
+   * @return The location of the swerve module in feet.
    */
   public Vector2D getLocation() {
     return this.location;
@@ -91,7 +91,7 @@ public class SwerveModuleConfiguration implements NetworkTablePopulator {
   /**
    * Gets the wheel size.
    *
-   * @return The diameter of the wheel on the module, in inches.
+   * @return The diameter of the wheel on the module, in feet.
    */
   public double getWheelDiameter() {
     return this.wheelDiameter;
