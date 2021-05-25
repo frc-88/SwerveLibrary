@@ -1,7 +1,8 @@
 package frc.team88.swerve.util;
 
-import frc.team88.swerve.configuration.TrapezoidalControllerConfiguration;
 import java.util.Objects;
+
+import frc.team88.swerve.configuration.subconfig.TrapezoidalControllerConfiguration;
 
 /**
  * Class that performs the math of a trapezoidal profile controller. Calculates the required speed

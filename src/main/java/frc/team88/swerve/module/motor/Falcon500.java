@@ -4,7 +4,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import frc.team88.swerve.configuration.Falcon500Configuration;
+
+import frc.team88.swerve.configuration.subconfig.Falcon500Configuration;
+
 import java.util.Objects;
 
 /** SwerveMotor implementation for the Falcon 500. */

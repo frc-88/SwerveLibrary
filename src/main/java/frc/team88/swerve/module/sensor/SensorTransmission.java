@@ -1,7 +1,8 @@
 package frc.team88.swerve.module.sensor;
 
-import frc.team88.swerve.configuration.SensorTransmissionConfiguration;
 import java.util.Objects;
+
+import frc.team88.swerve.configuration.subconfig.SensorTransmissionConfiguration;
 
 /** Composed of a single sensor, and applies a gear ratio to it. */
 public class SensorTransmission implements PositionSensor {
