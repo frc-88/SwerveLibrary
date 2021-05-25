@@ -259,7 +259,7 @@ public class SwerveModule {
   /**
    * Gets the location of this module.
    *
-   * @return A position vector from the robot's origin to the location of this module, in inches.
+   * @return A position vector from the robot's origin to the location of this module, in feet.
    * The positive x-axis points forwards, and the positive y-axis points left.
    */
   public Vector2D getLocation() {
@@ -322,7 +322,7 @@ public class SwerveModule {
    * @return The conversion factor.
    */
   private double getWheelRotationsToFeet() {
-    return (config.getWheelDiameter() / 12.) * Math.PI;
+    return (config.getWheelDiameter()) * Math.PI;
   }
 
   /**
