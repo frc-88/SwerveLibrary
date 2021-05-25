@@ -445,6 +445,37 @@ public class Configuration implements NetworkTablePopulator {
   }
 
   /**
+   * Finds the config for the motor in the given config. If it has an assigned name, that will be
+   * used, otherwise the defaults of [0, 1] will be used.
+   * 
+   * @param moduleConfig The config to be searched.
+   * @param motorIdx The index of the motor, either 0 or 1.
+   * @return The subconfig for the motor in the provided config.
+   * @throw SwerveConfigException If the motor is not in the config or is not a table.
+   */
+  private Config findMotorConfig(Config moduleConfig, int motorIdx) {
+    String motorKey = "";
+
+    String nameKey = "motor-" + motorIdx + "-name";
+    if (moduleConfig.contains(nameKey)) {
+      if (!(moduleConfig.get(nameKey) instanceof String)) {
+        throw new IncorrectConfigTypeException(nameKey + " must be a string.");
+      }
+      motorKey = "motors." + moduleConfig.get(nameKey);
+    } else {
+      motorKey = "motors." + motorIdx;
+    }
+
+    if (!moduleConfig.contains(motorKey)) {
+      throw new ConfigFieldNotFoundException("The module config is missing motor at " + motorKey + ".");
+    } else if (!(moduleConfig.get(motorKey) instanceof Config)) {
+      throw new IncorrectConfigTypeException("The motor " + motorKey + " must be a table.");
+    } else {
+      return moduleConfig.get(motorKey);
+    }
+  }
+
+  /**
    * Instantiates an individual module.
    *
    * @param instanceConfig The instance config for this module.
@@ -471,8 +502,8 @@ public class Configuration implements NetworkTablePopulator {
     
     SwerveMotor motors[] =
         new SwerveMotor[] {
-          this.instantiateMotor(configCheckAndGet(moduleConfig, "motors.0", Config.class), networkTable + "/motors/0"),
-          this.instantiateMotor(configCheckAndGet(moduleConfig, "motors.1", Config.class), networkTable + "/motors/1")
+          this.instantiateMotor(findMotorConfig(moduleConfig, 0), networkTable + "/motors/0"),
+          this.instantiateMotor(findMotorConfig(moduleConfig, 1), networkTable + "/motors/1")
         };
     PositionSensor azimuthSensor =
         this.instantiateSensor(configCheckAndGet(moduleConfig, "azimuth-sensor", Config.class), networkTable + "/sensor");
@@ -519,7 +550,7 @@ public class Configuration implements NetworkTablePopulator {
    * @param key The key of the field to get.
    * @param type The expected type of the field.
    * @return The value of the field.
-   * @throws SwerveConfigException If the user provided config is incorrect.
+   * @throws SwerveConfigException If the key does not exist or is not the right type.
    */
   public static <T> T configCheckAndGet(Config config, String key, Class<T> type) {
     if (!config.contains(key)) {
@@ -538,7 +569,7 @@ public class Configuration implements NetworkTablePopulator {
    * @param config The config to get the field from.
    * @param key The key of the field to get.
    * @return The value of the field.
-   * @throws SwerveConfigException If the user provided config is incorrect.
+   * @throws SwerveConfigException If the key does not exist or is not a number.
    */
   public static double configCheckAndGetDouble(Config config, String key) {
     Number value = configCheckAndGet(config, key, Number.class);
@@ -553,7 +584,7 @@ public class Configuration implements NetworkTablePopulator {
    * @param key The key of the field to get.
    * @param enumType The expected enum type of the field.
    * @return The value of the field.
-   * @throws SwerveConfigException If the user provided config is incorrect.
+   * @throws SwerveConfigException If the key does not exist, is not a string, or is not in the enum.
    */
   public static <T extends Enum<T>> T configCheckAndGetEnum(Config config, String key, Class<T> enumType) {
     String value = configCheckAndGet(config, key, String.class);
@@ -573,7 +604,7 @@ public class Configuration implements NetworkTablePopulator {
    * @param type The expected type of the field.
    * @param defaultValue The value to return if the field doesn't exist.
    * @return The value of the field.
-   * @throws SwerveConfigException If the user provided config is incorrect.
+   * @throws SwerveConfigException If the key is not the right type.
    */
   public static <T> T configCheckAndGetOrElse(Config config, String key, Class<T> type, T defaultValue) {
     if (!config.contains(key)) {
@@ -593,7 +624,7 @@ public class Configuration implements NetworkTablePopulator {
    * @param key The key of the field to get.
    * @param defaultValue The value to return if the field doesn't exist.
    * @return The value of the field.
-   * @throws SwerveConfigException If the user provided config is incorrect.
+   * @throws SwerveConfigException If the key is not a number.
    */
   public static double configCheckAndGetDoubleOrElse(Config config, String key, double defaultValue) {
     Number value = configCheckAndGetOrElse(config, key, Number.class, 0.);
