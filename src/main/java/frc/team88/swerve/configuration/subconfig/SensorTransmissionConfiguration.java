@@ -1,7 +1,10 @@
-package frc.team88.swerve.configuration;
+package frc.team88.swerve.configuration.subconfig;
 
 import com.electronwill.nightconfig.core.Config;
 import edu.wpi.first.networktables.NetworkTable;
+import frc.team88.swerve.configuration.Configuration;
+import frc.team88.swerve.configuration.exceptions.InvalidConfigValueException;
+import frc.team88.swerve.configuration.exceptions.SwerveConfigException;
 import frc.team88.swerve.data.NetworkTablePopulator;
 import java.util.Objects;
 
@@ -19,12 +22,16 @@ public class SensorTransmissionConfiguration implements NetworkTablePopulator {
    * Constructs this configuration from a position sensor config.
    *
    * @param config The instantiated position sensor template.
+   * @throws SwerveConfigException If the user provided config is incorrect.
    */
   public SensorTransmissionConfiguration(Config config) {
     Objects.requireNonNull(config);
-    this.inverted = config.get("inverted");
-    this.ratio = (double) config.get("ratio");
-    this.offset = (double) config.get("offset");
+    this.inverted = Configuration.configCheckAndGet(config, "inverted", Boolean.class);
+    this.ratio = Configuration.configCheckAndGetDouble(config, "ratio");
+    if (this.ratio <= 0) {
+      throw new InvalidConfigValueException("Ratio must be positive.");
+    }
+    this.offset = Configuration.configCheckAndGetDouble(config, "offset");
   }
 
   /**

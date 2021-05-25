@@ -23,7 +23,14 @@ inverted = false
 ratio = 1
 offset = 0
 
+#######################################
+# CANCoder
+#######################################
 
+[sensor-templates.cancoder]
+inverted = false
+ratio = 1
+offset = 0
 
 ###########################################################
 # MOTOR TEMPLATES
@@ -46,6 +53,7 @@ inverted = false
 max-speed-rps = 90.0
 
 
+
 ###########################################################
 # MODULE TEMPLATES
 ###########################################################
@@ -60,13 +68,15 @@ differential-matrix = [
         [0.069444444, 0.09722222]
     ]
 wheel-diameter-inches = 3.5
-azimuth-sensor.template = "canified-pwm"
+motor-0-name = "hi"
+motor-1-name = "lo"
+azimuth-sensor.template = "cancoder"
 azimuth-sensor.ratio = 0.0027778
 
-[module-templates.team88.diff-swerve-2021.beta.motors.0]
+[module-templates.team88.diff-swerve-2021.beta.motors.hi]
 template = "falcon500"
 
-[module-templates.team88.diff-swerve-2021.beta.motors.1]
+[module-templates.team88.diff-swerve-2021.beta.motors.lo]
 template = "falcon500"
 
 [module-templates.team88.diff-swerve-2021.beta.azimuth-controller]

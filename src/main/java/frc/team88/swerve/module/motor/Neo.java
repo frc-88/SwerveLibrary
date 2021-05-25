@@ -1,11 +1,18 @@
 package frc.team88.swerve.module.motor;
 
 import com.revrobotics.CANSparkMax;
-import frc.team88.swerve.configuration.NeoConfiguration;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import frc.team88.swerve.configuration.subconfig.NeoConfiguration;
+
 import java.util.Objects;
 
-/** PIDMotor implementation for the NEO. Uses the built-in encoder and PID on the Spark Max. */
-public class Neo extends CANSparkMax implements SwerveMotor {
+/** SwerveMotor implementation for the NEO. */
+public class Neo implements SwerveMotor {
+
+  // The Spark Max that is being wrapped.
+  private final CANSparkMax spark;
 
   // The configuration data for this motor.
   private final NeoConfiguration config;
@@ -23,13 +30,13 @@ public class Neo extends CANSparkMax implements SwerveMotor {
    * @param config The config data for this motor.
    */
   public Neo(int canID, NeoConfiguration config) {
-    super(canID, MotorType.kBrushless);
+    spark = new CANSparkMax(canID, MotorType.kBrushless);
 
     this.config = Objects.requireNonNull(config);
 
-    this.restoreFactoryDefaults();
-    this.setIdleMode(IdleMode.kBrake);
-    this.setInverted(config.isInverted());
+    this.spark.restoreFactoryDefaults();
+    this.spark.setIdleMode(IdleMode.kBrake);
+    this.spark.setInverted(config.isInverted());
   }
 
   /**
@@ -39,12 +46,12 @@ public class Neo extends CANSparkMax implements SwerveMotor {
    */
   @Override
   public double getPosition() {
-    return this.getEncoder().getPosition() + offset;
+    return this.spark.getEncoder().getPosition() + offset;
   }
 
   @Override
   public double getVelocity() {
-    return this.getEncoder().getVelocity() / 60.;
+    return this.spark.getEncoder().getVelocity() / 60.;
   }
 
   /**
@@ -58,7 +65,7 @@ public class Neo extends CANSparkMax implements SwerveMotor {
 
   @Override
   public void setVelocity(double velocity) {
-    this.set(velocity / this.getMaxVelocity());
+    this.spark.set(velocity / this.getMaxVelocity());
     this.commandVelocity = velocity;
   }
 
@@ -74,7 +81,7 @@ public class Neo extends CANSparkMax implements SwerveMotor {
 
   @Override
   public double getCommandVoltage() {
-    return this.getAppliedOutput() * this.getBusVoltage();
+    return this.spark.getAppliedOutput() * this.spark.getBusVoltage();
   }
 
   @Override
@@ -84,11 +91,11 @@ public class Neo extends CANSparkMax implements SwerveMotor {
 
   @Override
   public void setCoast() {
-    this.setIdleMode(IdleMode.kCoast);
+    this.spark.setIdleMode(IdleMode.kCoast);
   }
 
   @Override
   public void setBrake() {
-    this.setIdleMode(IdleMode.kBrake);
+    this.spark.setIdleMode(IdleMode.kBrake);
   }
 }
