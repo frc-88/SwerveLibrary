@@ -191,9 +191,9 @@ public class VelocityState implements NetworkTablePopulator {
    * rotation.
    *
    * @param x The x component of the center of rotation, in feet. The positive x-axis points
-   * forwards on the robot.
-   * @param y The y component of the center of rotation, in feet. The positive y-axis points left
-   * on the robot.
+   *     forwards on the robot.
+   * @param y The y component of the center of rotation, in feet. The positive y-axis points left on
+   *     the robot.
    * @return The new velocity state.
    */
   public VelocityState changeCenterOfRotation(double x, double y) {

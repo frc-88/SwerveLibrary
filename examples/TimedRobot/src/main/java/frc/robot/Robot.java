@@ -6,19 +6,16 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team88.swerve.SwerveController;
 
 /**
  * Robot using Team 88's SwerveLibrary, using the TimedRobot framework without command-based
  * programming. The controller in use is an XBox controller, with the following mapping:
- * 
- * Left stick - Steer the direction of translation. Does not set speed.
- * Right trigger - Sets the translation speed of the robot.
- * Right stick X - Spin the robot about it's center.
- * Right bumper - Hold for robot-centric steering. Otherwise, steering isn field-centric.
- * Y button - Zeros the gyro so that the robot is facing forwards. Only works while disabled.
+ *
+ * <p>Left stick - Steer the direction of translation. Does not set speed. Right trigger - Sets the
+ * translation speed of the robot. Right stick X - Spin the robot about it's center. Right bumper -
+ * Hold for robot-centric steering. Otherwise, steering isn field-centric. Y button - Zeros the gyro
+ * so that the robot is facing forwards. Only works while disabled.
  */
 public class Robot extends TimedRobot {
 
@@ -34,7 +31,7 @@ public class Robot extends TimedRobot {
 
   // The port of the XBox gamepad.
   private static final int GAMEPAD_PORT = 0;
-  
+
   // The deadband to use for XBox gamepad joysticks.
   private static final double JOYSTICK_DEADBAND = 0.1;
 
@@ -81,16 +78,16 @@ public class Robot extends TimedRobot {
 
   /**
    * Calculates the angle of translation set by the left stick.
-   * 
+   *
    * @return The angle of translation, in degrees. 0 corresponds to forwards, and positive
-   * corresponds to counterclockwise.
+   *     corresponds to counterclockwise.
    */
   private double calculateTranslationDirection() {
     // The x and y axis values. Y is inverted so that down is positive on XBox controllers, so we
     // need to invert it back.
     double x = gamepad.getRawAxis(0);
     double y = -gamepad.getRawAxis(1);
-    
+
     // Calculate the angle.
     return Math.toDegrees(Math.atan2(y, x));
   }
@@ -99,9 +96,9 @@ public class Robot extends TimedRobot {
    * Determines if the left stick is pressed out far enough to merit changing the translation
    * direction. If the joystick is close to the center, it is too difficult to control the
    * direction.
-   * 
+   *
    * @return True if the current translation direction should be changed, false if it should stay
-   * the same.
+   *     the same.
    */
   private boolean shouldChangeDirection() {
     // The x and y axis values. Y is inverted so that down is positive on XBox controllers, so we
@@ -130,8 +127,7 @@ public class Robot extends TimedRobot {
     rotationVelocity *= MAX_ROTATION;
 
     // Set the translation speed and rotation velocities.
-    this.swerve.setVelocity(
-        translationSpeed, rotationVelocity);
+    this.swerve.setVelocity(translationSpeed, rotationVelocity);
 
     // Determine if the left stick is pressed enough to merit changing the direction.
     if (this.shouldChangeDirection()) {
@@ -139,11 +135,11 @@ public class Robot extends TimedRobot {
       boolean isFieldCentric = !this.gamepad.getRawButton(6);
 
       // Set the translation direction from the left stick.
-      this.swerve.setTranslationDirection(
-        this.calculateTranslationDirection(), isFieldCentric);
+      this.swerve.setTranslationDirection(this.calculateTranslationDirection(), isFieldCentric);
 
-    // If we aren't changing translation direction, and we aren't commanding a significant speed in
-    // either translation or rotation, just hold the modules in their current position.
+      // If we aren't changing translation direction, and we aren't commanding a significant speed
+      // in
+      // either translation or rotation, just hold the modules in their current position.
     } else if (translationSpeed < HOLD_DIRECTION_TRANSLATION_THRESHOLD
         && Math.abs(rotationVelocity) < HOLD_DIRECTION_ROTATION_THRESHOLD) {
       this.swerve.holdDirection();

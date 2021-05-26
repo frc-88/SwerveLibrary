@@ -125,8 +125,9 @@ public class PIDConfiguration implements NetworkTablePopulator {
   }
 
   /**
-   * If the field exists, check that it's a positive number then return it as a double. Otherwise, return 0.
-   * 
+   * If the field exists, check that it's a positive number then return it as a double. Otherwise,
+   * return 0.
+   *
    * @param config The config to get value from.
    * @param key The key of the field to get.
    * @return The value of the field, or 0.
@@ -135,7 +136,9 @@ public class PIDConfiguration implements NetworkTablePopulator {
   private static double getPIDConstant(Config config, String key) {
     double value = Configuration.configCheckAndGetDoubleOrElse(config, key, 0.);
     if (value < 0) {
-      throw new InvalidConfigValueException(String.format("Field %s contains %f, but PID constant values must be non-negative.", key, value));
+      throw new InvalidConfigValueException(
+          String.format(
+              "Field %s contains %f, but PID constant values must be non-negative.", key, value));
     }
     return value;
   }

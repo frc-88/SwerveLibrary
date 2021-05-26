@@ -29,11 +29,14 @@ public class TrapezoidalControllerConfiguration implements NetworkTablePopulator
     this.pidConfig = new PIDConfiguration(config);
     this.maxSpeed = Configuration.configCheckAndGetDouble(config, "max-speed");
     if (this.maxSpeed <= 0) {
-      throw new InvalidConfigValueException(String.format("Max speed is %d, but it should be positive.", this.maxSpeed));
+      throw new InvalidConfigValueException(
+          String.format("Max speed is %d, but it should be positive.", this.maxSpeed));
     }
     this.maxAcceleration = Configuration.configCheckAndGetDouble(config, "max-acceleration");
     if (this.maxAcceleration <= 0) {
-      throw new InvalidConfigValueException(String.format("Max acceleration is %d, but it should be positive.", this.maxAcceleration));
+      throw new InvalidConfigValueException(
+          String.format(
+              "Max acceleration is %d, but it should be positive.", this.maxAcceleration));
     }
   }
 

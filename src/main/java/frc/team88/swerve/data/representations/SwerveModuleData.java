@@ -28,7 +28,7 @@ public class SwerveModuleData implements NetworkTablePopulator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param module The swerve module to collect data from.
    */
   public SwerveModuleData(SwerveModule module) {

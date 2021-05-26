@@ -38,25 +38,31 @@ public class SwerveModuleConfiguration implements NetworkTablePopulator {
     Objects.requireNonNull(config);
     this.location =
         Vector2D.createCartesianCoordinates(
-          Configuration.configCheckAndGetDouble(config, "location-inches.x") / 12.0,
-          Configuration.configCheckAndGetDouble(config, "location-inches.y") / 12.0);
+            Configuration.configCheckAndGetDouble(config, "location-inches.x") / 12.0,
+            Configuration.configCheckAndGetDouble(config, "location-inches.y") / 12.0);
 
     // Convert 2D list to 2D array
     if (!config.contains("differential-matrix")) {
-      throw new ConfigFieldNotFoundException("The differential-matrix field was not found in a swerve module config.");
+      throw new ConfigFieldNotFoundException(
+          "The differential-matrix field was not found in a swerve module config.");
     }
     this.forwardMatrix =
         new Array2DRowRealMatrix(
             convertObjectListTo2DDoubleArray(config.get("differential-matrix")), true);
     this.inverseMatrix = MatrixUtils.inverse(this.forwardMatrix);
 
-    this.wheelDiameter = Configuration.configCheckAndGetDouble(config, "wheel-diameter-inches") / 12.0;
+    this.wheelDiameter =
+        Configuration.configCheckAndGetDouble(config, "wheel-diameter-inches") / 12.0;
     if (this.wheelDiameter <= 0) {
-      throw new InvalidConfigValueException(String.format("Wheel diameter is %d, but it should be positive.", this.wheelDiameter));
+      throw new InvalidConfigValueException(
+          String.format("Wheel diameter is %d, but it should be positive.", this.wheelDiameter));
     }
     this.azimuthControllerConfig =
-        new TrapezoidalControllerConfiguration(Configuration.configCheckAndGet(config, "azimuth-controller", Config.class));
-    this.wheelControllerConfig = new PIDConfiguration(Configuration.configCheckAndGet(config, "wheel-controller", Config.class));
+        new TrapezoidalControllerConfiguration(
+            Configuration.configCheckAndGet(config, "azimuth-controller", Config.class));
+    this.wheelControllerConfig =
+        new PIDConfiguration(
+            Configuration.configCheckAndGet(config, "wheel-controller", Config.class));
   }
 
   /**
@@ -163,7 +169,8 @@ public class SwerveModuleConfiguration implements NetworkTablePopulator {
       for (int col = 0; col < 2; col++) {
         Object innerItem = innerList.get(col);
         if (!(innerItem instanceof Number)) {
-          throw new InvalidConfigValueException("Differential matrix contains a non-number element.");
+          throw new InvalidConfigValueException(
+              "Differential matrix contains a non-number element.");
         }
         Number value = (Number) (innerItem);
         arr[row][col] = value.doubleValue();

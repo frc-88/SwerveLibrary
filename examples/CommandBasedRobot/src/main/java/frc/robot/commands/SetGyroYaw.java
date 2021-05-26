@@ -7,9 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Drivetrain;
 
-/**
- * Sets the current robot heading.
- */
+/** Sets the current robot heading. */
 public class SetGyroYaw extends InstantCommand {
 
   // The drivetrain subsystem.
@@ -20,10 +18,10 @@ public class SetGyroYaw extends InstantCommand {
 
   /**
    * Constructor.
-   * 
+   *
    * @param drivetrain The drivetrain subsystem used by this command.
    * @param yaw The yaw to set as the current heading when this command is run, increasing
-   * counterclockwise.
+   *     counterclockwise.
    */
   public SetGyroYaw(Drivetrain drivetrain, double yaw) {
     m_drivetrain = drivetrain;

@@ -13,7 +13,7 @@ public class GyroData implements NetworkTablePopulator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param gyro The gyro to collect data from.
    */
   public GyroData(SwerveGyro gyro) {
