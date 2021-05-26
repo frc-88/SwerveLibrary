@@ -13,5 +13,9 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    - name: Build with Gradle
+    - name: Build SwerveLibrary
       run: ./gradlew build
+    - name: Build TimedRobot example
+      run: pushd examples/TimedRobot; ./gradlew build; popd
+    - name: Build CommandBasedRobot example
+      run: pushd examples/CommandBasedRobot; ./gradlew build; popd
