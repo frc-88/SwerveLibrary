@@ -1,3 +1,6 @@
+// NOTE: This file installs the SwerveLibrary package by reference to the code in this repository,
+//       and isn't intended and an example. Please see the README for installation instructions.
+
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2021.3.1"
@@ -53,6 +56,8 @@ dependencies {
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
 
     testImplementation 'junit:junit:4.12'
+
+    compile project(':SwerveLibrary')
 
     // Enable simulation gui support. Must check the box in vscode to enable support
     // upon debugging

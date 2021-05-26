@@ -1,3 +1,6 @@
+// NOTE: This file installs the SwerveLibrary package by reference to the code in this repository,
+//       and isn't intended and an example. Please see the README for installation instructions.
+
 import org.gradle.internal.os.OperatingSystem
 
 pluginManagement {
@@ -25,3 +28,6 @@ pluginManagement {
         }
     }
 }
+
+include 'SwerveLibrary'
+project(':SwerveLibrary').projectDir = new File('../../')

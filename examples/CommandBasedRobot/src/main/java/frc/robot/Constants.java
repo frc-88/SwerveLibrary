@@ -12,4 +12,14 @@ package frc.robot;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {}
+public final class Constants {
+
+    // The port of the XBox gamepad.
+    public static final int GAMEPAD_PORT = 0;
+
+    // The max translation and rotation speeds to be commanded to the drivetrain.
+    public static final double MAX_SPEED = 14.7; // feet per second
+    public static final double MAX_ROTATION = 90.; // degrees per second
+
+    
+}

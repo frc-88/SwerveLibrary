@@ -28,7 +28,7 @@ public class Robot extends TimedRobot {
   // The xBox gamepad.
   private Joystick gamepad;
 
-  // The max translation and rotation speeds to be commanded the robot.
+  // The max translation and rotation speeds to be commanded to the robot.
   private static final double MAX_SPEED = 14.7; // feet per second
   private static final double MAX_ROTATION = 90.; // degrees per second
 
@@ -91,9 +91,8 @@ public class Robot extends TimedRobot {
     double x = gamepad.getRawAxis(0);
     double y = -gamepad.getRawAxis(1);
     
-    // Calculate the angle. By swapping x and y, and inverting x, we get the desired coordinate
-    // system where 0 is forwards and positive is counterclockwise.
-    return Math.toDegrees(Math.atan2(-x, y));
+    // Calculate the angle.
+    return Math.toDegrees(Math.atan2(y, x));
   }
 
   /**

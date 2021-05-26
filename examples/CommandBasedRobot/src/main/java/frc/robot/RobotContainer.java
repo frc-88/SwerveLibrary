@@ -4,11 +4,18 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.ManualDrive;
+import frc.robot.commands.SetGyroYaw;
+import frc.robot.subsystems.Drivetrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,14 +25,20 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final Drivetrain m_drivetrain = new Drivetrain();
 
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+  private final WaitCommand m_autoCommand = new WaitCommand(1);
+
+  // The drive XBox controller.
+  private final Joystick m_gamepad = new Joystick(Constants.GAMEPAD_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+
+    // Set default drivetrain command.
+    CommandScheduler.getInstance().setDefaultCommand(m_drivetrain, new ManualDrive(m_drivetrain, m_gamepad));
   }
 
   /**
@@ -34,7 +47,17 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    // If disabled, zero the gyro when the Y button on the gamepad is pressed.
+    (new JoystickButton(m_gamepad, 4)).whenPressed(new ConditionalCommand(new SetGyroYaw(m_drivetrain, 0), new WaitCommand(0), DriverStation.getInstance()::isDisabled));
+  }
+
+  /**
+   * Calls update on the drivetrain subsystem. Should be called after the scheduler run.
+   */
+  public void updateDrivetrain() {
+    m_drivetrain.update();
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
