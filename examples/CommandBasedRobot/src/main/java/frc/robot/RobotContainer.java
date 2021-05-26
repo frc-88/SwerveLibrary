@@ -38,7 +38,8 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Set default drivetrain command.
-    CommandScheduler.getInstance().setDefaultCommand(m_drivetrain, new ManualDrive(m_drivetrain, m_gamepad));
+    CommandScheduler.getInstance()
+        .setDefaultCommand(m_drivetrain, new ManualDrive(m_drivetrain, m_gamepad));
   }
 
   /**
@@ -49,12 +50,15 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // If disabled, zero the gyro when the Y button on the gamepad is pressed.
-    (new JoystickButton(m_gamepad, 4)).whenPressed(new ConditionalCommand(new SetGyroYaw(m_drivetrain, 0), new WaitCommand(0), DriverStation.getInstance()::isDisabled));
+    (new JoystickButton(m_gamepad, 4))
+        .whenPressed(
+            new ConditionalCommand(
+                new SetGyroYaw(m_drivetrain, 0),
+                new WaitCommand(0),
+                DriverStation.getInstance()::isDisabled));
   }
 
-  /**
-   * Calls update on the drivetrain subsystem. Should be called after the scheduler run.
-   */
+  /** Calls update on the drivetrain subsystem. Should be called after the scheduler run. */
   public void updateDrivetrain() {
     m_drivetrain.update();
   }

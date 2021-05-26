@@ -4,18 +4,17 @@
 
 package frc.robot.commands;
 
-import frc.robot.Constants;
-import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
+import frc.robot.subsystems.Drivetrain;
 
 /**
  * Commands the swerve drive using commands from an XBox controller with the following mapping:
- * 
- * Left stick - Steer the direction of translation. Does not set speed.
- * Right trigger - Sets the translation speed of the robot.
- * Right stick X - Spin the robot about it's center.
- * Right bumper - Hold for robot-centric steering. Otherwise, steering isn field-centric.
+ *
+ * <p>Left stick - Steer the direction of translation. Does not set speed. Right trigger - Sets the
+ * translation speed of the robot. Right stick X - Spin the robot about it's center. Right bumper -
+ * Hold for robot-centric steering. Otherwise, steering isn field-centric.
  */
 public class ManualDrive extends CommandBase {
 
@@ -71,8 +70,7 @@ public class ManualDrive extends CommandBase {
     rotationVelocity *= Constants.MAX_SPEED;
 
     // Set the translation speed and rotation velocities.
-    m_drivetrain.setVelocity(
-        translationSpeed, rotationVelocity);
+    m_drivetrain.setVelocity(translationSpeed, rotationVelocity);
 
     // Determine if the left stick is pressed enough to merit changing the direction.
     if (this.shouldChangeDirection()) {
@@ -80,11 +78,11 @@ public class ManualDrive extends CommandBase {
       boolean isFieldCentric = !m_controller.getRawButton(6);
 
       // Set the translation direction from the left stick.
-      m_drivetrain.setTranslationDirection(
-        this.calculateTranslationDirection(), isFieldCentric);
+      m_drivetrain.setTranslationDirection(this.calculateTranslationDirection(), isFieldCentric);
 
-    // If we aren't changing translation direction, and we aren't commanding a significant speed in
-    // either translation or rotation, just hold the modules in their current position.
+      // If we aren't changing translation direction, and we aren't commanding a significant speed
+      // in
+      // either translation or rotation, just hold the modules in their current position.
     } else if (translationSpeed < HOLD_DIRECTION_TRANSLATION_THRESHOLD
         && Math.abs(rotationVelocity) < HOLD_DIRECTION_ROTATION_THRESHOLD) {
       m_drivetrain.holdDirection();
@@ -107,16 +105,16 @@ public class ManualDrive extends CommandBase {
 
   /**
    * Calculates the angle of translation set by the left stick.
-   * 
+   *
    * @return The angle of translation, in degrees. 0 corresponds to forwards, and positive
-   * corresponds to counterclockwise.
+   *     corresponds to counterclockwise.
    */
   private double calculateTranslationDirection() {
     // The x and y axis values. Y is inverted so that down is positive on XBox controllers, so we
     // need to invert it back.
     double x = m_controller.getRawAxis(0);
     double y = -m_controller.getRawAxis(1);
-    
+
     // Calculate the angle.
     return Math.toDegrees(Math.atan2(y, x));
   }
@@ -125,9 +123,9 @@ public class ManualDrive extends CommandBase {
    * Determines if the left stick is pressed out far enough to merit changing the translation
    * direction. If the joystick is close to the center, it is too difficult to control the
    * direction.
-   * 
+   *
    * @return True if the current translation direction should be changed, false if it should stay
-   * the same.
+   *     the same.
    */
   private boolean shouldChangeDirection() {
     // The x and y axis values. Y is inverted so that down is positive on XBox controllers, so we

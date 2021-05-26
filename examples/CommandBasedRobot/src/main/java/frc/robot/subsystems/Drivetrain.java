@@ -9,10 +9,10 @@ import frc.team88.swerve.SwerveController;
 
 /**
  * It is tradition on team 88 for every subsystem to be accompanied by a haiku.
- * 
- * <p> The drive subsystem
- * <br> contains the swerve controller
- * <br> and calls its methods.
+ *
+ * <p>The drive subsystem <br>
+ * contains the swerve controller <br>
+ * and calls its methods.
  */
 public class Drivetrain extends SubsystemBase {
 
@@ -22,41 +22,35 @@ public class Drivetrain extends SubsystemBase {
   // The path to the swerve config file in the deploy directory.
   private static final String SWERVE_CONFIG = "swerve.toml";
 
-  /**
-   * Constructor.
-   */
+  /** Constructor. */
   public Drivetrain() {
     this.swerve = new SwerveController(SWERVE_CONFIG);
     this.setYaw(0.);
   }
-  
-  /**
-   * Updates the swerve controller. Should be called at the end of each program loop.
-   */
+
+  /** Updates the swerve controller. Should be called at the end of each program loop. */
   public void update() {
     this.swerve.update();
   }
 
   /**
    * Sets the current yaw to be read by the gyro.
-   * 
+   *
    * @param yaw The yaw to be set as the current heading of the robot.
    */
   public void setYaw(double yaw) {
     this.swerve.setGyroYaw(yaw);
   }
 
-  /**
-   * Sets the translation and rotation speeds to zero and holds the module steering in place.
-   */
+  /** Sets the translation and rotation speeds to zero and holds the module steering in place. */
   public void holdDirection() {
     this.swerve.holdDirection();
   }
 
   /**
-   * Sets the translation speed and rotation velocity of the robot, without modifying the
-   * direction of translation.
-   * 
+   * Sets the translation speed and rotation velocity of the robot, without modifying the direction
+   * of translation.
+   *
    * @param translationSpeed The speed for translation, in feet per second.
    * @param rotationVelocity The velocity for rotation, in degrees per second.
    */
@@ -66,11 +60,11 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * Sets the direction of translation as either a field-centric or robot-centric angle.
-   * 
+   *
    * @param translationDirection The direction to translation, in degrees increasing
-   * counterclockwise with forwards at 0.
+   *     counterclockwise with forwards at 0.
    * @param fieldCentric If true, the direction will be intrepretted relative to the gyro's zero
-   * point. If false, it will be interpretted relative to the front of the robot.
+   *     point. If false, it will be interpretted relative to the front of the robot.
    */
   public void setTranslationDirection(double translationDirection, boolean fieldCentric) {
     this.swerve.setTranslationDirection(translationDirection, fieldCentric);

@@ -14,12 +14,10 @@ package frc.robot;
  */
 public final class Constants {
 
-    // The port of the XBox gamepad.
-    public static final int GAMEPAD_PORT = 0;
+  // The port of the XBox gamepad.
+  public static final int GAMEPAD_PORT = 0;
 
-    // The max translation and rotation speeds to be commanded to the drivetrain.
-    public static final double MAX_SPEED = 14.7; // feet per second
-    public static final double MAX_ROTATION = 90.; // degrees per second
-
-    
+  // The max translation and rotation speeds to be commanded to the drivetrain.
+  public static final double MAX_SPEED = 14.7; // feet per second
+  public static final double MAX_ROTATION = 90.; // degrees per second
 }

@@ -14,9 +14,13 @@ buildscript {
 plugins {
     // Support for the java library
     id 'java-library'
+    // Code formatter
+    id 'com.github.sherter.google-java-format' version '0.9'
 }
 
 apply plugin: 'edu.wpi.first.GradleRIO'
+
+compileJava.dependsOn 'googleJavaFormat'
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11

@@ -259,8 +259,8 @@ public class SwerveModule {
   /**
    * Gets the location of this module.
    *
-   * @return A position vector from the robot's origin to the location of this module, in feet.
-   * The positive x-axis points forwards, and the positive y-axis points left.
+   * @return A position vector from the robot's origin to the location of this module, in feet. The
+   *     positive x-axis points forwards, and the positive y-axis points left.
    */
   public Vector2D getLocation() {
     return this.config.getLocation();

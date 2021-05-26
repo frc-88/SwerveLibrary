@@ -15,7 +15,7 @@ public class MotorData implements NetworkTablePopulator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param motor The motor to collect data from.
    */
   public MotorData(SwerveMotor motor) {

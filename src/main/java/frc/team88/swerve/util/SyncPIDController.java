@@ -1,8 +1,7 @@
 package frc.team88.swerve.util;
 
-import java.util.Objects;
-
 import frc.team88.swerve.configuration.subconfig.PIDConfiguration;
+import java.util.Objects;
 
 /**
  * Class that performs the math of a PID controller, converting a setpoint and error to an output.

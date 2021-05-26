@@ -35,7 +35,6 @@ import frc.team88.swerve.module.sensor.CANifiedPWMEncoder;
 import frc.team88.swerve.module.sensor.PositionSensor;
 import frc.team88.swerve.module.sensor.SensorTransmission;
 import frc.team88.swerve.module.sensor.SwerveCANcoder;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -89,21 +88,22 @@ public class Configuration implements NetworkTablePopulator {
     try {
       userConfigPath = Filesystem.getDeployDirectory().toPath().resolve(configPath);
     } catch (Exception e) {
-      throw new ConfigNotFoundException("Error encountered getting path of file " + configPath + " in deploy directory.", e);
+      throw new ConfigNotFoundException(
+          "Error encountered getting path of file " + configPath + " in deploy directory.", e);
     }
     if (!Files.exists(userConfigPath)) {
-      throw new ConfigNotFoundException("The given config file " + configPath + " does not exist in the deploy directory.");
+      throw new ConfigNotFoundException(
+          "The given config file " + configPath + " does not exist in the deploy directory.");
     } else if (Files.isDirectory(userConfigPath)) {
-      throw new ConfigNotFoundException("The given config file " + configPath + " is actually a directory.");
+      throw new ConfigNotFoundException(
+          "The given config file " + configPath + " is actually a directory.");
     }
     try {
       tomlParser.parse(
-          userConfigPath,
-          this.configData,
-          ParsingMode.MERGE,
-          FileNotFoundAction.THROW_ERROR);
+          userConfigPath, this.configData, ParsingMode.MERGE, FileNotFoundAction.THROW_ERROR);
     } catch (Exception e) {
-      throw new InvalidConfigFormatException("The given config file " + configPath + " is not a valid TOML file.", e);
+      throw new InvalidConfigFormatException(
+          "The given config file " + configPath + " is not a valid TOML file.", e);
     }
 
     // Create all of the objects and configs
@@ -182,7 +182,8 @@ public class Configuration implements NetworkTablePopulator {
           if (valueAsList.size() != targetList.size()) {
             throw new TemplateInstantiationException(
                 String.format(
-                    "Cannot instantiate template because %s contains lists of different lengths", key));
+                    "Cannot instantiate template because %s contains lists of different lengths",
+                    key));
           }
           newList = new ArrayList<Object>(targetList);
         } else {
@@ -223,7 +224,7 @@ public class Configuration implements NetworkTablePopulator {
   /**
    * Instantiates a template's config by apppending and overwritting the design with an
    * instance-specific config.
-   * 
+   *
    * @param templateConfig The config of the template being used as a base.
    * @param instanceConfig The config of the instance implementing the template.
    * @throws SwerveConfigException If the user provided config is incorrect.
@@ -261,7 +262,7 @@ public class Configuration implements NetworkTablePopulator {
 
   /**
    * Instantiates the gyro object from the config.
-   * 
+   *
    * @throws SwerveConfigException If the user provided config is incorrect.
    */
   private void instantiateGyro() {
@@ -280,7 +281,9 @@ public class Configuration implements NetworkTablePopulator {
         break;
       default:
         throw new IllegalArgumentException(
-            String.format("The template %s does not have a corresponding gyro class. Please contact the library developer.", template));
+            String.format(
+                "The template %s does not have a corresponding gyro class. Please contact the library developer.",
+                template));
     }
   }
 
@@ -296,7 +299,8 @@ public class Configuration implements NetworkTablePopulator {
   private SensorTransmission instantiateCanifiedPWM(Config instanceConfig, String networkTable) {
     int canID = configCheckAndGet(instanceConfig, "can-id", Integer.class);
     if (canID < 0 || canID >= 64) {
-      throw new InvalidConfigValueException(String.format("CAN ID %d is not in range [0, 63]", canID));
+      throw new InvalidConfigValueException(
+          String.format("CAN ID %d is not in range [0, 63]", canID));
     }
     if (!this.canifiers.containsKey(canID)) {
       this.canifiers.put(canID, new CANifier(canID));
@@ -346,7 +350,8 @@ public class Configuration implements NetworkTablePopulator {
         new SensorTransmissionConfiguration(instanceConfig);
     this.networkTableConfigs.put(networkTable, sensorConfig);
 
-    SwerveCANcoder rawSensor = new SwerveCANcoder(configCheckAndGet(instanceConfig, "can-id", Integer.class));
+    SwerveCANcoder rawSensor =
+        new SwerveCANcoder(configCheckAndGet(instanceConfig, "can-id", Integer.class));
     return new SensorTransmission(rawSensor, sensorConfig);
   }
 
@@ -374,7 +379,9 @@ public class Configuration implements NetworkTablePopulator {
         return this.instantiateCANCoder(sensorConfig, networkTable);
       default:
         throw new IllegalArgumentException(
-            String.format("The template %s does not have a corresponding sensor class. Please contact the library developer.", template));
+            String.format(
+                "The template %s does not have a corresponding sensor class. Please contact the library developer.",
+                template));
     }
   }
 
@@ -392,7 +399,8 @@ public class Configuration implements NetworkTablePopulator {
 
     int canID = configCheckAndGet(instanceConfig, "can-id", Integer.class);
     if (canID < 0 || canID >= 64) {
-      throw new InvalidConfigValueException(String.format("CAN ID %d is not in range [0, 63]", canID));
+      throw new InvalidConfigValueException(
+          String.format("CAN ID %d is not in range [0, 63]", canID));
     }
     return new Falcon500(canID, falconConfig);
   }
@@ -411,7 +419,8 @@ public class Configuration implements NetworkTablePopulator {
 
     int canID = configCheckAndGet(instanceConfig, "can-id", Integer.class);
     if (canID < 0 || canID >= 64) {
-      throw new InvalidConfigValueException(String.format("CAN ID %d is not in range [0, 63]", canID));
+      throw new InvalidConfigValueException(
+          String.format("CAN ID %d is not in range [0, 63]", canID));
     }
     return new Neo(canID, neoConfig);
   }
@@ -440,14 +449,16 @@ public class Configuration implements NetworkTablePopulator {
         return this.instantiateNeo(motorConfig, networkTable);
       default:
         throw new IllegalArgumentException(
-            String.format("The template %s does not have a corresponding motor class. Please contact the library developer.", template));
+            String.format(
+                "The template %s does not have a corresponding motor class. Please contact the library developer.",
+                template));
     }
   }
 
   /**
    * Finds the config for the motor in the given config. If it has an assigned name, that will be
    * used, otherwise the defaults of [0, 1] will be used.
-   * 
+   *
    * @param moduleConfig The config to be searched.
    * @param motorIdx The index of the motor, either 0 or 1.
    * @return The subconfig for the motor in the provided config.
@@ -467,7 +478,8 @@ public class Configuration implements NetworkTablePopulator {
     }
 
     if (!moduleConfig.contains(motorKey)) {
-      throw new ConfigFieldNotFoundException("The module config is missing motor at " + motorKey + ".");
+      throw new ConfigFieldNotFoundException(
+          "The module config is missing motor at " + motorKey + ".");
     } else if (!(moduleConfig.get(motorKey) instanceof Config)) {
       throw new IncorrectConfigTypeException("The motor " + motorKey + " must be a table.");
     } else {
@@ -499,14 +511,16 @@ public class Configuration implements NetworkTablePopulator {
     } else {
       moduleConfig = instanceConfig;
     }
-    
+
     SwerveMotor motors[] =
         new SwerveMotor[] {
           this.instantiateMotor(findMotorConfig(moduleConfig, 0), networkTable + "/motors/0"),
           this.instantiateMotor(findMotorConfig(moduleConfig, 1), networkTable + "/motors/1")
         };
     PositionSensor azimuthSensor =
-        this.instantiateSensor(configCheckAndGet(moduleConfig, "azimuth-sensor", Config.class), networkTable + "/sensor");
+        this.instantiateSensor(
+            configCheckAndGet(moduleConfig, "azimuth-sensor", Config.class),
+            networkTable + "/sensor");
 
     SwerveModuleConfiguration swerveModuleConfig = new SwerveModuleConfiguration(moduleConfig);
     this.networkTableConfigs.put(networkTable, swerveModuleConfig);
@@ -514,9 +528,9 @@ public class Configuration implements NetworkTablePopulator {
     return new SwerveModule(motors, azimuthSensor, swerveModuleConfig);
   }
 
-  /** 
+  /**
    * Instantiates the module objects from the config.
-   * 
+   *
    * @throws SwerveConfigException If the user provided config is incorrect.
    */
   private void instantiateModules() {
@@ -525,7 +539,9 @@ public class Configuration implements NetworkTablePopulator {
     }
     List<Config> moduleConfigs = this.configData.get("modules");
     if (moduleConfigs.size() < 2) {
-      throw new InvalidConfigValueException(String.format("Only %d modules foundd in config, at least 2 required.", moduleConfigs.size()));
+      throw new InvalidConfigValueException(
+          String.format(
+              "Only %d modules foundd in config, at least 2 required.", moduleConfigs.size()));
     }
     this.modules = new SwerveModule[moduleConfigs.size()];
 
@@ -544,7 +560,7 @@ public class Configuration implements NetworkTablePopulator {
 
   /**
    * Checks the existence and type of the given config field, then returns the value.
-   * 
+   *
    * @param <T> The type of the field.
    * @param config The config to get the field from.
    * @param key The key of the field to get.
@@ -558,14 +574,21 @@ public class Configuration implements NetworkTablePopulator {
     }
     Object value = config.get(key);
     if (!type.isInstance(value)) {
-      throw new IncorrectConfigTypeException("Field '" + key + "' is of type " + value.getClass().getSimpleName() + ", but should be of type " + type.getSimpleName() + ".");
+      throw new IncorrectConfigTypeException(
+          "Field '"
+              + key
+              + "' is of type "
+              + value.getClass().getSimpleName()
+              + ", but should be of type "
+              + type.getSimpleName()
+              + ".");
     }
     return type.cast(value);
   }
 
   /**
    * Checks that the given field exists and is a number, then returns it as a double.
-   * 
+   *
    * @param config The config to get the field from.
    * @param key The key of the field to get.
    * @return The value of the field.
@@ -578,26 +601,30 @@ public class Configuration implements NetworkTablePopulator {
 
   /**
    * Checks that the given field exists and is an enum, then returns the value.
-   * 
+   *
    * @param <T> The type of the field.
    * @param config The config to get the field from.
    * @param key The key of the field to get.
    * @param enumType The expected enum type of the field.
    * @return The value of the field.
-   * @throws SwerveConfigException If the key does not exist, is not a string, or is not in the enum.
+   * @throws SwerveConfigException If the key does not exist, is not a string, or is not in the
+   *     enum.
    */
-  public static <T extends Enum<T>> T configCheckAndGetEnum(Config config, String key, Class<T> enumType) {
+  public static <T extends Enum<T>> T configCheckAndGetEnum(
+      Config config, String key, Class<T> enumType) {
     String value = configCheckAndGet(config, key, String.class);
     try {
       return Enum.valueOf(enumType, value);
     } catch (IllegalArgumentException e) {
-      throw new InvalidConfigValueException("'" + value + "' is not a valid value of enum " + enumType.getSimpleName() + ".", e);
+      throw new InvalidConfigValueException(
+          "'" + value + "' is not a valid value of enum " + enumType.getSimpleName() + ".", e);
     }
   }
 
   /**
-   * If the given field exists, check it's type then return it's value. Otherwise, return the default.
-   * 
+   * If the given field exists, check it's type then return it's value. Otherwise, return the
+   * default.
+   *
    * @param <T> The type of the field.
    * @param config The config to get the field from.
    * @param key The key of the field to get.
@@ -606,27 +633,37 @@ public class Configuration implements NetworkTablePopulator {
    * @return The value of the field.
    * @throws SwerveConfigException If the key is not the right type.
    */
-  public static <T> T configCheckAndGetOrElse(Config config, String key, Class<T> type, T defaultValue) {
+  public static <T> T configCheckAndGetOrElse(
+      Config config, String key, Class<T> type, T defaultValue) {
     if (!config.contains(key)) {
       return defaultValue;
     }
     Object value = config.get(key);
     if (!type.isInstance(value)) {
-      throw new IncorrectConfigTypeException("Field '" + key + "' is of type " + value.getClass().getSimpleName() + ", but should be of type " + type.getSimpleName() + ".");
+      throw new IncorrectConfigTypeException(
+          "Field '"
+              + key
+              + "' is of type "
+              + value.getClass().getSimpleName()
+              + ", but should be of type "
+              + type.getSimpleName()
+              + ".");
     }
     return type.cast(value);
   }
 
   /**
-   * If the given field exists, check that it's a number then return it as a double. Otherwise, return the default.
-   * 
+   * If the given field exists, check that it's a number then return it as a double. Otherwise,
+   * return the default.
+   *
    * @param config The config to get the field from.
    * @param key The key of the field to get.
    * @param defaultValue The value to return if the field doesn't exist.
    * @return The value of the field.
    * @throws SwerveConfigException If the key is not a number.
    */
-  public static double configCheckAndGetDoubleOrElse(Config config, String key, double defaultValue) {
+  public static double configCheckAndGetDoubleOrElse(
+      Config config, String key, double defaultValue) {
     Number value = configCheckAndGetOrElse(config, key, Number.class, 0.);
     return value.doubleValue();
   }

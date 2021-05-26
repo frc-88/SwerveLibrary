@@ -3,8 +3,8 @@ package frc.team88.swerve.util;
 /**
  * Represents a 2D vector with many math utility functions. Immutable. Follows the standard
  * cartesian frame of reference, with angle 0 on the positive x axis and increasing
- * counterclockwise. On the robot, the positive x axis is pointing forwards, while the positive
- * y axis is pointing to the left.
+ * counterclockwise. On the robot, the positive x axis is pointing forwards, while the positive y
+ * axis is pointing to the left.
  */
 public class Vector2D {
 
