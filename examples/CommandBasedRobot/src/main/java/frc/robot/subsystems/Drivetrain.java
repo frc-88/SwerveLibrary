@@ -12,7 +12,7 @@ import frc.team88.swerve.SwerveController;
  * 
  * <p> The drive subsystem
  * <br> contains the swerve controller
- * <br> and calls it's methods.
+ * <br> and calls its methods.
  */
 public class Drivetrain extends SubsystemBase {
 
