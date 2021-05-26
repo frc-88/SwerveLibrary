@@ -1,0 +1,35 @@
+# This is the configuration file for SwerveLibrary. See the README for more in-depth information
+# about how to fill this out.
+
+[gyro]
+template = "navx" # The type of gyro being used.
+port-type = "I2C" # The type of port the navx is plugged into.
+port = "kMXP" # The name of the port, as passed into the navx constructor.
+
+[[modules]]
+template = "team88.diff-swerve-2021.beta" # The template for the module.
+location-inches = { x = 10.991, y = 12.491 } # The location of the module.
+motors.lo.can-id = 0 # The CAN ID of the first motor.
+motors.hi.can-id = 1 # The CAN ID of the second motor.
+azimuth-sensor.can-id = 0 # The CAN ID of the CANCoder.
+
+[[modules]]
+template = "team88.diff-swerve-2021.beta" # The template for the module.
+location-inches = { x = -10.991, y = 12.491 } # The location of the module.
+motors.lo.can-id = 2 # The CAN ID of the first motor.
+motors.hi.can-id = 3 # The CAN ID of the second motor.
+azimuth-sensor.can-id = 1 # The CAN ID of the CANCoder.
+
+[[modules]]
+template = "team88.diff-swerve-2021.beta" # The template for the module.
+location-inches = { x = -10.991, y = -12.491 } # The location of the module.
+motors.lo.can-id = 12 # The CAN ID of the first motor.
+motors.hi.can-id = 13 # The CAN ID of the second motor.
+azimuth-sensor.can-id = 2 # The CAN ID of the CANCoder.
+
+[[modules]]
+template = "team88.diff-swerve-2021.beta" # The template for the module.
+location-inches = { x = 10.991, y = -12.491 } # The location of the module.
+motors.lo.can-id = 14 # The CAN ID of the first motor.
+motors.hi.can-id = 15 # The CAN ID of the second motor.
+azimuth-sensor.can-id = 3 # The CAN ID of the CANCoder.
