@@ -8,8 +8,7 @@ import frc.team88.swerve.motion.SwerveChassis;
 import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
 import frc.team88.swerve.tuning.TuningManager;
-import frc.team88.swerve.commandmux.CommandMux;
-import frc.team88.swerve.data.NetworkTableCommandListener;
+import frc.team88.swerve.util.RobotControllerWrapper;
 import java.util.Map;
 import java.util.Objects;
 
@@ -20,8 +19,6 @@ public class SwerveController {
   private final SwerveChassis chassis;
   private final TuningManager tuningManager;
   private final DataManager dataManager;
-  private final NetworkTableCommandListener ntCommandListener;
-  private int lastActivatedMux = -1;
 
   /**
    * Constructs the SwerveController using the given toml config.
@@ -34,9 +31,7 @@ public class SwerveController {
     this.config = new Configuration(configPath);
     this.chassis = new SwerveChassis(this.config);
     this.tuningManager = new TuningManager(this.config);
-    this.ntCommandListener = new NetworkTableCommandListener(this.config);
-    this.dataManager = new DataManager(this.config, this.chassis, this.tuningManager, this.ntCommandListener);
-    activateMuxId(-1);  // disable command mux by default
+    this.dataManager = new DataManager(this.config, this.chassis, this.tuningManager);
   }
 
   /**
@@ -51,9 +46,7 @@ public class SwerveController {
     this.config = new Configuration(configPath, gyro);
     this.chassis = new SwerveChassis(this.config);
     this.tuningManager = new TuningManager(this.config);
-    this.ntCommandListener = new NetworkTableCommandListener(this.config);
-    this.dataManager = new DataManager(this.config, this.chassis, this.tuningManager, this.ntCommandListener);
-    activateMuxId(-1);  // disable command mux by default
+    this.dataManager = new DataManager(this.config, this.chassis, this.tuningManager);
   }
 
   /**
@@ -67,24 +60,15 @@ public class SwerveController {
     this.dataManager.update();
   }
 
-  public void activateMuxId(int muxId) {
-    lastActivatedMux = muxId;
-    this.config.getCommandMux().activate(muxId);
+  public boolean isNetworkTableCommandActive(double staleThresholdSeconds) {
+    double commandTime = this.dataManager.getNetworkTableCommandTime() * 1E-6;
+    double currentTime = RobotControllerWrapper.getInstance().getFPGATime() * 1E-6;
+
+    return (currentTime - commandTime) < staleThresholdSeconds;
   }
 
-  public boolean isMuxActive(int muxId) {
-    return this.config.getCommandMux().getActive() == muxId;
-  }
-
-  public boolean isMuxActive() {
-    return isMuxActive(lastActivatedMux);
-  }
-
-  public void controlFromNt() {
-    if (!isMuxActive(this.ntCommandListener.getMuxId())) {
-      return;
-    }
-    VelocityState velocityState = this.ntCommandListener.getCommand();
+  public void commandFromNetworkTables() {
+    VelocityState velocityState = this.dataManager.getNetworkTableCommand();
     VelocityState oldVelocityState = this.getTargetVelocity();
     velocityState =
         oldVelocityState
@@ -95,7 +79,6 @@ public class SwerveController {
     this.chassis.setTargetState(velocityState);
     this.chassis.holdAzimuths(false);
   }
-
 
   /**
    * Sets the translation and rotation velocity of the robot.
@@ -114,9 +97,6 @@ public class SwerveController {
       double translationSpeed,
       double rotationVelocity,
       boolean fieldCentric) {
-    if (!isMuxActive()) {
-      return;
-    }
     VelocityState velocityState = this.getTargetVelocity();
     velocityState =
         velocityState
@@ -137,9 +117,6 @@ public class SwerveController {
    *     independent of translation, in degrees per second.
    */
   public void setVelocity(double translationSpeed, double rotationVelocity) {
-    if (!isMuxActive()) {
-      return;
-    }
     VelocityState velocityState = this.getTargetVelocity();
     velocityState =
         velocityState
@@ -159,9 +136,6 @@ public class SwerveController {
    *     it will be interpretted relative to the front of the robot.
    */
   public void setTranslationDirection(double translationDirection, boolean fieldCentric) {
-    if (!isMuxActive()) {
-      return;
-    }
     VelocityState velocityState = this.getTargetVelocity();
     velocityState =
         velocityState
@@ -180,9 +154,6 @@ public class SwerveController {
    * @param y The y component, in feet.
    */
   public void setCenterOfRotation(double x, double y) {
-    if (!isMuxActive()) {
-      return;
-    }
     VelocityState velocityState = this.getTargetVelocity();
     velocityState = velocityState.changeCenterOfRotation(x, y);
     this.chassis.setTargetState(velocityState);
@@ -190,9 +161,6 @@ public class SwerveController {
 
   /** Sets the robot to stop moving and hold it's current swerve module positions. */
   public void holdDirection() {
-    if (!isMuxActive()) {
-      return;
-    }
     VelocityState velocityState = this.getTargetVelocity();
     velocityState = velocityState.changeTranslationSpeed(0).changeRotationVelocity(0);
     this.chassis.setTargetState(velocityState);

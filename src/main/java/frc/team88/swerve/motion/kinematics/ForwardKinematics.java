@@ -8,8 +8,8 @@ import frc.team88.swerve.util.WrappedAngle;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.DecompositionSolver;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.commons.math3.linear.RealMatrixFormat;
+import org.apache.commons.math3.linear.SingularValueDecomposition;
 
 // Heavily influenced by these wpilib classes:
 // import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;

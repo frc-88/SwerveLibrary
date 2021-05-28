@@ -37,14 +37,14 @@ public interface SwerveGyro {
 
   /**
    * Gets linear acceleration in the X direction
-   * 
+   *
    * @return linear acceleration in X in Gs (9.81 m/s^2)
    */
   public double getLinearAccelX();
 
   /**
    * Gets linear acceleration in the Y direction
-   * 
+   *
    * @return linear acceleration in Y in Gs (9.81 m/s^2)
    */
   public double getLinearAccelY();

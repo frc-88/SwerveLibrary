@@ -69,5 +69,4 @@ public class NavX implements SwerveGyro {
   public double getLinearAccelY() {
     return this.base.getWorldLinearAccelY();
   }
-
 }

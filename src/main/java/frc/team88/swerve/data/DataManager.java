@@ -36,11 +36,11 @@ public class DataManager {
   // Root table for all Swerve Library data;
   NetworkTable mainTable;
 
-  public DataManager(Configuration config, SwerveChassis chassis, TuningManager tuningManager, NetworkTableCommandListener ntCommandListener) {
+  public DataManager(Configuration config, SwerveChassis chassis, TuningManager tuningManager) {
     this.config = Objects.requireNonNull(config);
     this.chassis = Objects.requireNonNull(chassis);
     this.tuningManager = tuningManager;
-    this.ntCommandListener = Objects.requireNonNull(ntCommandListener);
+    this.ntCommandListener = new NetworkTableCommandListener();
     mainTable = NetworkTableInstance.getDefault().getTable("swerveLibrary");
     setupCallbacks();
   }
@@ -80,16 +80,32 @@ public class DataManager {
   }
 
   /**
-   * Sets up callbacks for commands sent via network tables.
-   * Only listens for swerveLibrary/commands/timestamp.
-   * The callback assumes if this entry has updated, then 
-   * the other command entries have update too
+   * Sets up callbacks for commands sent via network tables. Only listens for
+   * swerveLibrary/commands/timestamp. The callback assumes if this entry has updated, then the
+   * other command entries have update too
    */
-  private void setupCallbacks()
-  {
+  private void setupCallbacks() {
     NetworkTable commandTable = mainTable.getSubTable("commands");
     ntCommandListener.setTable(commandTable);
     commandTable.addEntryListener("timestamp", ntCommandListener, EntryListenerFlags.kUpdate);
+  }
+
+  /**
+   * Gets the last command sent via network tables
+   *
+   * @return VelocityState
+   */
+  public VelocityState getNetworkTableCommand() {
+    return ntCommandListener.getCommand();
+  }
+
+  /**
+   * Gets the time at which the last command was sent via network tables
+   *
+   * @return FPGA time in microseconds
+   */
+  public long getNetworkTableCommandTime() {
+    return ntCommandListener.getCommandTime();
   }
 
   /**
