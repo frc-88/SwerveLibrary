@@ -1,6 +1,6 @@
 package frc.team88.swerve.module;
 
-import frc.team88.swerve.configuration.SwerveModuleConfiguration;
+import frc.team88.swerve.configuration.subconfig.SwerveModuleConfiguration;
 import frc.team88.swerve.module.motor.SwerveMotor;
 import frc.team88.swerve.module.sensor.PositionSensor;
 import frc.team88.swerve.util.MathUtils;
@@ -259,8 +259,8 @@ public class SwerveModule {
   /**
    * Gets the location of this module.
    *
-   * @return A position vector from the robot's origin to the location of this module, in inches.
-   * The positive x-axis points forwards, and the positive y-axis points left.
+   * @return A position vector from the robot's origin to the location of this module, in feet. The
+   *     positive x-axis points forwards, and the positive y-axis points left.
    */
   public Vector2D getLocation() {
     return this.config.getLocation();

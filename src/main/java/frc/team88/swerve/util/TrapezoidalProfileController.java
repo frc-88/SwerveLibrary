@@ -1,6 +1,6 @@
 package frc.team88.swerve.util;
 
-import frc.team88.swerve.configuration.TrapezoidalControllerConfiguration;
+import frc.team88.swerve.configuration.subconfig.TrapezoidalControllerConfiguration;
 import java.util.Objects;
 
 /**

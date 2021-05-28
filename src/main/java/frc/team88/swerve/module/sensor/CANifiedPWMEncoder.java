@@ -4,9 +4,7 @@ import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.PWMChannel;
 import com.ctre.phoenix.CANifierStatusFrame;
 
-/**
- * Represents a PWM-based encoder that is connected to a CANifier.
- */
+/** Represents a PWM-based encoder that is connected to a CANifier. */
 public class CANifiedPWMEncoder implements PositionSensor {
 
   // The CANifier that the encoder is plugged into

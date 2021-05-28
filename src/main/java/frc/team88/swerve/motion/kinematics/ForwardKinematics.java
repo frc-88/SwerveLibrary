@@ -162,14 +162,15 @@ public class ForwardKinematics {
     double currentTime_s = RobotControllerWrapper.getInstance().getFPGATime() * 1E-6;
     double dt = currentTime_s - previousTime_s;
     previousTime_s = currentTime_s;
-    if (dt > kTimeJumpThreshold || dt <= 0.) {  // ignore cases where the clock jumps forward or backwards suddenly
+    // ignore cases where the clock jumps forward or backwards suddenly
+    if (dt > kTimeJumpThreshold || dt <= 0.) {
       return;
     }
 
     double dx = m_state.getXVelocity() * dt;
     double dy = m_state.getYVelocity() * dt;
     double dtheta = Math.toRadians(m_state.getThetaVelocity()) * dt;
-    
+
     double sin_dtheta = Math.sin(dtheta);
     double cos_dtheta = Math.cos(dtheta);
 

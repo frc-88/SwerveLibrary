@@ -1,7 +1,11 @@
-package frc.team88.swerve.configuration;
+package frc.team88.swerve.configuration.subconfig;
 
 import com.electronwill.nightconfig.core.Config;
 import edu.wpi.first.networktables.NetworkTable;
+import frc.team88.swerve.configuration.Configuration;
+import frc.team88.swerve.configuration.exceptions.ConfigFieldNotFoundException;
+import frc.team88.swerve.configuration.exceptions.InvalidConfigValueException;
+import frc.team88.swerve.configuration.exceptions.SwerveConfigException;
 import frc.team88.swerve.data.NetworkTablePopulator;
 import frc.team88.swerve.util.Vector2D;
 import java.util.ArrayList;
@@ -27,25 +31,38 @@ public class SwerveModuleConfiguration implements NetworkTablePopulator {
   /**
    * Constructs this configuration from an instantiated module template.
    *
-   * @param instantiatedConfig The instantiated module template.
+   * @param config The instantiated module template.
+   * @throws SwerveConfigException If the user provided config is incorrect.
    */
-  public SwerveModuleConfiguration(Config instantiatedConfig) {
-    Objects.requireNonNull(instantiatedConfig);
+  public SwerveModuleConfiguration(Config config) {
+    Objects.requireNonNull(config);
     this.location =
         Vector2D.createCartesianCoordinates(
-            (double) instantiatedConfig.get("location-inches.x") / 12.0,
-            (double) instantiatedConfig.get("location-inches.y") / 12.0);
+            Configuration.configCheckAndGetDouble(config, "location-inches.x") / 12.0,
+            Configuration.configCheckAndGetDouble(config, "location-inches.y") / 12.0);
 
     // Convert 2D list to 2D array
+    if (!config.contains("differential-matrix")) {
+      throw new ConfigFieldNotFoundException(
+          "The differential-matrix field was not found in a swerve module config.");
+    }
     this.forwardMatrix =
         new Array2DRowRealMatrix(
-            convertObjectListTo2DDoubleArray(instantiatedConfig.get("differential-matrix")), true);
+            convertObjectListTo2DDoubleArray(config.get("differential-matrix")), true);
     this.inverseMatrix = MatrixUtils.inverse(this.forwardMatrix);
 
-    this.wheelDiameter = (double) instantiatedConfig.get("wheel-diameter-inches") / 12.0;
+    this.wheelDiameter =
+        Configuration.configCheckAndGetDouble(config, "wheel-diameter-inches") / 12.0;
+    if (this.wheelDiameter <= 0) {
+      throw new InvalidConfigValueException(
+          String.format("Wheel diameter is %d, but it should be positive.", this.wheelDiameter));
+    }
     this.azimuthControllerConfig =
-        new TrapezoidalControllerConfiguration(instantiatedConfig.get("azimuth-controller"));
-    this.wheelControllerConfig = new PIDConfiguration(instantiatedConfig.get("wheel-controller"));
+        new TrapezoidalControllerConfiguration(
+            Configuration.configCheckAndGet(config, "azimuth-controller", Config.class));
+    this.wheelControllerConfig =
+        new PIDConfiguration(
+            Configuration.configCheckAndGet(config, "wheel-controller", Config.class));
   }
 
   /**
@@ -127,33 +144,35 @@ public class SwerveModuleConfiguration implements NetworkTablePopulator {
    *
    * @param list A 2x2 nested list of Objects which will be casted to Double objects.
    * @return A 2x2 double array.
+   * @throws SwerveConfigException If the user provided config is incorrect.
    */
   private double[][] convertObjectListTo2DDoubleArray(List<?> list) {
     double arr[][] = new double[2][2];
     if (!(list instanceof List<?>)) {
-      throw new IllegalArgumentException("Differential matrix is not a list.");
+      throw new InvalidConfigValueException("Differential matrix is not a list.");
     }
     List<Object> outerList = new ArrayList<Object>(list);
     if (outerList.size() != 2) {
-      throw new IllegalArgumentException("Differential matrix does not have height 2.");
+      throw new InvalidConfigValueException("Differential matrix does not have height 2.");
     }
 
     for (int row = 0; row < 2; row++) {
       Object outerItem = outerList.get(row);
       if (!(outerItem instanceof List<?>)) {
-        throw new IllegalArgumentException("Differential matrix is not a list of lists.");
+        throw new InvalidConfigValueException("Differential matrix is not a list of lists.");
       }
       List<Object> innerList = new ArrayList<Object>((List<?>) outerItem);
       if (innerList.size() != 2) {
-        throw new IllegalArgumentException("Differential matrix does not have width 2.");
+        throw new InvalidConfigValueException("Differential matrix does not have width 2.");
       }
 
       for (int col = 0; col < 2; col++) {
         Object innerItem = innerList.get(col);
-        if (!(innerItem instanceof Double)) {
-          throw new IllegalArgumentException("Differential matrix contains a non-double element.");
+        if (!(innerItem instanceof Number)) {
+          throw new InvalidConfigValueException(
+              "Differential matrix contains a non-number element.");
         }
-        Double value = (Double) (innerItem);
+        Number value = (Number) (innerItem);
         arr[row][col] = value.doubleValue();
       }
     }

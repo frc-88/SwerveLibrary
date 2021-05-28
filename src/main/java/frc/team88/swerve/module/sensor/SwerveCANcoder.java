@@ -3,9 +3,7 @@ package frc.team88.swerve.module.sensor;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 
-/**
- * Represents a cancoder.
- */
+/** Represents a cancoder. */
 public class SwerveCANcoder implements PositionSensor {
 
   // The cancoder being wrapped

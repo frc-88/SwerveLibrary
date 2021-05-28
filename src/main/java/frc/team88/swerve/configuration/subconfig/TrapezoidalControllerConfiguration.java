@@ -1,7 +1,10 @@
-package frc.team88.swerve.configuration;
+package frc.team88.swerve.configuration.subconfig;
 
 import com.electronwill.nightconfig.core.Config;
 import edu.wpi.first.networktables.NetworkTable;
+import frc.team88.swerve.configuration.Configuration;
+import frc.team88.swerve.configuration.exceptions.InvalidConfigValueException;
+import frc.team88.swerve.configuration.exceptions.SwerveConfigException;
 import frc.team88.swerve.data.NetworkTablePopulator;
 import java.util.Objects;
 
@@ -19,12 +22,22 @@ public class TrapezoidalControllerConfiguration implements NetworkTablePopulator
    * Constructs from a raw configuration.
    *
    * @param config The raw configuration.
+   * @throws SwerveConfigException If the user provided config is incorrect.
    */
   public TrapezoidalControllerConfiguration(Config config) {
     Objects.requireNonNull(config);
     this.pidConfig = new PIDConfiguration(config);
-    this.maxSpeed = (double) config.get("max-speed");
-    this.maxAcceleration = (double) config.get("max-acceleration");
+    this.maxSpeed = Configuration.configCheckAndGetDouble(config, "max-speed");
+    if (this.maxSpeed <= 0) {
+      throw new InvalidConfigValueException(
+          String.format("Max speed is %d, but it should be positive.", this.maxSpeed));
+    }
+    this.maxAcceleration = Configuration.configCheckAndGetDouble(config, "max-acceleration");
+    if (this.maxAcceleration <= 0) {
+      throw new InvalidConfigValueException(
+          String.format(
+              "Max acceleration is %d, but it should be positive.", this.maxAcceleration));
+    }
   }
 
   /**

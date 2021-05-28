@@ -3,7 +3,9 @@ name: Java CI
 on: [push]
 
 jobs:
-  build:
+
+
+  build-swervelibrary:
 
     runs-on: ubuntu-latest
 
@@ -13,5 +15,56 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    - name: Build with Gradle
+    - name: Grant execute permisions to gradlew
+      run: chmod +x gradlew
+    - name: Build gradle
       run: ./gradlew build
+  
+  build-timedrobot-example:
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Change directory to TimedRobot example
+      run: cd examples/TimedRobot
+    - name: Grant execute permisions to gradlew
+      run: chmod +x gradlew
+    - name: Build gradle
+      run: ./gradlew build
+
+  build-commandbasedrobot-example:
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Change directory to CommandBasedRobot example
+      run: cd examples/CommandBasedRobot
+    - name: Grant execute permisions to gradlew
+      run: chmod +x gradlew
+    - name: Build gradle
+      run: ./gradlew build
+
+  verify-format:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Grant execute permisions to gradlew
+      run: chmod +x gradlew
+    - name: Verify format
+      run: ./gradlew verifyGoogleJavaFormat

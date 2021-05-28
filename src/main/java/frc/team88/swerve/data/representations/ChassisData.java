@@ -10,7 +10,7 @@ public class ChassisData implements NetworkTablePopulator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param chassis The chassis to collect data from.
    */
   public ChassisData(SwerveChassis chassis) {

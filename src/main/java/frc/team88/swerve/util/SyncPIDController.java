@@ -1,6 +1,6 @@
 package frc.team88.swerve.util;
 
-import frc.team88.swerve.configuration.PIDConfiguration;
+import frc.team88.swerve.configuration.subconfig.PIDConfiguration;
 import java.util.Objects;
 
 /**
