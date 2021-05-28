@@ -15,11 +15,15 @@ To install, simply add the following line to the dependencies section of build.g
 
 ```groovy
 dependencies {
-    // WPILib autofills this section with some code. Do not delete it.
+    // WPILIB autofills this section with some code. Do not delete it.
     
     compile io.github.frc-88:swerve:0.1.0
 }
 ```
+
+At this time, in order for the library to work, you must have _both_ the pheonix and rev-robotics
+vendor dependencies installed. See [the instructions from WPILIB](https://docs.wpilib.org/en/stable/docs/software/vscode-overview/3rd-party-libraries.html)
+on how to do this.
 
 ## Usage
 
