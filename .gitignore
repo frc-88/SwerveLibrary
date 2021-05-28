@@ -137,6 +137,7 @@ $RECYCLE.BIN/
 ### Gradle ###
 .gradle
 /build/
+gradle.properties
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -155,6 +156,9 @@ gradle-app.setting
 .project
 .settings/
 bin/
+
+# Keys for publishing
+*.gpg
 
 
 # End of https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode
