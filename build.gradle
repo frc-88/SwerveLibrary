@@ -29,7 +29,7 @@ apply plugin: 'io.codearte.nexus-staging'
 
 archivesBaseName = 'swerve'
 group = "io.github.frc-88"
-version = "0.1.0-rc.0"
+version = "0.1.0"
 
 compileJava.dependsOn 'googleJavaFormat'
 
