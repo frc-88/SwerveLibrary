@@ -3,10 +3,15 @@ buildscript {
         repositories {
             maven {
                 url 'https://plugins.gradle.org/m2/'
+                url 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+                url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
             }
+            jcenter()
         }
         dependencies {
             classpath "edu.wpi.first:GradleRIO:2021.3.1"
+            classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+            classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
         }
     }
 }
@@ -19,6 +24,12 @@ plugins {
 }
 
 apply plugin: 'edu.wpi.first.GradleRIO'
+apply plugin: 'com.bmuschko.nexus'
+apply plugin: 'io.codearte.nexus-staging'
+
+archivesBaseName = 'swerve'
+group = "io.github.frc-88"
+version = "0.1.0"
 
 compileJava.dependsOn 'googleJavaFormat'
 
@@ -53,17 +64,50 @@ test {
     useJUnitPlatform()
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+modifyPom {
+    project {
+        name 'swerve'
+        description 'Controls library for swerve drives, including differential swerves.'
+        url 'https://github.com/frc-88/SwerveLibrary'
+        inceptionYear '2021'
+
+        scm {
+            url 'https://github.com/frc-88/SwerveLibrary'
+            connection 'scm:https://github.com/frc-88/SwerveLibrary'
+            developerConnection 'scm:git://github.com/frc-88/SwerveLibrary'
+        }
+
+        licenses {
+            license {
+                name 'The MIT License'
+                url 'https://github.com/frc-88/SwerveLibrary/blob/master/LICENSE.md'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'paulterrasi'
+                name 'Paul Terrasi'
+                email 'paul.a.terrasi@gmail.com'
+            }
+        }
+    }
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+extraArchive {
+    sources = true
+    tests = true
+    javadoc = true
 }
 
-artifacts {
-    archives sourcesJar
-    archives javadocJar
+nexus {
+    sign = true
+    repositoryUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+    snapshotRepositoryUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+}
+
+nexusStaging {
+    serverUrl = "https://s01.oss.sonatype.org/service/local/"
+    packageGroup = "io.github.frc-88"
 }
