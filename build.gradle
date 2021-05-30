@@ -24,8 +24,10 @@ plugins {
 }
 
 apply plugin: 'edu.wpi.first.GradleRIO'
-apply plugin: 'com.bmuschko.nexus'
-apply plugin: 'io.codearte.nexus-staging'
+if (rootProject == project) {
+    apply plugin: 'com.bmuschko.nexus'
+    apply plugin: 'io.codearte.nexus-staging'
+}
 
 archivesBaseName = 'swerve'
 group = "io.github.frc-88"
@@ -64,50 +66,52 @@ test {
     useJUnitPlatform()
 }
 
-modifyPom {
-    project {
-        name 'swerve'
-        description 'Controls library for swerve drives, including differential swerves.'
-        url 'https://github.com/frc-88/SwerveLibrary'
-        inceptionYear '2021'
-
-        scm {
+if (rootProject == project) {
+    modifyPom {
+        project {
+            name 'swerve'
+            description 'Controls library for swerve drives, including differential swerves.'
             url 'https://github.com/frc-88/SwerveLibrary'
-            connection 'scm:https://github.com/frc-88/SwerveLibrary'
-            developerConnection 'scm:git://github.com/frc-88/SwerveLibrary'
-        }
+            inceptionYear '2021'
 
-        licenses {
-            license {
-                name 'The MIT License'
-                url 'https://github.com/frc-88/SwerveLibrary/blob/master/LICENSE.md'
-                distribution 'repo'
+            scm {
+                url 'https://github.com/frc-88/SwerveLibrary'
+                connection 'scm:https://github.com/frc-88/SwerveLibrary'
+                developerConnection 'scm:git://github.com/frc-88/SwerveLibrary'
             }
-        }
 
-        developers {
-            developer {
-                id 'paulterrasi'
-                name 'Paul Terrasi'
-                email 'paul.a.terrasi@gmail.com'
+            licenses {
+                license {
+                    name 'The MIT License'
+                    url 'https://github.com/frc-88/SwerveLibrary/blob/master/LICENSE.md'
+                    distribution 'repo'
+                }
+            }
+
+            developers {
+                developer {
+                    id 'paulterrasi'
+                    name 'Paul Terrasi'
+                    email 'paul.a.terrasi@gmail.com'
+                }
             }
         }
     }
-}
 
-extraArchive {
-    sources = true
-    tests = true
-    javadoc = true
-}
+    extraArchive {
+        sources = true
+        tests = true
+        javadoc = true
+    }
 
-nexus {
-    sign = true
-    repositoryUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-    snapshotRepositoryUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-}
+    nexus {
+        sign = true
+        repositoryUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+        snapshotRepositoryUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+    }
 
-nexusStaging {
-    serverUrl = "https://s01.oss.sonatype.org/service/local/"
-    packageGroup = "io.github.frc-88"
+    nexusStaging {
+        serverUrl = "https://s01.oss.sonatype.org/service/local/"
+        packageGroup = "io.github.frc-88"
+    }
 }
