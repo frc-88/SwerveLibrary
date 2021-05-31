@@ -59,6 +59,7 @@ public class ManualDrive extends CommandBase {
     // commands our max speed in feet per second. Because the triggers on the XBox controller
     // actually go to zero when released, no deadband is needed.
     double translationSpeed = m_controller.getRawAxis(3);
+    translationSpeed *= Constants.MAX_SPEED;
 
     // Get the rotation velocity from the right stick X axis, scaled linearly so that fully pushed
     // commands our max rotation speed in rotations per second. Uses a deadband since XBox
@@ -67,7 +68,7 @@ public class ManualDrive extends CommandBase {
     if (Math.abs(rotationVelocity) < JOYSTICK_DEADBAND) {
       rotationVelocity = 0;
     }
-    rotationVelocity *= Constants.MAX_SPEED;
+    rotationVelocity *= Constants.MAX_ROTATION;
 
     // Set the translation speed and rotation velocities.
     m_drivetrain.setVelocity(translationSpeed, rotationVelocity);
