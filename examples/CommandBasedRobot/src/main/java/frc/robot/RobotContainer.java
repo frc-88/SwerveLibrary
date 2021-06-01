@@ -30,7 +30,7 @@ public class RobotContainer {
   private final WaitCommand m_autoCommand = new WaitCommand(1);
 
   // The drive XBox controller.
-  private final Joystick m_gamepad = new Joystick(Constants.GAMEPAD_PORT);
+  private final XboxController m_gamepad = new XboxController(Constants.GAMEPAD_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -39,7 +39,7 @@ public class RobotContainer {
 
     // Set default drivetrain command.
     CommandScheduler.getInstance()
-        .setDefaultCommand(m_drivetrain, new ManualDrive(m_drivetrain, m_gamepad));
+        .setDefaultCommand(m_drivetrain, new InstantCommand(() -> m_drivetrain.manualDrive(m_gamepad)));
   }
 
   /**
@@ -50,10 +50,10 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // If disabled, zero the gyro when the Y button on the gamepad is pressed.
-    (new JoystickButton(m_gamepad, 4))
+    (new JoystickButton(m_gamepad, XboxController.Button.kY.value))
         .whenPressed(
             new ConditionalCommand(
-                new SetGyroYaw(m_drivetrain, 0),
+                new InstantCommand(() -> m_drivetrain.setYaw(0), m_drivetrain),
                 new WaitCommand(0),
                 DriverStation.getInstance()::isDisabled));
   }
