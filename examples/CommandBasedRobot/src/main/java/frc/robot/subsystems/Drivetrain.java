@@ -39,6 +39,7 @@ public class Drivetrain extends SubsystemBase {
     this.swerve = new SwerveController(DriveConstants.SWERVE_CONFIG);
     this.setYaw(0.);
 
+    // Creates a chooser dropdown with each of the driver control options
     oiChooser.addOption("Split Joysticks with Triggers Turning", "Split Joysticks with Triggers Turning");
     oiChooser.addOption("Single Joystick with Triggers Turning", "Single Joystick with Triggers Turning");
     oiChooser.addOption("Single Joystick with Joystick X Turning", "Single Joystick with Joystick X Turning");
@@ -47,6 +48,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void manualDrive(XboxController m_gamepad) {
+    // Pass the correct joystick properties of whichever chooser option is selected.
     switch(oiChooser.getSelected()) {
       case "2 Joysticks with Gas Pedal":
         xDirection = m_gamepad.getX(Hand.kLeft);
@@ -69,8 +71,18 @@ public class Drivetrain extends SubsystemBase {
         rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
         translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
     }
-    translationSpeed *= DriveConstants.MAX_SPEED;
+
+    // If left bumper is pressed go into "Turtle Mode" for fine control both scale from % to fps
+    if (m_gamepad.getBumper(Hand.kLeft)) {
+      translationSpeed *= DriveConstants.TURTLE_SPEED;
+    }
+    else {
+      translationSpeed *= DriveConstants.MAX_SPEED;
+    }
+
+    // Scales from % to degrees per second
     rotationSpeed *= DriveConstants.MAX_ROTATION;
+    
     var translationDirection = calculateTranslationDirection(xDirection, yDirection);
     setVelocity(translationSpeed, rotationSpeed);
     setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
