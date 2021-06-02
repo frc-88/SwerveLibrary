@@ -22,6 +22,9 @@ public final class Constants {
   }
 
   public static final class DriveConstants {
+    // The path to the swerve config file in the deploy directory.
+    public static final String SWERVE_CONFIG = "swerve.toml";
+
     // The max translation and rotation speeds to be commanded to the drivetrain.
     public static final double MAX_SPEED = 14.7; // feet per second
     public static final double MAX_ROTATION = 90.; // degrees per second
