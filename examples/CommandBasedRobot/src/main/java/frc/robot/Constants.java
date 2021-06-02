@@ -27,6 +27,7 @@ public final class Constants {
 
     // The max translation and rotation speeds to be commanded to the drivetrain.
     public static final double MAX_SPEED = 14.7; // feet per second
+    public static final double TURTLE_SPEED = 5.0; // feet per second
     public static final double MAX_ROTATION = 90.; // degrees per second
 
     // The threshold for left stick magnitude to change translation direction.
