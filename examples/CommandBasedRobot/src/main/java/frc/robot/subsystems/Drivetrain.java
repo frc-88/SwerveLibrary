@@ -4,7 +4,13 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
 import frc.team88.swerve.SwerveController;
 
 /**
@@ -19,13 +25,67 @@ public class Drivetrain extends SubsystemBase {
   // The controller for the swerve drive.
   private SwerveController swerve;
 
-  // The path to the swerve config file in the deploy directory.
-  private static final String SWERVE_CONFIG = "swerve.toml";
+  // Chooser for selecting the Joystick Control Style used
+  private final SendableChooser<String> oiChooser = new SendableChooser<>();
+
+  // Variables for control with different joystick setups
+  private double xDirection;
+  private double yDirection;
+  private double rotationSpeed;
+  private double translationSpeed;
 
   /** Constructor. */
   public Drivetrain() {
-    this.swerve = new SwerveController(SWERVE_CONFIG);
+    this.swerve = new SwerveController(DriveConstants.SWERVE_CONFIG);
     this.setYaw(0.);
+
+    // Creates a chooser dropdown with each of the driver control options
+    oiChooser.addOption("Split Joysticks with Triggers Turning", "Split Joysticks with Triggers Turning");
+    oiChooser.addOption("Single Joystick with Triggers Turning", "Single Joystick with Triggers Turning");
+    oiChooser.addOption("Single Joystick with Joystick X Turning", "Single Joystick with Joystick X Turning");
+    oiChooser.setDefaultOption("2 Joysticks with Gas Pedal", "2 Joysticks with Gas Pedal");
+    SmartDashboard.putData("Drive Controls Chooser", oiChooser);
+  }
+
+  public void manualDrive(XboxController m_gamepad) {
+    // Pass the correct joystick properties of whichever chooser option is selected.
+    switch(oiChooser.getSelected()) {
+      case "2 Joysticks with Gas Pedal":
+        xDirection = m_gamepad.getX(Hand.kLeft);
+        yDirection = -m_gamepad.getY(Hand.kLeft);
+        rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
+        translationSpeed = m_gamepad.getTriggerAxis(Hand.kRight);
+      case "Split Joysticks with Triggers Turning":
+        xDirection = m_gamepad.getX(Hand.kRight);
+        yDirection = -m_gamepad.getY(Hand.kLeft);
+        rotationSpeed = m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
+        translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
+      case "Single Joystick with Triggers Turning":
+        xDirection = m_gamepad.getX(Hand.kLeft);
+        yDirection = -m_gamepad.getY(Hand.kLeft);
+        rotationSpeed = m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
+        translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
+      case "Single Joystick with Joystick X Turning":
+        xDirection = m_gamepad.getX(Hand.kLeft);
+        yDirection = -m_gamepad.getY(Hand.kLeft);
+        rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
+        translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
+    }
+
+    // If left bumper is pressed go into "Turtle Mode" for fine control both scale from % to fps
+    if (m_gamepad.getBumper(Hand.kLeft)) {
+      translationSpeed *= DriveConstants.TURTLE_SPEED;
+    }
+    else {
+      translationSpeed *= DriveConstants.MAX_SPEED;
+    }
+
+    // Scales from % to degrees per second
+    rotationSpeed *= DriveConstants.MAX_ROTATION;
+    
+    var translationDirection = calculateTranslationDirection(xDirection, yDirection);
+    setVelocity(translationSpeed, rotationSpeed);
+    setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
   }
 
   /** Updates the swerve controller. Should be called at the end of each program loop. */
@@ -80,5 +140,25 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+  public double applyDeadband(double value) {
+    if (Math.abs(value) < OIConstants.JOYSTICK_DEADBAND) {
+      return 0;
+    }
+    else {
+      return value;
+    }
+  }
+
+  /**
+   * Calculates the angle of translation set by the left stick.
+   *
+   * @return The angle of translation, in degrees. 0 corresponds to forwards, and positive
+   *     corresponds to counterclockwise.
+   */
+  private double calculateTranslationDirection(double x, double y) {
+    // Calculate the angle.
+    return Math.toDegrees(Math.atan2(y, x));
   }
 }
