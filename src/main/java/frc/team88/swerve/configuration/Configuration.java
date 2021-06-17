@@ -2,6 +2,7 @@ package frc.team88.swerve.configuration;
 
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.PWMChannel;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileNotFoundAction;
 import com.electronwill.nightconfig.core.io.ConfigParser;
@@ -26,6 +27,7 @@ import frc.team88.swerve.configuration.subconfig.SensorTransmissionConfiguration
 import frc.team88.swerve.configuration.subconfig.SwerveModuleConfiguration;
 import frc.team88.swerve.data.NetworkTablePopulator;
 import frc.team88.swerve.gyro.NavX;
+import frc.team88.swerve.gyro.Pigeon;
 import frc.team88.swerve.gyro.SwerveGyro;
 import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.module.motor.Falcon500;
@@ -261,6 +263,27 @@ public class Configuration implements NetworkTablePopulator {
   }
 
   /**
+   * Instatiates a Pigeon object.
+   *
+   * @param gyroConfig The config for the gyro.
+   * @return The Pigeon object.
+   * @throws SwerveConfigException If the user provided config is incorrect.
+   */
+  private Pigeon instantiatePigeon(Config gyroConfig) {
+    String portType = configCheckAndGet(gyroConfig, "port-type", String.class);
+    switch (portType) {
+      case "TalonSRX":
+        TalonSRX controller = new TalonSRX(configCheckAndGet(gyroConfig, "id", Integer.class));
+        return new Pigeon(controller);
+      case "CAN":
+        return new Pigeon(configCheckAndGet(gyroConfig, "id", Integer.class));
+      default:
+        throw new InvalidConfigValueException(
+            String.format("Invalid port type %s given in configuration.", portType));
+    }
+  }
+
+  /**
    * Instantiates the gyro object from the config.
    *
    * @throws SwerveConfigException If the user provided config is incorrect.
@@ -278,6 +301,9 @@ public class Configuration implements NetworkTablePopulator {
     switch (template) {
       case "navx":
         this.gyro = this.instantiateNavX(gyroConfig);
+        break;
+      case "pigeon":
+        this.gyro = this.instantiatePigeon(gyroConfig);
         break;
       default:
         throw new IllegalArgumentException(
