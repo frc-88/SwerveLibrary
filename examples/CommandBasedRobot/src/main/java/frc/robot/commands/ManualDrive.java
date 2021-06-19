@@ -115,8 +115,8 @@ public class ManualDrive extends CommandBase {
     double x = m_controller.getRawAxis(0);
     double y = -m_controller.getRawAxis(1);
 
-    // Calculate the angle.
-    return Math.toDegrees(Math.atan2(y, x));
+    // Calculate the angle. The variables are switched up because 0 degrees needs to be forwards.
+    return Math.toDegrees(Math.atan2(x, -y));
   }
 
   /**
