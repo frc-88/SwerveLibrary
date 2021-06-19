@@ -29,7 +29,8 @@ public class InverseKinematics {
   }
 
   /**
-   * Sets the target motion state.
+   * Sets the target motion state. This function does not maintain any state, so it can be used to
+   * test a target state without commiting to it.
    *
    * @param target The motion state to target. Robot-centric.
    * @return The calculated module states.
