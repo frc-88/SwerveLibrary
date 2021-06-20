@@ -3,6 +3,8 @@ package frc.team88.swerve.configuration.exceptions;
 /** Thrown when the type of a field is not the expected type. */
 public class IncorrectConfigTypeException extends SwerveConfigException {
 
+  private static final long serialVersionUID = 0L;
+
   /**
    * Constructor.
    *

@@ -1,10 +1,12 @@
 package frc.team88.swerve.motion.kinematics;
 
 import frc.team88.swerve.module.SwerveModule;
+import frc.team88.swerve.motion.state.ModuleState;
 import frc.team88.swerve.motion.state.OdomState;
+import frc.team88.swerve.motion.state.VelocityState;
 import frc.team88.swerve.util.RobotControllerWrapper;
 import frc.team88.swerve.util.Vector2D;
-import frc.team88.swerve.util.WrappedAngle;
+import java.util.stream.Stream;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.DecompositionSolver;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -111,7 +113,23 @@ public class ForwardKinematics {
 
   /** Update the current robot pose. */
   public void update() {
-    calculateChassisVector();
+    ModuleState[] currentModuleStates =
+        Stream.of(this.modules)
+            .map(
+                (m) -> {
+                  double wheelVelocity = m.getWheelVelocity();
+                  double azimuthPosition =
+                      wheelVelocity < 0
+                          ? -m.getAzimuthPosition().asDouble()
+                          : m.getAzimuthPosition().asDouble();
+                  return new ModuleState(azimuthPosition, Math.abs(wheelVelocity));
+                })
+            .toArray(ModuleState[]::new);
+    VelocityState velState = calculateChassisVector(currentModuleStates);
+    m_state.setVelocity(
+        velState.getTranslationVector().getX(), velState.getTranslationVector().getY());
+    m_state.setThetaVelocity(velState.getRotationVelocity());
+
     estimatePoseExponential();
   }
 
@@ -133,13 +151,18 @@ public class ForwardKinematics {
     this.m_state = state;
   }
 
-  /** Calculate the velocities of the chassis. */
-  private void calculateChassisVector() {
-    for (int idx = 0; idx < modules.length; idx++) {
-      WrappedAngle azimuth = modules[idx].getAzimuthPosition();
-      double wheel_speed = modules[idx].getWheelVelocity();
+  /**
+   * Calculate the velocities of the chassis.
+   *
+   * @param moduleStates The states of the modules to calculate the chassis vector.
+   * @return VelocityState The velocity state calculated from the module states.
+   */
+  public VelocityState calculateChassisVector(ModuleState[] moduleStates) {
+    for (int idx = 0; idx < moduleStates.length; idx++) {
+      double azimuth = moduleStates[idx].getAzimuthPosition();
+      double wheel_speed = moduleStates[idx].getWheelSpeed();
 
-      double azimuthRad = Math.toRadians(azimuth.asDouble());
+      double azimuthRad = Math.toRadians(azimuth);
 
       double vx = wheel_speed * Math.cos(azimuthRad);
       double vy = wheel_speed * Math.sin(azimuthRad);
@@ -147,8 +170,14 @@ public class ForwardKinematics {
       moduleStatesMatrix.setEntry(idx * 2 + 1, 0, vy);
     }
     RealMatrix chassisVector = forwardKinematics.multiply(moduleStatesMatrix);
-    m_state.setVelocity(chassisVector.getEntry(0, 0), chassisVector.getEntry(1, 0));
-    m_state.setThetaVelocity(Math.toDegrees(chassisVector.getEntry(2, 0)));
+    Vector2D translationVector =
+        Vector2D.createCartesianCoordinates(
+            chassisVector.getEntry(0, 0), chassisVector.getEntry(1, 0));
+    return new VelocityState(
+        translationVector.getAngle().asDouble(),
+        translationVector.getMagnitude(),
+        chassisVector.getEntry(2, 0),
+        false);
   }
 
   /**

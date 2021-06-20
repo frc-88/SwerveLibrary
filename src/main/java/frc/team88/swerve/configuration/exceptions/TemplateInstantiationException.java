@@ -3,6 +3,8 @@ package frc.team88.swerve.configuration.exceptions;
 /** Thrown when a template can not be instantiated. */
 public class TemplateInstantiationException extends SwerveConfigException {
 
+  private static final long serialVersionUID = 0L;
+
   /**
    * Constructor.
    *

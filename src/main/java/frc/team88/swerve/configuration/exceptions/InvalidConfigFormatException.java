@@ -3,6 +3,8 @@ package frc.team88.swerve.configuration.exceptions;
 /** Thrown when the user-specified config cannot be parsed. */
 public class InvalidConfigFormatException extends SwerveConfigException {
 
+  private static final long serialVersionUID = 0L;
+
   /**
    * Constructor.
    *

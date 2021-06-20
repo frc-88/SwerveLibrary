@@ -4,8 +4,8 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -34,38 +34,61 @@ public class Drivetrain extends SubsystemBase {
   private double rotationSpeed;
   private double translationSpeed;
 
+  public enum DriveControls {
+    SPLIT_TRIGGER("Split Joysticks with Triggers Turning"),
+    SINGLE_TRIGGER("Single Joystick with Triggers Turning"),
+    SINGLE_JOYSTICK("Single Joystick with Joystick X Turning"),
+    TWO_JOYSTICK_GAS("2 Joysticks with Gas Pedal");
+
+    private String displayName;
+
+    DriveControls(String displayName) {
+      this.displayName = displayName;
+    }
+
+    public String displayName() {
+      return displayName;
+    }
+  }
+
   /** Constructor. */
   public Drivetrain() {
     this.swerve = new SwerveController(DriveConstants.SWERVE_CONFIG);
     this.setYaw(0.);
 
     // Creates a chooser dropdown with each of the driver control options
-    oiChooser.addOption("Split Joysticks with Triggers Turning", "Split Joysticks with Triggers Turning");
-    oiChooser.addOption("Single Joystick with Triggers Turning", "Single Joystick with Triggers Turning");
-    oiChooser.addOption("Single Joystick with Joystick X Turning", "Single Joystick with Joystick X Turning");
-    oiChooser.setDefaultOption("2 Joysticks with Gas Pedal", "2 Joysticks with Gas Pedal");
+    oiChooser.addOption(
+        DriveControls.SPLIT_TRIGGER.displayName, DriveControls.SPLIT_TRIGGER.displayName);
+    oiChooser.addOption(
+        DriveControls.SINGLE_TRIGGER.displayName, DriveControls.SINGLE_TRIGGER.displayName);
+    oiChooser.addOption(
+        DriveControls.SINGLE_JOYSTICK.displayName, DriveControls.SINGLE_JOYSTICK.displayName);
+    oiChooser.setDefaultOption(
+        DriveControls.TWO_JOYSTICK_GAS.displayName, DriveControls.TWO_JOYSTICK_GAS.displayName);
     SmartDashboard.putData("Drive Controls Chooser", oiChooser);
   }
 
   public void manualDrive(XboxController m_gamepad) {
     // Pass the correct joystick properties of whichever chooser option is selected.
-    switch(oiChooser.getSelected()) {
-      case "2 Joysticks with Gas Pedal":
+    switch (oiChooser.getSelected()) {
+      case DriveControls.TWO_JOYSTICK_GAS.displayName:
         xDirection = m_gamepad.getX(Hand.kLeft);
         yDirection = -m_gamepad.getY(Hand.kLeft);
         rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
         translationSpeed = m_gamepad.getTriggerAxis(Hand.kRight);
-      case "Split Joysticks with Triggers Turning":
+      case DriveControls.SPLIT_TRIGGER.displayName:
         xDirection = m_gamepad.getX(Hand.kRight);
         yDirection = -m_gamepad.getY(Hand.kLeft);
-        rotationSpeed = m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
+        rotationSpeed =
+            m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
         translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
-      case "Single Joystick with Triggers Turning":
+      case DriveControls.SINGLE_TRIGGER.displayName:
         xDirection = m_gamepad.getX(Hand.kLeft);
         yDirection = -m_gamepad.getY(Hand.kLeft);
-        rotationSpeed = m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
+        rotationSpeed =
+            m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
         translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
-      case "Single Joystick with Joystick X Turning":
+      case DriveControls.SINGLE_JOYSTICK.displayName:
         xDirection = m_gamepad.getX(Hand.kLeft);
         yDirection = -m_gamepad.getY(Hand.kLeft);
         rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
@@ -75,14 +98,13 @@ public class Drivetrain extends SubsystemBase {
     // If left bumper is pressed go into "Turtle Mode" for fine control both scale from % to fps
     if (m_gamepad.getBumper(Hand.kLeft)) {
       translationSpeed *= DriveConstants.TURTLE_SPEED;
-    }
-    else {
+    } else {
       translationSpeed *= DriveConstants.MAX_SPEED;
     }
 
     // Scales from % to degrees per second
     rotationSpeed *= DriveConstants.MAX_ROTATION;
-    
+
     var translationDirection = calculateTranslationDirection(xDirection, yDirection);
     setVelocity(translationSpeed, rotationSpeed);
     setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
@@ -145,8 +167,7 @@ public class Drivetrain extends SubsystemBase {
   public double applyDeadband(double value) {
     if (Math.abs(value) < OIConstants.JOYSTICK_DEADBAND) {
       return 0;
-    }
-    else {
+    } else {
       return value;
     }
   }
@@ -159,6 +180,7 @@ public class Drivetrain extends SubsystemBase {
    */
   private double calculateTranslationDirection(double x, double y) {
     // Calculate the angle.
-    return Math.toDegrees(Math.atan2(y, x));
+    // Swapping x/y and inverting y because our coordinate system has +x forwards and -y right
+    return Math.toDegrees(Math.atan2(x, -y));
   }
 }
