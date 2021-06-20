@@ -4,8 +4,8 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -41,11 +41,14 @@ public class Drivetrain extends SubsystemBase {
     TWO_JOYSTICK_GAS("2 Joysticks with Gas Pedal");
 
     private String displayName;
+
     DriveControls(String displayName) {
       this.displayName = displayName;
     }
 
-    public String displayName() { return displayName; }
+    public String displayName() {
+      return displayName;
+    }
   }
 
   /** Constructor. */
@@ -54,16 +57,20 @@ public class Drivetrain extends SubsystemBase {
     this.setYaw(0.);
 
     // Creates a chooser dropdown with each of the driver control options
-    oiChooser.addOption(DriveControls.SPLIT_TRIGGER.displayName, DriveControls.SPLIT_TRIGGER.displayName);
-    oiChooser.addOption(DriveControls.SINGLE_TRIGGER.displayName, DriveControls.SINGLE_TRIGGER.displayName);
-    oiChooser.addOption(DriveControls.SINGLE_JOYSTICK.displayName, DriveControls.SINGLE_JOYSTICK.displayName);
-    oiChooser.setDefaultOption(DriveControls.TWO_JOYSTICK_GAS.displayName, DriveControls.TWO_JOYSTICK_GAS.displayName);
+    oiChooser.addOption(
+        DriveControls.SPLIT_TRIGGER.displayName, DriveControls.SPLIT_TRIGGER.displayName);
+    oiChooser.addOption(
+        DriveControls.SINGLE_TRIGGER.displayName, DriveControls.SINGLE_TRIGGER.displayName);
+    oiChooser.addOption(
+        DriveControls.SINGLE_JOYSTICK.displayName, DriveControls.SINGLE_JOYSTICK.displayName);
+    oiChooser.setDefaultOption(
+        DriveControls.TWO_JOYSTICK_GAS.displayName, DriveControls.TWO_JOYSTICK_GAS.displayName);
     SmartDashboard.putData("Drive Controls Chooser", oiChooser);
   }
 
   public void manualDrive(XboxController m_gamepad) {
     // Pass the correct joystick properties of whichever chooser option is selected.
-    switch(oiChooser.getSelected()) {
+    switch (oiChooser.getSelected()) {
       case DriveControls.TWO_JOYSTICK_GAS.displayName:
         xDirection = m_gamepad.getX(Hand.kLeft);
         yDirection = -m_gamepad.getY(Hand.kLeft);
@@ -72,12 +79,14 @@ public class Drivetrain extends SubsystemBase {
       case DriveControls.SPLIT_TRIGGER.displayName:
         xDirection = m_gamepad.getX(Hand.kRight);
         yDirection = -m_gamepad.getY(Hand.kLeft);
-        rotationSpeed = m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
+        rotationSpeed =
+            m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
         translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
       case DriveControls.SINGLE_TRIGGER.displayName:
         xDirection = m_gamepad.getX(Hand.kLeft);
         yDirection = -m_gamepad.getY(Hand.kLeft);
-        rotationSpeed = m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
+        rotationSpeed =
+            m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
         translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
       case DriveControls.SINGLE_JOYSTICK.displayName:
         xDirection = m_gamepad.getX(Hand.kLeft);
@@ -89,14 +98,13 @@ public class Drivetrain extends SubsystemBase {
     // If left bumper is pressed go into "Turtle Mode" for fine control both scale from % to fps
     if (m_gamepad.getBumper(Hand.kLeft)) {
       translationSpeed *= DriveConstants.TURTLE_SPEED;
-    }
-    else {
+    } else {
       translationSpeed *= DriveConstants.MAX_SPEED;
     }
 
     // Scales from % to degrees per second
     rotationSpeed *= DriveConstants.MAX_ROTATION;
-    
+
     var translationDirection = calculateTranslationDirection(xDirection, yDirection);
     setVelocity(translationSpeed, rotationSpeed);
     setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
@@ -159,8 +167,7 @@ public class Drivetrain extends SubsystemBase {
   public double applyDeadband(double value) {
     if (Math.abs(value) < OIConstants.JOYSTICK_DEADBAND) {
       return 0;
-    }
-    else {
+    } else {
       return value;
     }
   }
