@@ -271,12 +271,18 @@ public class Configuration implements NetworkTablePopulator {
    */
   private Pigeon instantiatePigeon(Config gyroConfig) {
     String portType = configCheckAndGet(gyroConfig, "port-type", String.class);
+    int id = configCheckAndGet(instanceConfig, "id", Integer.class);
+    if (id < 0 || id >= 64) {
+      throw new InvalidConfigValueException(
+              String.format("id %d is not in range [0, 63]", id));
+    }
+
     switch (portType) {
       case "TalonSRX":
-        TalonSRX controller = new TalonSRX(configCheckAndGet(gyroConfig, "id", Integer.class));
+        TalonSRX controller = new TalonSRX(id);
         return new Pigeon(controller);
       case "CAN":
-        return new Pigeon(configCheckAndGet(gyroConfig, "id", Integer.class));
+        return new Pigeon(id);
       default:
         throw new InvalidConfigValueException(
             String.format("Invalid port type %s given in configuration.", portType));
