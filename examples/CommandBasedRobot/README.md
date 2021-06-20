@@ -39,7 +39,7 @@ Single Joystick with Joystick X Turning:
  * Right stick X - Spin the robot about it's center.
 
 All:
- * Right bumper - Hold for robot-centric steering. Otherwise, steering isn field-centric.
+ * Right bumper - Hold for robot-centric steering. Otherwise, steering is field-centric.
  * Left bumper - Turtle mode, significantly reduces the speed for fine control.
  * Y button - Zeros the gyro so that the robot is facing forwards. Only works while disabled.
 
