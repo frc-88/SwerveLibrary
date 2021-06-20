@@ -1,7 +1,6 @@
 package frc.team88.swerve.util;
 
 import java.util.Objects;
-import org.javatuples.Pair;
 
 /**
  * Represents an angle which is constrained to [-180, 180) degrees. Does the math to find the best
@@ -65,34 +64,6 @@ public class WrappedAngle {
       return difference + 360;
     } else {
       return difference - 360;
-    }
-  }
-
-  /**
-   * Gets the smallest difference (by magnitude) between this angle and either the given angle or
-   * the given angle + 180, going etiher clockwise or counter-clockwise.
-   *
-   * @param that The angle to get the difference from
-   * @param biasTo360 The maximum distance from the given angle where the distance returned will be
-   *     from it and not it + 180. Range is [0, 180], where 90 means indifference to where the given
-   *     angle or the given angle + 180 is used, 180 means never use the given angle + 180, and
-   *     anything less than 0.01 means always use the given angle + 180
-   * @return A javatuples pair containing (1) The difference, in degrees. When added to this angle,
-   *     the sum will be the given angle or the given angle + 180. (2) True adding the difference
-   *     will result in the given angle + 180, false if it will result in the given angle
-   */
-  public Pair<Double, Boolean> getSmallestDifferenceWithHalfAngle(
-      WrappedAngle that, double biasTo360) {
-    Objects.requireNonNull(that);
-    if (biasTo360 < 0 || biasTo360 > 180) {
-      throw new IllegalArgumentException("biasTo360 must be in range [0, 180]");
-    }
-    double differenceToFullAngle = getSmallestDifferenceWith(that);
-    if (Math.abs(differenceToFullAngle) > biasTo360 || biasTo360 < 0.01) {
-      return new Pair<Double, Boolean>(
-          getSmallestDifferenceWith(new WrappedAngle(that.asDouble() + 180)), true);
-    } else {
-      return new Pair<Double, Boolean>(differenceToFullAngle, false);
     }
   }
 
