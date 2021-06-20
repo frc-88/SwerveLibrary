@@ -159,6 +159,7 @@ public class Drivetrain extends SubsystemBase {
    */
   private double calculateTranslationDirection(double x, double y) {
     // Calculate the angle.
-    return Math.toDegrees(Math.atan2(y, x));
+    // Swapping x/y and inverting y because our coordinate system has +x forwards and -y right
+    return Math.toDegrees(Math.atan2(x, -y));
   }
 }

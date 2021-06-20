@@ -30,10 +30,10 @@ public final class Constants {
     public static final double TURTLE_SPEED = 5.0; // feet per second
     public static final double MAX_ROTATION = 90.; // degrees per second
 
-    // The threshold for left stick magnitude to change translation direction.
+    // The threshold for left stick magnitude to change translation direction when using a gas pedal.
     public static final double CHANGE_DIRECTION_THRESHOLD = 0.25;
 
-    // The speed thresholds for hold modules in their current direction.
+    // The speed thresholds for holding modules in their current direction.
     public static final double HOLD_DIRECTION_TRANSLATION_THRESHOLD = 0.1;
     public static final double HOLD_DIRECTION_ROTATION_THRESHOLD = 1;
   }
