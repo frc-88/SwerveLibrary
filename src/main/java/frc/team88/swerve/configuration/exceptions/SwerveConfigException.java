@@ -3,6 +3,8 @@ package frc.team88.swerve.configuration.exceptions;
 /** Thrown when the user supplied config cannot be used to configure the swerve drive. */
 public class SwerveConfigException extends RuntimeException {
 
+  private static final long serialVersionUID = 0L;
+
   /**
    * Constructor.
    *
