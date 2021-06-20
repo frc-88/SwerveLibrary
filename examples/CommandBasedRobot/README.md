@@ -7,12 +7,23 @@ Note that the project will not run if copied outside of this repository, because
 swerve library code directly in the settings.gradle file.
 
 To run the project outside of this repository you will need to change the line in build.gradle from:
-`compile project(':SwerveLibrary')`
+
+```groovy
+compile project(':SwerveLibrary')
+```
+
 To:
-`compile "io.github.frc-88:swerve:0.1.0"`
+
+```groovy
+compile "io.github.frc-88:swerve:0.1.0"
+```
+
 And then remove these lines from settings.gradle:
-`include 'SwerveLibrary'`
-`project(':SwerveLibrary').projectDir = new File('../../')`
+
+```groovy
+include 'SwerveLibrary'
+project(':SwerveLibrary').projectDir = new File('../../')
+```
 
 ## Controls
 
