@@ -6,7 +6,8 @@ package frc.team88.swerve.gyro;
  *
  * <p>"An angle of 0 degrees is defined as pointing in the direction of the positive y-axis,
  * increasing positively in the counter-clockwise direction and negatively in the clockwise
- * direction. The positive x-axis is at -90 degrees."
+ * direction. The positive x-axis is at -90 degrees. The angle is not expected to wrap instead it
+ * ranges from -180 to 180."
  *
  * <p>Technically classes which implement this interface have no way to enforce where the 0 angle
  * points, but it is expected that users will follow this rule.
