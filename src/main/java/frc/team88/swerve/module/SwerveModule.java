@@ -11,7 +11,6 @@ import frc.team88.swerve.util.WrappedAngle;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.javatuples.Pair;
 
 /**
  * Represents a single swerve module that is composed of a PIDMotor for wheel control, a PIDMotor
@@ -33,9 +32,6 @@ public class SwerveModule {
 
   // Controller for the wheel velocity.
   private SyncPIDController wheelVelocityController;
-
-  // True if the wheel is currently reversed, false otherwise.
-  private boolean isWheelReversed = false;
 
   // The conversion factor from azimuth rotations to degrees.
   private final double azimuthRotationsToDegrees = 360.;
@@ -72,38 +68,29 @@ public class SwerveModule {
   }
 
   /**
-   * Sets the wheel speed and azimuth position. The azimuth velocity is assumed to be 0.
+   * Sets the wheel velocity and azimuth position. The azimuth velocity is assumed to be 0.
    *
-   * @param wheelSpeed The wheel speed to set, in feet per second.
+   * @param wheelVelocity The wheel velocity to set, in feet per second.
    * @param azimuthPosition The azimuth position to set, in degrees.
    */
-  public void set(double wheelSpeed, WrappedAngle azimuthPosition) {
-    set(wheelSpeed, azimuthPosition, 0);
+  public void set(double wheelVelocity, WrappedAngle azimuthPosition) {
+    set(wheelVelocity, azimuthPosition, 0);
   }
 
   /**
-   * Sets the wheel speed and azimuth position/velocity.
+   * Sets the wheel velocity and azimuth position/velocity.
    *
-   * @param wheelSpeed The wheel speed to set, in feet per second.
-   * @param azimuthPosition The azimuth position to set, ignoring potential wheel reversal, in
-   *     degrees.
+   * @param wheelVelocity The wheel velocity to set, in feet per second.
+   * @param azimuthPosition The azimuth position to set, in degrees.
    * @param azimuthVelocity The azimuth velocity to target when the position is reached, in degrees
    *     per second.
    */
-  public void set(double wheelSpeed, WrappedAngle azimuthPosition, double azimuthVelocity) {
-    if (wheelSpeed < 0) {
-      throw new IllegalAccessError("Wheel speed cannot be negative");
-    }
+  public void set(double wheelVelocity, WrappedAngle azimuthPosition, double azimuthVelocity) {
+    this.targetWheelVelocity = wheelVelocity;
 
-    // Calculate the actual sensor value to target for the azimuth, and
-    // flip the wheel direction if necessary.
-    Pair<Double, Boolean> distanceAndFlip =
-        this.getAzimuthPosition()
-            .getSmallestDifferenceWithHalfAngle(azimuthPosition, this.getAzimuthWrapBias());
-    double unwrappedAzimuthAngle = this.azimuthSensor.getPosition() + distanceAndFlip.getValue0();
-
-    // Reverse the wheel if applicable.
-    this.targetWheelVelocity = distanceAndFlip.getValue1() ? -wheelSpeed : wheelSpeed;
+    // Calculate the actual sensor value to target for the azimuth
+    double distanceToAzimuth = this.getAzimuthPosition().getSmallestDifferenceWith(azimuthPosition);
+    double unwrappedAzimuthAngle = this.azimuthSensor.getPosition() + distanceToAzimuth;
 
     // Get the azimuth velocity to command from the trapezoidal profile controller.
     this.azimuthPositionController.setTargetVelocity(azimuthVelocity);
@@ -119,11 +106,6 @@ public class SwerveModule {
                 this.getWheelVelocity(), this.targetWheelVelocity);
 
     this.setRawWheelVelocities(this.commandedWheelVelocity, commandAzimuthVelocity);
-
-    // Set if the wheel direction is flipped
-    if (distanceAndFlip.getValue1()) {
-      this.isWheelReversed = !this.isWheelReversed;
-    }
   }
 
   /**
@@ -176,19 +158,6 @@ public class SwerveModule {
    */
   public WrappedAngle getAzimuthPosition() {
     return new WrappedAngle(this.azimuthSensor.getPosition());
-  }
-
-  /**
-   * Gets the current azimuth position, accounting for wheel reversal.
-   *
-   * @return The current azimuth position, in degrees.
-   */
-  public WrappedAngle getAzimuthPositionFlipped() {
-    WrappedAngle azimuth = new WrappedAngle(this.azimuthSensor.getPosition());
-    if (this.getWheelVelocity() < 0) {
-      azimuth.plus(180);
-    }
-    return azimuth;
   }
 
   /**
@@ -403,24 +372,5 @@ public class SwerveModule {
         w_m0_clamped,
         Math.min(w_m1_minimized, w_m1_maximized),
         Math.max(w_m1_minimized, w_m1_maximized));
-  }
-
-  /**
-   * Gets the curerent biasTo360 to use for determing how to get to the next angle, depending on the
-   * swithing mode.
-   *
-   * @return The bias to use.
-   */
-  private double getAzimuthWrapBias() {
-    double currentSpeed = Math.abs(this.getWheelVelocity());
-    if (this.getAzimuthVelocity() > 30) {
-      return 180;
-    } else if (currentSpeed < 2.5) {
-      return 90;
-    } else if (currentSpeed < 5.5) {
-      return 120;
-    } else {
-      return 180;
-    }
   }
 }
