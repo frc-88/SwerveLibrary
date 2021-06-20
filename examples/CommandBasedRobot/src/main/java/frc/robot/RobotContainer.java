@@ -6,15 +6,14 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.ManualDrive;
-import frc.robot.commands.SetGyroYaw;
+import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Drivetrain;
 
 /**
@@ -30,16 +29,17 @@ public class RobotContainer {
   private final WaitCommand m_autoCommand = new WaitCommand(1);
 
   // The drive XBox controller.
-  private final Joystick m_gamepad = new Joystick(Constants.GAMEPAD_PORT);
+  private final XboxController m_gamepad = new XboxController(OIConstants.GAMEPAD_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
 
-    // Set default drivetrain command.
+    // Set default drivetrain command which could use both joysticks and/or Triggers.
     CommandScheduler.getInstance()
-        .setDefaultCommand(m_drivetrain, new ManualDrive(m_drivetrain, m_gamepad));
+        .setDefaultCommand(
+            m_drivetrain, new InstantCommand(() -> m_drivetrain.manualDrive(m_gamepad)));
   }
 
   /**
@@ -50,10 +50,10 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // If disabled, zero the gyro when the Y button on the gamepad is pressed.
-    (new JoystickButton(m_gamepad, 4))
+    (new JoystickButton(m_gamepad, XboxController.Button.kY.value))
         .whenPressed(
             new ConditionalCommand(
-                new SetGyroYaw(m_drivetrain, 0),
+                new InstantCommand(() -> m_drivetrain.setYaw(0), m_drivetrain),
                 new WaitCommand(0),
                 DriverStation.getInstance()::isDisabled));
   }

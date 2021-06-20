@@ -27,12 +27,31 @@ project(':SwerveLibrary').projectDir = new File('../../')
 
 ## Controls
 
-The code used an XBox gamepad for controls, with the following mapping:
+The code uses an XBox gamepad for controls, with 4 options controlled by a chooser on the Dashboard:
 
+2 Joysticks with Gas Pedal:
  * Left stick - Steer the direction of translation. Does not set speed.
  * Right trigger - Sets the translation speed of the robot.
  * Right stick X - Spin the robot about it's center.
- * Right bumper - Hold for robot-centric steering. Otherwise, steering isn field-centric.
+
+Split Joysticks with Triggers Turning:
+ * Left stick Y - Steer and control the speed of the Y direction of translation.
+ * Right stick X - Steer and control the speed of the X direction of translation.
+ * Left Trigger - Spin the robot counter clockwise
+ * Right Trigger - Spin the robot clockwise
+
+Single Joystick with Triggers Turning:
+ * Left stick - Steer and control the speed of the direction of translation.
+ * Left Trigger - Spin the robot counter clockwise
+ * Right Trigger - Spin the robot clockwise
+
+Single Joystick with Joystick X Turning:
+ * Left stick - Steer and control the speed of the direction of translation.
+ * Right stick X - Spin the robot about it's center.
+
+All:
+ * Right bumper - Hold for robot-centric steering. Otherwise, steering is field-centric.
+ * Left bumper - Turtle mode, significantly reduces the speed for fine control.
  * Y button - Zeros the gyro so that the robot is facing forwards. Only works while disabled.
 
 ## Important files
