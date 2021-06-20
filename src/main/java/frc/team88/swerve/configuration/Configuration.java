@@ -273,8 +273,7 @@ public class Configuration implements NetworkTablePopulator {
     String portType = configCheckAndGet(gyroConfig, "port-type", String.class);
     int id = configCheckAndGet(gyroConfig, "id", Integer.class);
     if (id < 0 || id >= 64) {
-      throw new InvalidConfigValueException(
-              String.format("id %d is not in range [0, 63]", id));
+      throw new InvalidConfigValueException(String.format("id %d is not in range [0, 63]", id));
     }
 
     switch (portType) {
