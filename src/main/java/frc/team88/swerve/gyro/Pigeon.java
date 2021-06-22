@@ -19,7 +19,7 @@ public class Pigeon implements SwerveGyro {
   /**
    * Constructor. Uses the given PigeonIMU object instead of constructing a new one.
    *
-   * @param base The AHRS object to base this object on.
+   * @param base The PigeonIMU object to base this object on.
    */
   public Pigeon(PigeonIMU base) {
     this.base = base;
