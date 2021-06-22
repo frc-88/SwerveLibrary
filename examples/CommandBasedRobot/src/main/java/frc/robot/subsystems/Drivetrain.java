@@ -26,7 +26,7 @@ public class Drivetrain extends SubsystemBase {
   private SwerveController swerve;
 
   // Chooser for selecting the Joystick Control Style used
-  private final SendableChooser<String> oiChooser = new SendableChooser<>();
+  private final SendableChooser<DriveControls> oiChooser = new SendableChooser<>();
 
   // Variables for control with different joystick setups
   private double xDirection;
@@ -58,37 +58,37 @@ public class Drivetrain extends SubsystemBase {
 
     // Creates a chooser dropdown with each of the driver control options
     oiChooser.addOption(
-        DriveControls.SPLIT_TRIGGER.displayName, DriveControls.SPLIT_TRIGGER.displayName);
+        DriveControls.SPLIT_TRIGGER.displayName, DriveControls.SPLIT_TRIGGER);
     oiChooser.addOption(
-        DriveControls.SINGLE_TRIGGER.displayName, DriveControls.SINGLE_TRIGGER.displayName);
+        DriveControls.SINGLE_TRIGGER.displayName, DriveControls.SINGLE_TRIGGER);
     oiChooser.addOption(
-        DriveControls.SINGLE_JOYSTICK.displayName, DriveControls.SINGLE_JOYSTICK.displayName);
+        DriveControls.SINGLE_JOYSTICK.displayName, DriveControls.SINGLE_JOYSTICK);
     oiChooser.setDefaultOption(
-        DriveControls.TWO_JOYSTICK_GAS.displayName, DriveControls.TWO_JOYSTICK_GAS.displayName);
+        DriveControls.TWO_JOYSTICK_GAS.displayName, DriveControls.TWO_JOYSTICK_GAS);
     SmartDashboard.putData("Drive Controls Chooser", oiChooser);
   }
 
   public void manualDrive(XboxController m_gamepad) {
     // Pass the correct joystick properties of whichever chooser option is selected.
     switch (oiChooser.getSelected()) {
-      case DriveControls.TWO_JOYSTICK_GAS.displayName:
+      case TWO_JOYSTICK_GAS:
         xDirection = m_gamepad.getX(Hand.kLeft);
         yDirection = -m_gamepad.getY(Hand.kLeft);
         rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
         translationSpeed = m_gamepad.getTriggerAxis(Hand.kRight);
-      case DriveControls.SPLIT_TRIGGER.displayName:
+      case SPLIT_TRIGGER:
         xDirection = m_gamepad.getX(Hand.kRight);
         yDirection = -m_gamepad.getY(Hand.kLeft);
         rotationSpeed =
             m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
         translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
-      case DriveControls.SINGLE_TRIGGER.displayName:
+      case SINGLE_TRIGGER:
         xDirection = m_gamepad.getX(Hand.kLeft);
         yDirection = -m_gamepad.getY(Hand.kLeft);
         rotationSpeed =
             m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
         translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
-      case DriveControls.SINGLE_JOYSTICK.displayName:
+      case SINGLE_JOYSTICK:
         xDirection = m_gamepad.getX(Hand.kLeft);
         yDirection = -m_gamepad.getY(Hand.kLeft);
         rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
