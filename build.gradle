@@ -10,8 +10,7 @@ buildscript {
         }
         dependencies {
             classpath "edu.wpi.first:GradleRIO:2021.3.1"
-            classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
-            classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+            classpath "io.github.gradle-nexus:publish-plugin:1.1.0"
         }
     }
 }
@@ -21,17 +20,14 @@ plugins {
     id 'java-library'
     // Code formatter
     id 'com.github.sherter.google-java-format' version '0.9'
+    // Maven publishing
+    id "maven-publish"
 }
 
 apply plugin: 'edu.wpi.first.GradleRIO'
 if (rootProject == project) {
-    apply plugin: 'com.bmuschko.nexus'
-    apply plugin: 'io.codearte.nexus-staging'
+    apply plugin: "io.github.gradle-nexus.publish-plugin"
 }
-
-archivesBaseName = 'swerve'
-group = "io.github.frc-88"
-version = "0.1.0"
 
 compileJava.dependsOn 'googleJavaFormat'
 
@@ -67,51 +63,61 @@ test {
 }
 
 if (rootProject == project) {
-    modifyPom {
-        project {
-            name 'swerve'
-            description 'Controls library for swerve drives, including differential swerves.'
-            url 'https://github.com/frc-88/SwerveLibrary'
-            inceptionYear '2021'
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
 
-            scm {
-                url 'https://github.com/frc-88/SwerveLibrary'
-                connection 'scm:https://github.com/frc-88/SwerveLibrary'
-                developerConnection 'scm:git://github.com/frc-88/SwerveLibrary'
-            }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                archivesBaseName = 'swerve'
+                group = "io.github.frc-88"
+                version = "0.1.0"
 
-            licenses {
-                license {
-                    name 'The MIT License'
-                    url 'https://github.com/frc-88/SwerveLibrary/blob/master/LICENSE.md'
-                    distribution 'repo'
-                }
-            }
+                from components.java
 
-            developers {
-                developer {
-                    id 'paulterrasi'
-                    name 'Paul Terrasi'
-                    email 'paul.a.terrasi@gmail.com'
+                pom {
+                    name = 'swerve'
+                    description = 'Controls library for swerve drives, including differential swerves.'
+                    url = 'https://github.com/frc-88/SwerveLibrary'
+                    inceptionYear = '2021'
+
+                    scm {
+                        url = 'https://github.com/frc-88/SwerveLibrary'
+                        connection = 'scm:https://github.com/frc-88/SwerveLibrary'
+                        developerConnection = 'scm:git://github.com/frc-88/SwerveLibrary'
+                    }
+
+                    licenses {
+                        license {
+                            name = 'The MIT License'
+                            url = 'https://github.com/frc-88/SwerveLibrary/blob/master/LICENSE.md'
+                            distribution = 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'paulterrasi'
+                            name = 'Paul Terrasi'
+                            email = 'paul.a.terrasi@gmail.com'
+                        }
+                    }
                 }
             }
         }
     }
 
-    extraArchive {
-        sources = true
-        tests = true
-        javadoc = true
-    }
-
-    nexus {
-        sign = true
-        repositoryUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-        snapshotRepositoryUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-    }
-
-    nexusStaging {
-        serverUrl = "https://s01.oss.sonatype.org/service/local/"
+    nexusPublishing {
+        repositories {
+            sonatype {
+                nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+                snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+                username = System.getenv("SONATYPE_USERNAME")
+                password = System.getenv("SONATYPE_PASSWORD")
+            }
+        }
         packageGroup = "io.github.frc-88"
     }
 }
