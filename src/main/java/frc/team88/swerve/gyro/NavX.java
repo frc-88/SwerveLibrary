@@ -19,6 +19,15 @@ public class NavX implements SwerveGyro {
   }
 
   /**
+   * Constructor. Uses the given AHRS object instead of constructing a new one.
+   *
+   * @param base The AHRS object to base this object on.
+   */
+  public NavX(AHRS base) {
+    this.base = base;
+  }
+
+  /**
    * Construct. Uses the given SPI port.
    *
    * @param port The SPI port
