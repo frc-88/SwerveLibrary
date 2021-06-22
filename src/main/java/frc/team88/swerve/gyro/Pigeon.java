@@ -17,6 +17,15 @@ public class Pigeon implements SwerveGyro {
   }
 
   /**
+   * Constructor. Uses the given PigeonIMU object instead of constructing a new one.
+   *
+   * @param base The PigeonIMU object to base this object on.
+   */
+  public Pigeon(PigeonIMU base) {
+    this.base = base;
+  }
+
+  /**
    * Construct. Uses the given CAN ID.
    *
    * @param id The CAN ID
