@@ -1,10 +1,11 @@
-name: Publish to the Maven Central Repository
+name: Deploy to the Maven Central Repository
 on:
   release:
     types: [created]
 jobs:
-  publish:
+  deploy:
     runs-on: ubuntu-latest
+    environment: Maven-Deployment
     steps:
       - uses: actions/checkout@v2
       - name: Set up Java
