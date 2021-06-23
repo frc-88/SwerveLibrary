@@ -71,7 +71,8 @@ if (rootProject == project) {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                archivesBaseName = 'swerve'
+                archivesBaseName = 'SwerveLibrary'
+                artifactId = "swerve"
                 group = "io.github.frc-88"
                 version = "0.1.0"
 
