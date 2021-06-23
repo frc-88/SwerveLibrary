@@ -23,7 +23,7 @@ import frc.team88.swerve.SwerveController;
 public class Drivetrain extends SubsystemBase {
 
   // The controller for the swerve drive.
-  private SwerveController swerve;
+  public SwerveController swerve;
 
   // Chooser for selecting the Joystick Control Style used
   private final SendableChooser<DriveControls> oiChooser = new SendableChooser<>();
