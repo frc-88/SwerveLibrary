@@ -57,7 +57,8 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 
-    compile "io.github.frc-88:swerve:0.1.0"
+    //compile "io.github.frc-88:swerve:0.1.0"
+    compile project(':SwerveLibrary')
 
     // Enable simulation gui support. Must check the box in vscode to enable support
     // upon debugging

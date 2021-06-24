@@ -296,6 +296,7 @@ public class Configuration implements NetworkTablePopulator {
   private void instantiateGyro() {
     Config instanceConfig = configCheckAndGet(configData, "gyro", Config.class);
     String template = configCheckAndGet(instanceConfig, "template", String.class);
+    System.out.println(template);
     if (!this.configData.contains("gyro-templates." + template)) {
       throw new InvalidTemplateException("The gyro template " + template + " does not exist.");
     }
