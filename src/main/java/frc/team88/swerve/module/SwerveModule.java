@@ -137,7 +137,7 @@ public class SwerveModule {
 
   /** Sets both motors on this module to brake mode. */
   public void setBrake() {
-    Stream.of(this.motors).forEach(m -> m.setCoast());
+    Stream.of(this.motors).forEach(m -> m.setBrake());
   }
 
   /**
