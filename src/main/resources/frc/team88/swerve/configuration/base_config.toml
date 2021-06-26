@@ -86,8 +86,8 @@ kD = 15.0
 kF = 0.0
 i-zone = 0.0
 i-max = 0.0
-max-speed = 540.0
-max-acceleration = 720.0
+max-speed = 1440
+max-acceleration = 1080
 
 [module-templates.team88.diff-swerve-2021.beta.wheel-controller]
 kP = 0.0
@@ -95,3 +95,17 @@ kI = 0.1
 kD = 0.5
 i-zone = 1.5
 i-max = 0.0
+
+
+
+###########################################################
+# DEFAULTS
+###########################################################
+
+#######################################
+# Constraints
+#######################################
+
+[constraints]
+optimizer.feet-precision = 0.1
+optimizer.degrees-precision = 1

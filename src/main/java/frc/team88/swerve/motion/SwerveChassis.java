@@ -1,15 +1,18 @@
 package frc.team88.swerve.motion;
 
 import frc.team88.swerve.configuration.Configuration;
+import frc.team88.swerve.configuration.subconfig.ConstraintsConfiguration;
 import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.motion.kinematics.ForwardKinematics;
 import frc.team88.swerve.motion.kinematics.InverseKinematics;
 import frc.team88.swerve.motion.state.ModuleState;
 import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
+import frc.team88.swerve.motion.state.VelocityStateOptimizer;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
 import java.util.Objects;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /** Represents a complete swerve chassis, with high level operations for controlling it. */
@@ -103,7 +106,7 @@ public class SwerveChassis {
     VelocityState semiConstrainedState = this.makeRobotCentric(targetState);
 
     // Do not let any wheel exceed it's max speed
-    semiConstrainedState = this.limitWheelSpeed(semiConstrainedState);
+    semiConstrainedState = this.optimizeState(semiConstrainedState);
 
     // Set the constrained state
     this.constrainedState = semiConstrainedState;
@@ -225,43 +228,45 @@ public class SwerveChassis {
         .changeIsFieldCentric(false);
   }
 
+  private VelocityState optimizeState(VelocityState targetState) {
+    ConstraintsConfiguration constraintsConfig = this.config.getConstraints();
+
+    // Calculate the current vector of motion
+    ModuleState[] moduleStates =
+        Stream.of(this.config.getModules())
+            .map((m) -> new ModuleState(m.getAzimuthPosition().asDouble(), m.getWheelVelocity()))
+            .toArray(ModuleState[]::new);
+    VelocityState currentState = this.forwardKinematics.calculateChassisVector(moduleStates);
+
+    // Run the optimizer
+    VelocityStateOptimizer optimizer =
+        new VelocityStateOptimizer(
+            currentState, targetState, constraintsConfig.getOptimizerConfig());
+    for (VelocityState testState = optimizer.next();
+        optimizer.hasNext();
+        optimizer.setIfLastStateWasValid(this.areAllOptimizedConstraintsSatisfied(testState)))
+      ;
+
+    return optimizer.getOptimizedState();
+  }
+
+  private boolean areAllOptimizedConstraintsSatisfied(VelocityState state) {
+    return isWheelSpeedConstraintSatisfied(state);
+  }
+
   /**
-   * Limits the translation and rotation velocities such that no wheel exceeds it's max speed.
+   * Ensures that no module exceeds it's max wheel speed
    *
-   * @param state The state to limit.
-   * @return The limited state.
+   * @param state The state to check.
+   * @return If the given state involves a module exceeding it's max wheel speed.
    */
-  private VelocityState limitWheelSpeed(VelocityState state) {
+  private boolean isWheelSpeedConstraintSatisfied(VelocityState state) {
     SwerveModule[] modules = this.config.getModules();
 
     // Get the wheel speeds without any limiting.
-    ModuleState[] unlimitedModuleStates = this.inverseKinematics.calculate(state);
+    ModuleState[] moduleStates = this.inverseKinematics.calculate(state);
 
-    // Determine the largest possible factor <=1 that when applied to all
-    // wheel speeds will keep them below their max.
-    double speedFactor = 1.;
-    for (int i = 0; i < modules.length; i++) {
-      double individualSpeedFactor =
-          modules[i].getMaxWheelSpeed() / unlimitedModuleStates[i].getWheelSpeed();
-      if (individualSpeedFactor < speedFactor) {
-        speedFactor = individualSpeedFactor;
-      }
-    }
-
-    // If no wheels are exceeding their max speed, just return the original state.
-    if (speedFactor >= 0.99999) {
-      return state;
-    }
-
-    // Apply the factor to all the wheels
-    final double trueSpeedFactor = speedFactor; // Variables referenced in lambda must be final
-    ModuleState[] limitedModuleStates =
-        Stream.of(unlimitedModuleStates)
-            .map(
-                (s) -> new ModuleState(s.getAzimuthPosition(), s.getWheelSpeed() * trueSpeedFactor))
-            .toArray(ModuleState[]::new);
-
-    // Use forwards kinematics to determine the corresponding velocity state
-    return this.forwardKinematics.calculateChassisVector(limitedModuleStates);
+    return IntStream.range(0, modules.length)
+        .allMatch((i) -> moduleStates[i].getWheelSpeed() <= modules[i].getMaxWheelSpeed());
   }
 }

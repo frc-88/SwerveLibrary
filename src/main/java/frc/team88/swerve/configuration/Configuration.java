@@ -20,6 +20,7 @@ import frc.team88.swerve.configuration.exceptions.InvalidConfigValueException;
 import frc.team88.swerve.configuration.exceptions.InvalidTemplateException;
 import frc.team88.swerve.configuration.exceptions.SwerveConfigException;
 import frc.team88.swerve.configuration.exceptions.TemplateInstantiationException;
+import frc.team88.swerve.configuration.subconfig.ConstraintsConfiguration;
 import frc.team88.swerve.configuration.subconfig.Falcon500Configuration;
 import frc.team88.swerve.configuration.subconfig.NeoConfiguration;
 import frc.team88.swerve.configuration.subconfig.SensorTransmissionConfiguration;
@@ -57,6 +58,9 @@ public class Configuration implements NetworkTablePopulator {
 
   // The swerve modules from this configuration
   private SwerveModule[] modules;
+
+  // The constraints configuration
+  private ConstraintsConfiguration constraints;
 
   // The canifiers used by sensors in this configuration
   private final Map<Integer, CANifier> canifiers;
@@ -107,6 +111,7 @@ public class Configuration implements NetworkTablePopulator {
     }
 
     // Create all of the objects and configs
+    this.instantiatePlainConfigs();
     this.instantiateModules();
     if (Objects.nonNull(gyro)) {
       this.gyro = gyro;
@@ -143,6 +148,15 @@ public class Configuration implements NetworkTablePopulator {
    */
   public SwerveModule[] getModules() {
     return this.modules;
+  }
+
+  /**
+   * Gets the constraints configuration specified by this config.
+   *
+   * @return The constraints config.
+   */
+  public ConstraintsConfiguration getConstraints() {
+    return this.constraints;
   }
 
   /**
@@ -236,6 +250,11 @@ public class Configuration implements NetworkTablePopulator {
     this.deepCopyConfig(templateConfig, instantiatedConfig);
     this.deepCopyConfig(instanceConfig, instantiatedConfig);
     return instantiatedConfig;
+  }
+
+  private void instantiatePlainConfigs() {
+    this.constraints =
+        new ConstraintsConfiguration(configCheckAndGet(configData, "constraints", Config.class));
   }
 
   /**
