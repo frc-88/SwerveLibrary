@@ -6,9 +6,17 @@ programming framework.
 Note that the project will not run if copied outside of this repository, because it references the
 swerve library code directly in the settings.gradle file.
 
+To run the project outside of this repository you will need to change the line in build.gradle from:
+`compile project(':SwerveLibrary')`
+To:
+`compile "io.github.frc-88:swerve:0.1.0"`
+And then remove these lines from settings.gradle:
+`include 'SwerveLibrary'`
+`project(':SwerveLibrary').projectDir = new File('../../')`
+
 ## Controls
 
-The code used an XBox gamepad for controlls, with the following mapping:
+The code used an XBox gamepad for controls, with the following mapping:
 
  * Left stick - Steer the direction of translation. Does not set speed.
  * Right trigger - Sets the translation speed of the robot.
