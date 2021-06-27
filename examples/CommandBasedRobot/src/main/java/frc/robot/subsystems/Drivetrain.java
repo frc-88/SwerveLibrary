@@ -23,7 +23,7 @@ import frc.team88.swerve.SwerveController;
 public class Drivetrain extends SubsystemBase {
 
   // The controller for the swerve drive.
-  private SwerveController swerve;
+  public SwerveController swerve;
 
   // Chooser for selecting the Joystick Control Style used
   private final SendableChooser<DriveControls> oiChooser = new SendableChooser<>();
@@ -33,6 +33,7 @@ public class Drivetrain extends SubsystemBase {
   private double yDirection;
   private double rotationSpeed;
   private double translationSpeed;
+  private double vector;
 
   public enum DriveControls {
     SPLIT_TRIGGER("Split Joysticks with Triggers Turning"),
@@ -69,27 +70,37 @@ public class Drivetrain extends SubsystemBase {
     // Pass the correct joystick properties of whichever chooser option is selected.
     switch (oiChooser.getSelected()) {
       case TWO_JOYSTICK_GAS:
-        xDirection = m_gamepad.getX(Hand.kLeft);
-        yDirection = -m_gamepad.getY(Hand.kLeft);
+        xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
+        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        vector = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
+        // If the Left stick isn't pushed far enough ignore it
+        if (vector < DriveConstants.CHANGE_DIRECTION_THRESHOLD) {
+          xDirection = 0;
+          yDirection = 0;
+        }
         rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
         translationSpeed = m_gamepad.getTriggerAxis(Hand.kRight);
+        break;
       case SPLIT_TRIGGER:
-        xDirection = m_gamepad.getX(Hand.kRight);
-        yDirection = -m_gamepad.getY(Hand.kLeft);
+        xDirection = applyDeadband(m_gamepad.getX(Hand.kRight));
+        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
         rotationSpeed =
             m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
-        translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
+        break;
       case SINGLE_TRIGGER:
-        xDirection = m_gamepad.getX(Hand.kLeft);
-        yDirection = -m_gamepad.getY(Hand.kLeft);
+        xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
+        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
         rotationSpeed =
             m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
-        translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
+        break;
       case SINGLE_JOYSTICK:
-        xDirection = m_gamepad.getX(Hand.kLeft);
-        yDirection = -m_gamepad.getY(Hand.kLeft);
+        xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
+        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
         rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
-        translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
+        break;
     }
 
     // If left bumper is pressed go into "Turtle Mode" for fine control both scale from % to fps
@@ -102,9 +113,15 @@ public class Drivetrain extends SubsystemBase {
     // Scales from % to degrees per second
     rotationSpeed *= DriveConstants.MAX_ROTATION;
 
-    var translationDirection = calculateTranslationDirection(xDirection, yDirection);
-    setVelocity(translationSpeed, rotationSpeed);
-    setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
+    // If the velocity is significant actually run things otherwise call hold direction
+    if (translationSpeed <= DriveConstants.HOLD_DIRECTION_TRANSLATION_THRESHOLD
+        || Math.abs(rotationSpeed) < DriveConstants.HOLD_DIRECTION_ROTATION_THRESHOLD) {
+      var translationDirection = calculateTranslationDirection(xDirection, yDirection);
+      setVelocity(translationSpeed, rotationSpeed);
+      setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
+    } else {
+      swerve.holdDirection();
+    }
   }
 
   /** Updates the swerve controller. Should be called at the end of each program loop. */

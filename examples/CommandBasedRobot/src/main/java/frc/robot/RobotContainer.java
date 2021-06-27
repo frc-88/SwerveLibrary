@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
@@ -24,7 +25,7 @@ import frc.robot.subsystems.Drivetrain;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain m_drivetrain = new Drivetrain();
+  public final Drivetrain m_drivetrain = new Drivetrain();
 
   private final WaitCommand m_autoCommand = new WaitCommand(1);
 
@@ -38,8 +39,7 @@ public class RobotContainer {
 
     // Set default drivetrain command which could use both joysticks and/or Triggers.
     CommandScheduler.getInstance()
-        .setDefaultCommand(
-            m_drivetrain, new InstantCommand(() -> m_drivetrain.manualDrive(m_gamepad)));
+        .setDefaultCommand(m_drivetrain, new RunCommand(() -> m_drivetrain.manualDrive(m_gamepad)));
   }
 
   /**
