@@ -114,8 +114,8 @@ public class Drivetrain extends SubsystemBase {
     rotationSpeed *= DriveConstants.MAX_ROTATION;
 
     // If the velocity is significant actually run things otherwise call hold direction
-    if (translationSpeed <= DriveConstants.HOLD_DIRECTION_TRANSLATION_THRESHOLD
-        || Math.abs(rotationSpeed) < DriveConstants.HOLD_DIRECTION_ROTATION_THRESHOLD) {
+    if (translationSpeed > DriveConstants.HOLD_DIRECTION_TRANSLATION_THRESHOLD
+        || Math.abs(rotationSpeed) > DriveConstants.HOLD_DIRECTION_ROTATION_THRESHOLD) {
       var translationDirection = calculateTranslationDirection(xDirection, yDirection);
       setVelocity(translationSpeed, rotationSpeed);
       setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));

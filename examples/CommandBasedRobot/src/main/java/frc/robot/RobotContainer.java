@@ -39,7 +39,8 @@ public class RobotContainer {
 
     // Set default drivetrain command which could use both joysticks and/or Triggers.
     CommandScheduler.getInstance()
-        .setDefaultCommand(m_drivetrain, new RunCommand(() -> m_drivetrain.manualDrive(m_gamepad)));
+        .setDefaultCommand(
+            m_drivetrain, new RunCommand(() -> m_drivetrain.manualDrive(m_gamepad), m_drivetrain));
   }
 
   /**
