@@ -73,11 +73,6 @@ public class Drivetrain extends SubsystemBase {
         xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
         yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
         vector = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
-        // If the Left stick isn't pushed far enough ignore it
-        if (vector < DriveConstants.CHANGE_DIRECTION_THRESHOLD) {
-          xDirection = 0;
-          yDirection = 0;
-        }
         rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
         translationSpeed = m_gamepad.getTriggerAxis(Hand.kRight);
         break;
@@ -115,7 +110,9 @@ public class Drivetrain extends SubsystemBase {
 
     // If the velocity is significant actually run things otherwise call hold direction
     if (translationSpeed > DriveConstants.HOLD_DIRECTION_TRANSLATION_THRESHOLD
-        || Math.abs(rotationSpeed) > DriveConstants.HOLD_DIRECTION_ROTATION_THRESHOLD) {
+        || Math.abs(rotationSpeed) > DriveConstants.HOLD_DIRECTION_ROTATION_THRESHOLD
+        || (oiChooser.getSelected() == DriveControls.TWO_JOYSTICK_GAS
+            && vector >= DriveConstants.CHANGE_DIRECTION_THRESHOLD)) {
       var translationDirection = calculateTranslationDirection(xDirection, yDirection);
       setVelocity(translationSpeed, rotationSpeed);
       setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
