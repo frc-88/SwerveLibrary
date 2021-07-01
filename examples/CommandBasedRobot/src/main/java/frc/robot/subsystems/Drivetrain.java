@@ -79,7 +79,7 @@ public class Drivetrain extends SubsystemBase {
       case SPLIT_TRIGGER:
         xDirection = applyDeadband(m_gamepad.getX(Hand.kRight));
         yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
-        translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
+        translationSpeed = Math.max(Math.abs(xDirection), Math.abs(yDirection));
         rotationSpeed =
             m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
         break;
