@@ -2,7 +2,6 @@ package frc.team88.swerve.motion.kinematics;
 
 import static frc.team88.swerve.TestUtils.assertDoubleEquals;
 import static frc.team88.swerve.TestUtils.assertVectorEquals;
-import static org.mockito.Mockito.when;
 
 import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.motion.state.VelocityState;
@@ -41,9 +40,8 @@ public class InverseKinematicsTest {
   @Test
   public void testCalculateModuleRotationVectorPositive() {
     Vector2D location = Vector2D.createCartesianCoordinates(3, 2);
-    when(module1.getLocation()).thenReturn(location);
     Vector2D result =
-        ik.calculateModuleRotationVectors(new VelocityState(0, 0, 180, 1, 0, false), module1);
+        ik.calculateRotationVector(new VelocityState(0, 0, 180, 1, 0, false), location);
     assertDoubleEquals(180. * Math.sqrt(8.) * (2. * Math.PI) / 360., result.getMagnitude());
     assertDoubleEquals(135., result.getAngle().asDouble());
   }
@@ -51,9 +49,8 @@ public class InverseKinematicsTest {
   @Test
   public void testCalculateModuleRotationVectorNegative() {
     Vector2D location = Vector2D.createCartesianCoordinates(1, -2);
-    when(module1.getLocation()).thenReturn(location);
     Vector2D result =
-        ik.calculateModuleRotationVectors(new VelocityState(0, 0, -90, false), module1);
+        ik.calculateRotationVector(new VelocityState(0, 0, -90, false), location);
 
     assertDoubleEquals(90. * Math.sqrt(5.) * (2. * Math.PI) / 360., result.getMagnitude());
     assertDoubleEquals(location.getAngle().plus(-90).asDouble(), result.getAngle().asDouble());

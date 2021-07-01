@@ -44,8 +44,9 @@ public class ConstraintsConfiguration implements NetworkTablePopulator {
   public static class OptimizerConfiguration implements NetworkTablePopulator {
 
     // Configuration values. See getters for documentation.
-    private double precisionFeet;
-    private double precisionDegrees;
+    private double translationDirectionPrecision;
+    private double translationSpeedPrecision;
+    private double rotationVelocityPrecision;
 
     private transient boolean firstNetworkTableCall = true;
 
@@ -57,46 +58,65 @@ public class ConstraintsConfiguration implements NetworkTablePopulator {
      */
     public OptimizerConfiguration(Config config) {
       Objects.requireNonNull(config);
-      this.precisionFeet = Configuration.configCheckAndGetDouble(config, "feet-precision");
-      if (this.precisionFeet <= 0) {
+
+      this.translationDirectionPrecision = Configuration.configCheckAndGetDouble(config, "translation-direction-precision");
+      if (this.translationDirectionPrecision <= 0) {
         throw new InvalidConfigValueException(
-            String.format("Feet precision is %d, but it should be positive.", this.precisionFeet));
+            String.format("Translation direction precision is %d, but it should be positive.", this.translationDirectionPrecision));
       }
-      this.precisionDegrees = Configuration.configCheckAndGetDouble(config, "degrees-precision");
-      if (this.precisionDegrees <= 0) {
+
+      this.translationSpeedPrecision = Configuration.configCheckAndGetDouble(config, "translation-speed-precision");
+      if (this.translationSpeedPrecision <= 0) {
         throw new InvalidConfigValueException(
-            String.format(
-                "Degrees precision is %d, but it should be positive.", this.precisionDegrees));
+            String.format("Translation speed precision is %d, but it should be positive.", this.translationSpeedPrecision));
+      }
+
+      this.rotationVelocityPrecision = Configuration.configCheckAndGetDouble(config, "rotation-velocity-precision");
+      if (this.rotationVelocityPrecision <= 0) {
+        throw new InvalidConfigValueException(
+            String.format("Rotation velocity precision is %d, but it should be positive.", this.rotationVelocityPrecision));
       }
     }
 
     /**
-     * Gets the feet precision.
+     * Gets the translation direction precision.
      *
-     * @return The precision for optimizing measurements in feet.
+     * @return The precision for optimizing the translation direction.
      */
-    public double getPrecisionFeet() {
-      return this.precisionFeet;
+    public double getTranslationDirectionPrecision() {
+      return this.translationDirectionPrecision;
     }
 
     /**
-     * Gets the degrees precision.
+     * Gets the translation speed precision.
      *
-     * @return The precision for optimizing measurements in degrees.
+     * @return The precision for optimizing the translation speed.
      */
-    public double getPrecisionDegrees() {
-      return this.precisionDegrees;
+    public double getTranslationSpeedPrecision() {
+      return this.translationSpeedPrecision;
     }
+
+    /**
+     * Gets the rotation velocity precision.
+     *
+     * @return The precision for optimizing the rotation velocity.
+     */
+    public double getRotationVelocityPrecision() {
+      return this.rotationVelocityPrecision;
+    }
+
 
     @Override
     public void populateNetworkTable(NetworkTable table) {
       if (this.firstNetworkTableCall) {
         this.firstNetworkTableCall = false;
-        table.getEntry("precisionFeet").setDouble(this.precisionFeet);
-        table.getEntry("precisionDegrees").setDouble(this.precisionDegrees);
+        table.getEntry("translationDirectionPrecision").setDouble(this.translationDirectionPrecision);
+        table.getEntry("translationSpeedPrecision").setDouble(this.translationSpeedPrecision);
+        table.getEntry("rotationVelocityPrecision").setDouble(this.rotationVelocityPrecision);
       } else {
-        this.precisionFeet = table.getEntry("precisionFeet").getDouble(this.precisionFeet);
-        this.precisionDegrees = table.getEntry("precisionDegrees").getDouble(this.precisionDegrees);
+        this.translationDirectionPrecision = table.getEntry("translationDirectionPrecision").getDouble(this.translationDirectionPrecision);
+        this.translationSpeedPrecision = table.getEntry("translationSpeedPrecision").getDouble(this.translationSpeedPrecision);
+        this.rotationVelocityPrecision = table.getEntry("rotationVelocityPrecision").getDouble(this.rotationVelocityPrecision);
       }
     }
   }

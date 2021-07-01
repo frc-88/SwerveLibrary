@@ -105,6 +105,9 @@ public class SwerveChassis {
     // Must be robot-centric
     VelocityState semiConstrainedState = this.makeRobotCentric(targetState);
 
+    // Set center of rotation to the origin for easier calculations
+    semiConstrainedState = this.moveRotationCenterToOrigin(semiConstrainedState);
+
     // Do not let any wheel exceed it's max speed
     semiConstrainedState = this.optimizeState(semiConstrainedState);
 
@@ -228,20 +231,33 @@ public class SwerveChassis {
         .changeIsFieldCentric(false);
   }
 
+  /**
+   * Converts the given velocity state to have a center of rotation at the origin without
+   * affecting the actual motion being represented.
+   * 
+   * @param state The state to convert.
+   * @return The converted state.
+   */
+  private VelocityState moveRotationCenterToOrigin(VelocityState state) {
+    Vector2D oldTranslationVector = state.getTranslationVector();
+    Vector2D rotationVectorFromOrigin = this.inverseKinematics.calculateRotationVector(state, Vector2D.ORIGIN);
+    Vector2D newTranslationVector = oldTranslationVector.plus(rotationVectorFromOrigin);
+
+    // If there is no translation speed, make sure that the direction isn't lost in the vector
+    // conversion.
+    if (newTranslationVector.getMagnitude() < 0.0001) {
+      return new VelocityState(state.getTranslationDirection(), newTranslationVector.getMagnitude(), state.getRotationVelocity(), state.isFieldCentric());
+    }
+
+    return new VelocityState(newTranslationVector.getAngle().asDouble(), newTranslationVector.getMagnitude(), state.getRotationVelocity(), state.isFieldCentric());
+  }
+
   private VelocityState optimizeState(VelocityState targetState) {
     ConstraintsConfiguration constraintsConfig = this.config.getConstraints();
 
-    // Calculate the current vector of motion
-    ModuleState[] moduleStates =
-        Stream.of(this.config.getModules())
-            .map((m) -> new ModuleState(m.getAzimuthPosition().asDouble(), m.getWheelVelocity()))
-            .toArray(ModuleState[]::new);
-    VelocityState currentState = this.forwardKinematics.calculateChassisVector(moduleStates);
-
     // Run the optimizer
     VelocityStateOptimizer optimizer =
-        new VelocityStateOptimizer(
-            currentState, targetState, constraintsConfig.getOptimizerConfig());
+        new VelocityStateOptimizer(targetState, constraintsConfig.getOptimizerConfig());
     for (VelocityState testState = optimizer.next();
         optimizer.hasNext();
         optimizer.setIfLastStateWasValid(this.areAllOptimizedConstraintsSatisfied(testState)))

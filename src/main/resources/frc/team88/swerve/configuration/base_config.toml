@@ -107,5 +107,6 @@ i-max = 0.0
 #######################################
 
 [constraints]
-optimizer.feet-precision = 0.1
-optimizer.degrees-precision = 1
+optimizer.translation-direction-precision = 0.2
+optimizer.translation-speed-precision = 0.05
+optimizer.rotation-velocity-precision = 1

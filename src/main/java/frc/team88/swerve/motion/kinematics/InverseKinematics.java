@@ -47,7 +47,7 @@ public class InverseKinematics {
 
     ModuleState moduleStates[] = new ModuleState[this.modules.length];
     for (int idx = 0; idx < this.modules.length; ++idx) {
-      Vector2D rotationVector = calculateModuleRotationVectors(target, modules[idx]);
+      Vector2D rotationVector = calculateRotationVector(target, modules[idx].getLocation());
       Vector2D combinedVector = translationVector.plus(rotationVector);
       if (combinedVector.getMagnitude() == 0) {
         moduleStates[idx] = new ModuleState(target.getTranslationDirection(), 0);
@@ -75,16 +75,13 @@ public class InverseKinematics {
   }
 
   /**
-   * Calculates the velocity vector for the given module corresponding to the rotation component of
-   * motion.
+   * Calculates the velocity vector for the rotation component of motion at the given location.
    *
    * @param state The target velocity state.
-   * @param module The swerve module to calculate for.
+   * @param module The location where force is being applied, such as the location of the module, in feet.
    * @return The velocity vector in feet per second.
    */
-  protected Vector2D calculateModuleRotationVectors(VelocityState state, SwerveModule module) {
-    // Get the location of the module relative to the robot's origin
-    Vector2D location = module.getLocation();
+  public Vector2D calculateRotationVector(VelocityState state, Vector2D location) {
     // Calculate the location relative to the center of rotation.
     // (location - centerOfRotation)
     Vector2D positionFromRotationCenter =

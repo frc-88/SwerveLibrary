@@ -2,14 +2,12 @@ package frc.team88.swerve.motion.state;
 
 import frc.team88.swerve.configuration.subconfig.ConstraintsConfiguration.OptimizerConfiguration;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 /**
- * Takes a base velocity state and a desired velocity state, and tries to get as close to the
- * desired velocity state as possible. It takes the total required change to get from the base to
- * the desired state as [transDirection, transSpeed, rotationVel, cOfRX, cOfRY] and does a binary
- * search between that and 0 to the desired precision, with all values being scaled proportionally
- * to each other.
+ * Takes a desired velocity state and tries to find a valid state as close it as possible using an
+ * algorithm based on binary search.
  */
 public class VelocityStateOptimizer implements Iterator<VelocityState> {
 
@@ -17,42 +15,30 @@ public class VelocityStateOptimizer implements Iterator<VelocityState> {
   // 0) Translation Direction
   // 1) Translation Speed
   // 2) Rotation Direction
-  // 3) Center of Rotation X
-  // 4) Center of Rotation Y
-  // Of these, (2) uses precisionDegrees and the rest use precisionFeet.
 
-  private final double[] desiredChange;
+  private final double[] desiredState;
   private final OptimizerConfiguration config;
 
-  private double[] nextChangeToTest;
-  private double[] minimumChange;
-  private double[] maximumChange;
+  private double[] nextStateToTest;
+  private double[] minimumState;
+  private double[] maximumState;
 
-  private boolean foundState = false;
+  private Optional<double[]> foundState = Optional.empty();
 
   /**
    * Creates a velocity state optimizer.
    *
-   * @param baseState The baseline state to serve as a bound on our search.
-   * @param desiredState The desired state to achieve.
+   * @param desiredState The desired state to achieve. 
    * @param config The config for this optimizer.
    */
-  public VelocityStateOptimizer(
-      VelocityState baseState, VelocityState desiredState, OptimizerConfiguration config) {
+  public VelocityStateOptimizer(VelocityState desiredState, OptimizerConfiguration config) {
     this.config = config;
+    
+    this.desiredState = this.stateToArray(desiredState);
 
-    this.desiredChange =
-        new double[] {
-          desiredState.getTranslationDirection() - baseState.getTranslationDirection(),
-          desiredState.getTranslationSpeed() - baseState.getTranslationSpeed(),
-          desiredState.getRotationVelocity() - baseState.getRotationVelocity(),
-          desiredState.getCenterOfRotationX() - baseState.getCenterOfRotationX(),
-          desiredState.getCenterOfRotationY() - baseState.getCenterOfRotationY()
-        };
-
-    this.nextChangeToTest = this.desiredChange.clone();
-    this.minimumChange = new double[] {0, 0, 0, 0, 0};
-    this.maximumChange = this.desiredChange.clone();
+    this.nextStateToTest = this.desiredState.clone();
+    this.minimumState = this.stateToArray(new VelocityState(0, 0, 0, false));
+    this.maximumState = this.desiredState.clone();
   }
 
   /**
@@ -61,23 +47,22 @@ public class VelocityStateOptimizer implements Iterator<VelocityState> {
    * @return The optimized state.
    */
   public VelocityState getOptimizedState() {
-    return next();
+    if (this.foundState.isPresent()) {
+      System.err.println("The state has not yet been optimized, returning minimum valid state.");
+      return this.arrayToState(this.minimumState);
+    }
+
+    return this.arrayToState(this.foundState.get());
   }
 
   @Override
   public boolean hasNext() {
-    return !foundState;
+    return this.foundState.isPresent();
   }
 
   @Override
   public VelocityState next() {
-    return new VelocityState(
-        this.nextChangeToTest[0],
-        this.nextChangeToTest[1],
-        this.nextChangeToTest[2],
-        this.nextChangeToTest[3],
-        this.nextChangeToTest[4],
-        false);
+    return this.arrayToState(this.nextStateToTest);
   }
 
   /**
@@ -88,28 +73,48 @@ public class VelocityStateOptimizer implements Iterator<VelocityState> {
    */
   public void setIfLastStateWasValid(boolean valid) {
     if (valid) {
-      if (checkInPrecision(this.nextChangeToTest, this.maximumChange)) {
-        this.foundState = true;
+      if (checkInPrecision(this.nextStateToTest, this.maximumState)) {
+        this.foundState = Optional.of(this.nextStateToTest);
         return;
       }
 
-      this.minimumChange = this.nextChangeToTest.clone();
-      this.nextChangeToTest =
-          IntStream.range(0, this.desiredChange.length)
-              .mapToDouble((i) -> (this.maximumChange[i] - this.nextChangeToTest[i]) / 2)
+      this.minimumState = this.nextStateToTest.clone();
+      this.nextStateToTest =
+          IntStream.range(0, this.desiredState.length)
+              .mapToDouble((i) -> (this.maximumState[i] - this.nextStateToTest[i]) / 2)
               .toArray();
     } else {
-      if (checkInPrecision(this.nextChangeToTest, this.minimumChange)) {
-        this.foundState = true;
+      if (checkInPrecision(this.nextStateToTest, this.minimumState)) {
+        this.foundState = Optional.of(this.minimumState);
         return;
       }
 
-      this.maximumChange = this.nextChangeToTest.clone();
-      this.nextChangeToTest =
-          IntStream.range(0, this.desiredChange.length)
-              .mapToDouble((i) -> (this.nextChangeToTest[i] - this.minimumChange[i]) / 2)
+      this.maximumState = this.nextStateToTest.clone();
+      this.nextStateToTest =
+          IntStream.range(0, this.desiredState.length)
+              .mapToDouble((i) -> (this.nextStateToTest[i] - this.minimumState[i]) / 2)
               .toArray();
     }
+  }
+
+  /**
+   * Converts a velocity state to an array.
+   * 
+   * @param state The state to convert.
+   * @return An array containing {translationDirection, translationSpeed, rotationVelocity}.
+   */
+  private double[] stateToArray(VelocityState state) {
+    return new double[] {state.getTranslationDirection(), state.getTranslationSpeed(), state.getRotationVelocity()};
+  }
+
+  /**
+   * Converts an array back to a velocity state.
+   * 
+   * @param arr The array to convert, containing {translationDirection, translationSpeed, rotationVelocity}.
+   * @return A velocity state with center of rotation [0, 0] in robot-centric coordinates.
+   */
+  private VelocityState arrayToState(double[] arr) {
+    return new VelocityState(arr[0], arr[1], arr[2], false);
   }
 
   /**
@@ -120,10 +125,7 @@ public class VelocityStateOptimizer implements Iterator<VelocityState> {
    * @return The if the 2 states are the same within precision, falso otherwise.
    */
   private boolean checkInPrecision(double[] state0, double[] state1) {
-    return Math.abs(state0[0] - state1[0]) < config.getPrecisionFeet()
-        && Math.abs(state0[1] - state1[1]) < config.getPrecisionFeet()
-        && Math.abs(state0[2] - state1[2]) < config.getPrecisionDegrees()
-        && Math.abs(state0[3] - state1[3]) < config.getPrecisionFeet()
-        && Math.abs(state0[4] - state1[4]) < config.getPrecisionFeet();
+    double[] precisions = new double[]{this.config.getTranslationDirectionPrecision(), this.config.getTranslationSpeedPrecision(), this.config.getRotationVelocityPrecision()};
+    return IntStream.range(0, state0.length).allMatch((i) -> Math.abs(state0[i] - state1[i]) < precisions[i]);
   }
 }
