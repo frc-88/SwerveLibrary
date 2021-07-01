@@ -31,7 +31,7 @@ public class Drivetrain extends SubsystemBase {
   // Variables for control with different joystick setups
   private double xDirection;
   private double yDirection;
-  private double rotationSpeed;
+  private double rotationVelocity;
   private double translationSpeed;
   private boolean isTranslationDirectionSet;
 
@@ -72,7 +72,7 @@ public class Drivetrain extends SubsystemBase {
       case TWO_JOYSTICK_GAS:
         xDirection = m_gamepad.getX(Hand.kLeft);
         yDirection = -m_gamepad.getY(Hand.kLeft);
-        rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
+        rotationVelocity = applyDeadband(m_gamepad.getX(Hand.kRight));
         translationSpeed = m_gamepad.getTriggerAxis(Hand.kRight);
         isTranslationDirectionSet =
             Math.sqrt(xDirection * xDirection + yDirection * yDirection)
@@ -83,7 +83,7 @@ public class Drivetrain extends SubsystemBase {
         xDirection = applyDeadband(m_gamepad.getX(Hand.kRight));
         yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
         translationSpeed = Math.max(Math.abs(xDirection), Math.abs(yDirection));
-        rotationSpeed =
+        rotationVelocity =
             m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
         isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
         break;
@@ -92,7 +92,7 @@ public class Drivetrain extends SubsystemBase {
         xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
         yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
         translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
-        rotationSpeed =
+        rotationVelocity =
             m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
         isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
         break;
@@ -101,7 +101,7 @@ public class Drivetrain extends SubsystemBase {
         xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
         yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
         translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
-        rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
+        rotationVelocity = applyDeadband(m_gamepad.getX(Hand.kRight));
         isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
         break;
     }
@@ -114,10 +114,10 @@ public class Drivetrain extends SubsystemBase {
     }
 
     // Scales from % to degrees per second
-    rotationSpeed *= DriveConstants.MAX_ROTATION;
+    rotationVelocity *= DriveConstants.MAX_ROTATION;
 
     // Set the velocities, minus translation direction
-    setVelocity(translationSpeed, rotationSpeed);
+    setVelocity(translationSpeed, rotationVelocity);
 
     // If the driver is commanding a translation direction, set it
     if (isTranslationDirectionSet) {
@@ -127,7 +127,7 @@ public class Drivetrain extends SubsystemBase {
 
     // If neither a velocity or a direction is being set, hold the modules
     if (translationSpeed < DriveConstants.HOLD_DIRECTION_TRANSLATION_THRESHOLD
-        && Math.abs(rotationSpeed) < DriveConstants.HOLD_DIRECTION_ROTATION_THRESHOLD
+        && Math.abs(rotationVelocity) < DriveConstants.HOLD_DIRECTION_ROTATION_THRESHOLD
         && !isTranslationDirectionSet) {
       swerve.holdDirection();
     }
