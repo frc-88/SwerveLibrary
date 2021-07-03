@@ -56,7 +56,12 @@ public class RobotContainer {
             new ConditionalCommand(
                 new InstantCommand(() -> m_drivetrain.setYaw(0), m_drivetrain),
                 new WaitCommand(0),
-                DriverStation.getInstance()::isDisabled));
+                DriverStation.getInstance()::isDisabled) {
+              @Override
+              public boolean runsWhenDisabled() {
+                return true;
+              }
+            });
   }
 
   /** Calls update on the drivetrain subsystem. Should be called after the scheduler run. */
