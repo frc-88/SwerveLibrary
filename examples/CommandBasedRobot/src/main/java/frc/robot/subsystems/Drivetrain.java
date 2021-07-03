@@ -84,7 +84,7 @@ public class Drivetrain extends SubsystemBase {
         yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
         translationSpeed = Math.max(Math.abs(xDirection), Math.abs(yDirection));
         rotationVelocity =
-            m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
+            m_gamepad.getTriggerAxis(Hand.kRight) - m_gamepad.getTriggerAxis(Hand.kLeft);
         isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
         break;
 
@@ -93,7 +93,7 @@ public class Drivetrain extends SubsystemBase {
         yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
         translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
         rotationVelocity =
-            m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
+            m_gamepad.getTriggerAxis(Hand.kRight) - m_gamepad.getTriggerAxis(Hand.kLeft);
         isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
         break;
 

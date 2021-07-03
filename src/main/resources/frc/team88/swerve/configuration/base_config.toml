@@ -84,9 +84,9 @@ template = "falcon500"
 template = "falcon500"
 
 [module-templates.team88.diff-swerve-2021.beta.azimuth-controller]
-kP = 30.0
+kP = 20.0
 kI = 0.0
-kD = 15.0
+kD = 10.0
 kF = 0.0
 i-zone = 0.0
 i-max = 0.0
