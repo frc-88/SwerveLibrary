@@ -67,7 +67,7 @@ public class InverseKinematics {
    * @param state The target velocity state.
    * @return The velocity vector in feet per second.
    */
-  protected Vector2D calculateModuleTranslationVector(VelocityState state) {
+  public Vector2D calculateModuleTranslationVector(VelocityState state) {
     // The translation vector for each module is the same as the overall
     // translation vector
     return Vector2D.createPolarCoordinates(
@@ -82,7 +82,7 @@ public class InverseKinematics {
    * @param module The swerve module to calculate for.
    * @return The velocity vector in feet per second.
    */
-  protected Vector2D calculateModuleRotationVectors(VelocityState state, SwerveModule module) {
+  public Vector2D calculateModuleRotationVectors(VelocityState state, SwerveModule module) {
     // Get the location of the module relative to the robot's origin
     Vector2D location = module.getLocation();
     // Calculate the location relative to the center of rotation.

@@ -234,34 +234,34 @@ public class SwerveChassis {
   private VelocityState limitWheelSpeed(VelocityState state) {
     SwerveModule[] modules = this.config.getModules();
 
-    // Get the wheel speeds without any limiting.
-    ModuleState[] unlimitedModuleStates = this.inverseKinematics.calculate(state);
+    // Get the wheel speeds from both translation and rotation.
+    Vector2D translationVector = this.inverseKinematics.calculateModuleTranslationVector(state);
+    Vector2D[] rotationVectors =
+        Stream.of(modules)
+            .map((m) -> this.inverseKinematics.calculateModuleRotationVectors(state, m))
+            .toArray(Vector2D[]::new);
 
-    // Determine the largest possible factor <=1 that when applied to all
-    // wheel speeds will keep them below their max.
-    double speedFactor = 1.;
+    // Determine the module with the highest ratio of desired speed to max speed.
+    double speedFactor = 0.;
     for (int i = 0; i < modules.length; i++) {
-      double individualSpeedFactor =
-          modules[i].getMaxWheelSpeed() / unlimitedModuleStates[i].getWheelSpeed();
-      if (individualSpeedFactor < speedFactor) {
+      Vector2D fullVector = translationVector.plus(rotationVectors[i]);
+      double individualSpeedFactor = fullVector.getMagnitude() / modules[i].getMaxWheelSpeed();
+      if (individualSpeedFactor > speedFactor) {
         speedFactor = individualSpeedFactor;
       }
     }
 
     // If no wheels are exceeding their max speed, just return the original state.
-    if (speedFactor >= 0.99999) {
+    if (speedFactor <= 1) {
       return state;
     }
 
-    // Apply the factor to all the wheels
-    final double trueSpeedFactor = speedFactor; // Variables referenced in lambda must be final
-    ModuleState[] limitedModuleStates =
-        Stream.of(unlimitedModuleStates)
-            .map(
-                (s) -> new ModuleState(s.getAzimuthPosition(), s.getWheelSpeed() * trueSpeedFactor))
-            .toArray(ModuleState[]::new);
-
-    // Use forwards kinematics to determine the corresponding velocity state
-    return this.forwardKinematics.calculateChassisVector(limitedModuleStates);
+    // Reducing both translation and rotation by the speedFactor will result in
+    // the fastest wheel being at exactly max speed.
+    return new VelocityState(
+        state.getTranslationDirection(),
+        state.getTranslationSpeed() / speedFactor,
+        state.getRotationVelocity() / speedFactor,
+        state.isFieldCentric());
   }
 }
