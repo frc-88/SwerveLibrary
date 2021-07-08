@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.DecompositionSolver;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealMatrixFormat;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 
 // Heavily influenced by these wpilib classes:
@@ -103,6 +104,11 @@ public class ForwardKinematics {
     SingularValueDecomposition svd = new SingularValueDecomposition(inverseKinematics);
     DecompositionSolver solver = svd.getSolver();
     forwardKinematics = solver.getInverse();
+    RealMatrixFormat TABLE_FORMAT = new RealMatrixFormat("", "", "", "\n", "", ", ");
+    System.out.println("inverseKinematics:");
+    System.out.println(TABLE_FORMAT.format(inverseKinematics));
+    System.out.println("forwardKinematics:");
+    System.out.println(TABLE_FORMAT.format(forwardKinematics));
   }
 
   /** Update the current robot pose. */
@@ -185,8 +191,8 @@ public class ForwardKinematics {
     double currentTime_s = RobotControllerWrapper.getInstance().getFPGATime() * 1E-6;
     double dt = currentTime_s - previousTime_s;
     previousTime_s = currentTime_s;
-    if (dt > kTimeJumpThreshold
-        || dt <= 0.) { // ignore cases where the clock jumps forward or backwards suddenly
+    // ignore cases where the clock jumps forward or backwards suddenly
+    if (dt > kTimeJumpThreshold || dt <= 0.) {
       return;
     }
 
