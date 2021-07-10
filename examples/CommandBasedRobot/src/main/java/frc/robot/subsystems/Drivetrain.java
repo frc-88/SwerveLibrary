@@ -23,16 +23,17 @@ import frc.team88.swerve.SwerveController;
 public class Drivetrain extends SubsystemBase {
 
   // The controller for the swerve drive.
-  private SwerveController swerve;
+  public SwerveController swerve;
 
   // Chooser for selecting the Joystick Control Style used
-  private final SendableChooser<String> oiChooser = new SendableChooser<>();
+  private final SendableChooser<DriveControls> oiChooser = new SendableChooser<>();
 
   // Variables for control with different joystick setups
   private double xDirection;
   private double yDirection;
-  private double rotationSpeed;
+  private double rotationVelocity;
   private double translationSpeed;
+  private boolean isTranslationDirectionSet;
 
   public enum DriveControls {
     SPLIT_TRIGGER("Split Joysticks with Triggers Turning"),
@@ -57,42 +58,52 @@ public class Drivetrain extends SubsystemBase {
     this.setYaw(0.);
 
     // Creates a chooser dropdown with each of the driver control options
-    oiChooser.addOption(
-        DriveControls.SPLIT_TRIGGER.displayName, DriveControls.SPLIT_TRIGGER.displayName);
-    oiChooser.addOption(
-        DriveControls.SINGLE_TRIGGER.displayName, DriveControls.SINGLE_TRIGGER.displayName);
-    oiChooser.addOption(
-        DriveControls.SINGLE_JOYSTICK.displayName, DriveControls.SINGLE_JOYSTICK.displayName);
+    oiChooser.addOption(DriveControls.SPLIT_TRIGGER.displayName, DriveControls.SPLIT_TRIGGER);
+    oiChooser.addOption(DriveControls.SINGLE_TRIGGER.displayName, DriveControls.SINGLE_TRIGGER);
+    oiChooser.addOption(DriveControls.SINGLE_JOYSTICK.displayName, DriveControls.SINGLE_JOYSTICK);
     oiChooser.setDefaultOption(
-        DriveControls.TWO_JOYSTICK_GAS.displayName, DriveControls.TWO_JOYSTICK_GAS.displayName);
+        DriveControls.TWO_JOYSTICK_GAS.displayName, DriveControls.TWO_JOYSTICK_GAS);
     SmartDashboard.putData("Drive Controls Chooser", oiChooser);
   }
 
   public void manualDrive(XboxController m_gamepad) {
     // Pass the correct joystick properties of whichever chooser option is selected.
     switch (oiChooser.getSelected()) {
-      case DriveControls.TWO_JOYSTICK_GAS.displayName:
+      case TWO_JOYSTICK_GAS:
         xDirection = m_gamepad.getX(Hand.kLeft);
         yDirection = -m_gamepad.getY(Hand.kLeft);
-        rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
+        rotationVelocity = applyDeadband(m_gamepad.getX(Hand.kRight));
         translationSpeed = m_gamepad.getTriggerAxis(Hand.kRight);
-      case DriveControls.SPLIT_TRIGGER.displayName:
-        xDirection = m_gamepad.getX(Hand.kRight);
-        yDirection = -m_gamepad.getY(Hand.kLeft);
-        rotationSpeed =
+        isTranslationDirectionSet =
+            Math.sqrt(xDirection * xDirection + yDirection * yDirection)
+                >= DriveConstants.CHANGE_DIRECTION_THRESHOLD;
+        break;
+
+      case SPLIT_TRIGGER:
+        xDirection = applyDeadband(m_gamepad.getX(Hand.kRight));
+        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        translationSpeed = Math.max(Math.abs(xDirection), Math.abs(yDirection));
+        rotationVelocity =
             m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
-        translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
-      case DriveControls.SINGLE_TRIGGER.displayName:
-        xDirection = m_gamepad.getX(Hand.kLeft);
-        yDirection = -m_gamepad.getY(Hand.kLeft);
-        rotationSpeed =
+        isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
+        break;
+
+      case SINGLE_TRIGGER:
+        xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
+        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
+        rotationVelocity =
             m_gamepad.getTriggerAxis(Hand.kLeft) - m_gamepad.getTriggerAxis(Hand.kRight);
-        translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
-      case DriveControls.SINGLE_JOYSTICK.displayName:
-        xDirection = m_gamepad.getX(Hand.kLeft);
-        yDirection = -m_gamepad.getY(Hand.kLeft);
-        rotationSpeed = applyDeadband(m_gamepad.getX(Hand.kRight));
-        translationSpeed = applyDeadband(Math.max(xDirection, yDirection));
+        isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
+        break;
+
+      case SINGLE_JOYSTICK:
+        xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
+        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
+        rotationVelocity = applyDeadband(m_gamepad.getX(Hand.kRight));
+        isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
+        break;
     }
 
     // If left bumper is pressed go into "Turtle Mode" for fine control both scale from % to fps
@@ -103,11 +114,23 @@ public class Drivetrain extends SubsystemBase {
     }
 
     // Scales from % to degrees per second
-    rotationSpeed *= DriveConstants.MAX_ROTATION;
+    rotationVelocity *= DriveConstants.MAX_ROTATION;
 
-    var translationDirection = calculateTranslationDirection(xDirection, yDirection);
-    setVelocity(translationSpeed, rotationSpeed);
-    setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
+    // Set the velocities, minus translation direction
+    setVelocity(translationSpeed, rotationVelocity);
+
+    // If the driver is commanding a translation direction, set it
+    if (isTranslationDirectionSet) {
+      var translationDirection = calculateTranslationDirection(xDirection, yDirection);
+      setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
+    }
+
+    // If neither a velocity or a direction is being set, hold the modules
+    if (translationSpeed < DriveConstants.HOLD_DIRECTION_TRANSLATION_THRESHOLD
+        && Math.abs(rotationVelocity) < DriveConstants.HOLD_DIRECTION_ROTATION_THRESHOLD
+        && !isTranslationDirectionSet) {
+      swerve.holdDirection();
+    }
   }
 
   /** Updates the swerve controller. Should be called at the end of each program loop. */
