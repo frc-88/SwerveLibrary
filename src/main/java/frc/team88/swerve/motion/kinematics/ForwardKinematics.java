@@ -6,6 +6,7 @@ import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
 import frc.team88.swerve.util.RobotControllerWrapper;
 import frc.team88.swerve.util.Vector2D;
+import frc.team88.swerve.util.WrappedAngle;
 import java.util.stream.Stream;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.DecompositionSolver;
@@ -118,11 +119,15 @@ public class ForwardKinematics {
             .map(
                 (m) -> {
                   double wheelVelocity = m.getWheelVelocity();
-                  double azimuthPosition =
-                      wheelVelocity < 0
-                          ? -m.getAzimuthPosition().asDouble()
-                          : m.getAzimuthPosition().asDouble();
-                  return new ModuleState(azimuthPosition, Math.abs(wheelVelocity));
+                  WrappedAngle azimuthPosition = m.getAzimuthPosition();
+                  if (wheelVelocity < 0) {
+                    azimuthPosition = azimuthPosition.plus(180.0);
+                  }
+                  azimuthPosition =
+                      azimuthPosition.plus(
+                          180.0); // Wheel azimuth points in the opposite direction of travel
+                  wheelVelocity = Math.abs(wheelVelocity);
+                  return new ModuleState(azimuthPosition.asDouble(), wheelVelocity);
                 })
             .toArray(ModuleState[]::new);
     VelocityState velState = calculateChassisVector(currentModuleStates);
