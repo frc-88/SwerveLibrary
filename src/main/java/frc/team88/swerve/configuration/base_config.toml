@@ -72,8 +72,8 @@ differential-matrix = [
         [0.069444444, 0.09722222]
     ]
 wheel-diameter-inches = 3.5
-motor-0-name = "hi"
-motor-1-name = "lo"
+motor-0-name = "lo"
+motor-1-name = "hi"
 azimuth-sensor.template = "cancoder"
 azimuth-sensor.ratio = 0.0027778
 
@@ -84,14 +84,14 @@ template = "falcon500"
 template = "falcon500"
 
 [module-templates.team88.diff-swerve-2021.beta.azimuth-controller]
-kP = 30.0
+kP = 20.0
 kI = 0.0
-kD = 15.0
+kD = 10.0
 kF = 0.0
 i-zone = 0.0
 i-max = 0.0
-max-speed = 540.0
-max-acceleration = 720.0
+max-speed = 1440
+max-acceleration = 1080
 
 [module-templates.team88.diff-swerve-2021.beta.wheel-controller]
 kP = 0.0
