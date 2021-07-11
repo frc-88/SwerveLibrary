@@ -4,7 +4,13 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
 import frc.team88.swerve.SwerveController;
 
 /**
@@ -17,15 +23,114 @@ import frc.team88.swerve.SwerveController;
 public class Drivetrain extends SubsystemBase {
 
   // The controller for the swerve drive.
-  private SwerveController swerve;
+  public SwerveController swerve;
 
-  // The path to the swerve config file in the deploy directory.
-  private static final String SWERVE_CONFIG = "swerve.toml";
+  // Chooser for selecting the Joystick Control Style used
+  private final SendableChooser<DriveControls> oiChooser = new SendableChooser<>();
+
+  // Variables for control with different joystick setups
+  private double xDirection;
+  private double yDirection;
+  private double rotationVelocity;
+  private double translationSpeed;
+  private boolean isTranslationDirectionSet;
+
+  public enum DriveControls {
+    SPLIT_TRIGGER("Split Joysticks with Triggers Turning"),
+    SINGLE_TRIGGER("Single Joystick with Triggers Turning"),
+    SINGLE_JOYSTICK("Single Joystick with Joystick X Turning"),
+    TWO_JOYSTICK_GAS("2 Joysticks with Gas Pedal");
+
+    private String displayName;
+
+    DriveControls(String displayName) {
+      this.displayName = displayName;
+    }
+
+    public String displayName() {
+      return displayName;
+    }
+  }
 
   /** Constructor. */
   public Drivetrain() {
-    this.swerve = new SwerveController(SWERVE_CONFIG);
+    this.swerve = new SwerveController(DriveConstants.SWERVE_CONFIG);
     this.setYaw(0.);
+
+    // Creates a chooser dropdown with each of the driver control options
+    oiChooser.addOption(DriveControls.SPLIT_TRIGGER.displayName, DriveControls.SPLIT_TRIGGER);
+    oiChooser.addOption(DriveControls.SINGLE_TRIGGER.displayName, DriveControls.SINGLE_TRIGGER);
+    oiChooser.addOption(DriveControls.SINGLE_JOYSTICK.displayName, DriveControls.SINGLE_JOYSTICK);
+    oiChooser.setDefaultOption(
+        DriveControls.TWO_JOYSTICK_GAS.displayName, DriveControls.TWO_JOYSTICK_GAS);
+    SmartDashboard.putData("Drive Controls Chooser", oiChooser);
+  }
+
+  public void manualDrive(XboxController m_gamepad) {
+    // Pass the correct joystick properties of whichever chooser option is selected.
+    switch (oiChooser.getSelected()) {
+      case TWO_JOYSTICK_GAS:
+        xDirection = m_gamepad.getX(Hand.kLeft);
+        yDirection = -m_gamepad.getY(Hand.kLeft);
+        rotationVelocity = applyDeadband(m_gamepad.getX(Hand.kRight));
+        translationSpeed = m_gamepad.getTriggerAxis(Hand.kRight);
+        isTranslationDirectionSet =
+            Math.sqrt(xDirection * xDirection + yDirection * yDirection)
+                >= DriveConstants.CHANGE_DIRECTION_THRESHOLD;
+        break;
+
+      case SPLIT_TRIGGER:
+        xDirection = applyDeadband(m_gamepad.getX(Hand.kRight));
+        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        translationSpeed = Math.max(Math.abs(xDirection), Math.abs(yDirection));
+        rotationVelocity =
+            m_gamepad.getTriggerAxis(Hand.kRight) - m_gamepad.getTriggerAxis(Hand.kLeft);
+        isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
+        break;
+
+      case SINGLE_TRIGGER:
+        xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
+        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
+        rotationVelocity =
+            m_gamepad.getTriggerAxis(Hand.kRight) - m_gamepad.getTriggerAxis(Hand.kLeft);
+        isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
+        break;
+
+      case SINGLE_JOYSTICK:
+        xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
+        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
+        rotationVelocity = applyDeadband(m_gamepad.getX(Hand.kRight));
+        isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
+        break;
+    }
+
+    // If left bumper is pressed go into "Turtle Mode" for fine control both scale from % to fps
+    if (m_gamepad.getBumper(Hand.kLeft)) {
+      translationSpeed *= DriveConstants.TURTLE_SPEED;
+    } else {
+      translationSpeed *= DriveConstants.MAX_SPEED;
+    }
+
+    // Scales from % to degrees per second
+    rotationVelocity *= DriveConstants.MAX_ROTATION;
+
+    // Set the velocities, minus translation direction
+    setVelocity(translationSpeed, rotationVelocity);
+
+    // If the driver is commanding a translation direction, set it
+    if (isTranslationDirectionSet) {
+      var translationDirection = calculateTranslationDirection(xDirection, yDirection);
+      setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
+    }
+
+    // If neither a velocity or a direction is being set, hold the modules
+    if (translationSpeed < DriveConstants.HOLD_DIRECTION_TRANSLATION_THRESHOLD
+        && Math.abs(rotationVelocity) < DriveConstants.HOLD_DIRECTION_ROTATION_THRESHOLD
+        && !isTranslationDirectionSet) {
+      swerve.holdDirection();
+    }
   }
 
   /** Updates the swerve controller. Should be called at the end of each program loop. */
@@ -80,5 +185,25 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+  public double applyDeadband(double value) {
+    if (Math.abs(value) < OIConstants.JOYSTICK_DEADBAND) {
+      return 0;
+    } else {
+      return value;
+    }
+  }
+
+  /**
+   * Calculates the angle of translation set by the left stick.
+   *
+   * @return The angle of translation, in degrees. 0 corresponds to forwards, and positive
+   *     corresponds to counterclockwise.
+   */
+  private double calculateTranslationDirection(double x, double y) {
+    // Calculate the angle.
+    // Swapping x/y and inverting y because our coordinate system has +x forwards and -y right
+    return Math.toDegrees(Math.atan2(x, -y));
   }
 }

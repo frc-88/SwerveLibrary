@@ -100,7 +100,13 @@ public class SwerveChassis {
     VelocityState targetState = this.getTargetState();
 
     // Must be robot-centric
-    this.constrainedState = this.makeRobotCentric(targetState);
+    VelocityState semiConstrainedState = this.makeRobotCentric(targetState);
+
+    // Do not let any wheel exceed it's max speed
+    semiConstrainedState = this.limitWheelSpeed(semiConstrainedState);
+
+    // Set the constrained state
+    this.constrainedState = semiConstrainedState;
 
     // Command the modules
     ModuleState moduleStates[] = this.inverseKinematics.calculate(constrainedState);
@@ -217,5 +223,45 @@ public class SwerveChassis {
         .changeTranslationDirection(
             state.getTranslationDirection() - this.config.getGyro().getYaw())
         .changeIsFieldCentric(false);
+  }
+
+  /**
+   * Limits the translation and rotation velocities such that no wheel exceeds it's max speed.
+   *
+   * @param state The state to limit.
+   * @return The limited state.
+   */
+  private VelocityState limitWheelSpeed(VelocityState state) {
+    SwerveModule[] modules = this.config.getModules();
+
+    // Get the wheel speeds from both translation and rotation.
+    Vector2D translationVector = this.inverseKinematics.calculateModuleTranslationVector(state);
+    Vector2D[] rotationVectors =
+        Stream.of(modules)
+            .map((m) -> this.inverseKinematics.calculateModuleRotationVectors(state, m))
+            .toArray(Vector2D[]::new);
+
+    // Determine the module with the highest ratio of desired speed to max speed.
+    double speedFactor = 0.;
+    for (int i = 0; i < modules.length; i++) {
+      Vector2D fullVector = translationVector.plus(rotationVectors[i]);
+      double individualSpeedFactor = fullVector.getMagnitude() / modules[i].getMaxWheelSpeed();
+      if (individualSpeedFactor > speedFactor) {
+        speedFactor = individualSpeedFactor;
+      }
+    }
+
+    // If no wheels are exceeding their max speed, just return the original state.
+    if (speedFactor <= 1) {
+      return state;
+    }
+
+    // Reducing both translation and rotation by the speedFactor will result in
+    // the fastest wheel being at exactly max speed.
+    return new VelocityState(
+        state.getTranslationDirection(),
+        state.getTranslationSpeed() / speedFactor,
+        state.getRotationVelocity() / speedFactor,
+        state.isFieldCentric());
   }
 }

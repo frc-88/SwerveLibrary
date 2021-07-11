@@ -13,11 +13,29 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final class OIConstants {
+    // The port of the XBox gamepad.
+    public static final int GAMEPAD_PORT = 0;
 
-  // The port of the XBox gamepad.
-  public static final int GAMEPAD_PORT = 0;
+    // The deadband to use for XBox gamepad joysticks.
+    public static final double JOYSTICK_DEADBAND = 0.1;
+  }
 
-  // The max translation and rotation speeds to be commanded to the drivetrain.
-  public static final double MAX_SPEED = 14.7; // feet per second
-  public static final double MAX_ROTATION = 90.; // degrees per second
+  public static final class DriveConstants {
+    // The path to the swerve config file in the deploy directory.
+    public static final String SWERVE_CONFIG = "swerve.toml";
+
+    // The max translation and rotation speeds to be commanded to the drivetrain.
+    public static final double MAX_SPEED = 14.7; // feet per second
+    public static final double TURTLE_SPEED = 5.0; // feet per second
+    public static final double MAX_ROTATION = 360.; // degrees per second
+
+    // The threshold for left stick magnitude to change translation direction when using a gas
+    // pedal.
+    public static final double CHANGE_DIRECTION_THRESHOLD = 0.25;
+
+    // The speed thresholds for holding modules in their current direction.
+    public static final double HOLD_DIRECTION_TRANSLATION_THRESHOLD = 0.1;
+    public static final double HOLD_DIRECTION_ROTATION_THRESHOLD = 1;
+  }
 }

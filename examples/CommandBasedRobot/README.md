@@ -6,14 +6,52 @@ programming framework.
 Note that the project will not run if copied outside of this repository, because it references the
 swerve library code directly in the settings.gradle file.
 
+To run the project outside of this repository you will need to change the line in build.gradle from:
+
+```groovy
+compile project(':SwerveLibrary')
+```
+
+To:
+
+```groovy
+compile "io.github.frc-88:swerve:0.1.0"
+```
+
+And then remove these lines from settings.gradle:
+
+```groovy
+include 'SwerveLibrary'
+project(':SwerveLibrary').projectDir = new File('../../')
+```
+
 ## Controls
 
-The code used an XBox gamepad for controlls, with the following mapping:
+The code uses an XBox gamepad for controls, with 4 options controlled by a chooser on the Dashboard:
 
+2 Joysticks with Gas Pedal:
  * Left stick - Steer the direction of translation. Does not set speed.
  * Right trigger - Sets the translation speed of the robot.
  * Right stick X - Spin the robot about it's center.
- * Right bumper - Hold for robot-centric steering. Otherwise, steering isn field-centric.
+
+Split Joysticks with Triggers Turning:
+ * Left stick Y - Steer and control the speed of the Y direction of translation.
+ * Right stick X - Steer and control the speed of the X direction of translation.
+ * Left Trigger - Spin the robot counter clockwise
+ * Right Trigger - Spin the robot clockwise
+
+Single Joystick with Triggers Turning:
+ * Left stick - Steer and control the speed of the direction of translation.
+ * Left Trigger - Spin the robot counter clockwise
+ * Right Trigger - Spin the robot clockwise
+
+Single Joystick with Joystick X Turning:
+ * Left stick - Steer and control the speed of the direction of translation.
+ * Right stick X - Spin the robot about it's center.
+
+All:
+ * Right bumper - Hold for robot-centric steering. Otherwise, steering is field-centric.
+ * Left bumper - Turtle mode, significantly reduces the speed for fine control.
  * Y button - Zeros the gyro so that the robot is facing forwards. Only works while disabled.
 
 ## Important files
