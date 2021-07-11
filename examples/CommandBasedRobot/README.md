@@ -15,7 +15,7 @@ compile project(':SwerveLibrary')
 To:
 
 ```groovy
-compile "io.github.frc-88:swerve:0.1.0"
+compile "io.github.frc-88:swerve:0.2.0"
 ```
 
 And then remove these lines from settings.gradle:
