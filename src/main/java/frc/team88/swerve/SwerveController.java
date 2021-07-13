@@ -8,6 +8,7 @@ import frc.team88.swerve.motion.SwerveChassis;
 import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
 import frc.team88.swerve.tuning.TuningManager;
+import frc.team88.swerve.util.RobotControllerWrapper;
 import java.util.Map;
 import java.util.Objects;
 
@@ -57,6 +58,26 @@ public class SwerveController {
       this.chassis.update();
     }
     this.dataManager.update();
+  }
+
+  public boolean isNetworkTableCommandActive(double staleThresholdSeconds) {
+    double commandTime = this.dataManager.getNetworkTableCommandTime() * 1E-6;
+    double currentTime = RobotControllerWrapper.getInstance().getFPGATime() * 1E-6;
+
+    return (currentTime - commandTime) < staleThresholdSeconds;
+  }
+
+  public void commandFromNetworkTables() {
+    VelocityState velocityState = this.dataManager.getNetworkTableCommand();
+    VelocityState oldVelocityState = this.getTargetVelocity();
+    velocityState =
+        oldVelocityState
+            .changeTranslationDirection(velocityState.getTranslationDirection())
+            .changeTranslationSpeed(velocityState.getTranslationSpeed())
+            .changeRotationVelocity(velocityState.getRotationVelocity())
+            .changeIsFieldCentric(velocityState.isFieldCentric());
+    this.chassis.setTargetState(velocityState);
+    this.chassis.holdAzimuths(false);
   }
 
   /**

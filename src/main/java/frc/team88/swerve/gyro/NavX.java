@@ -68,4 +68,14 @@ public class NavX implements SwerveGyro {
   public void calibrateYaw(double yaw) {
     this.offset = yaw - this.getYaw() + this.offset;
   }
+
+  @Override
+  public double getLinearAccelX() {
+    return this.base.getWorldLinearAccelX();
+  }
+
+  @Override
+  public double getLinearAccelY() {
+    return this.base.getWorldLinearAccelY();
+  }
 }

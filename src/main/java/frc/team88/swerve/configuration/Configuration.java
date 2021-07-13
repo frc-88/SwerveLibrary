@@ -224,7 +224,7 @@ public class Configuration implements NetworkTablePopulator {
   }
 
   /**
-   * Instantiates a template's config by apppending and overwritting the design with an
+   * Instantiates a template's config by appending and overwritting the design with an
    * instance-specific config.
    *
    * @param templateConfig The config of the template being used as a base.

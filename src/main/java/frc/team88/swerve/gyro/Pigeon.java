@@ -58,6 +58,16 @@ public class Pigeon implements SwerveGyro {
   }
 
   @Override
+  public double getLinearAccelX() {
+    return 0.0; // TODO
+  }
+
+  @Override
+  public double getLinearAccelY() {
+    return 0.0; // TODO
+  }
+
+  @Override
   public void calibrateYaw(double yaw) {
     this.offset = yaw - this.getYaw() + this.offset;
   }

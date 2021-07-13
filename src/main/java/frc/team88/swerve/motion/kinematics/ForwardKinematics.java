@@ -6,10 +6,12 @@ import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
 import frc.team88.swerve.util.RobotControllerWrapper;
 import frc.team88.swerve.util.Vector2D;
+import frc.team88.swerve.util.WrappedAngle;
 import java.util.stream.Stream;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.DecompositionSolver;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealMatrixFormat;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 
 // Heavily influenced by these wpilib classes:
@@ -103,6 +105,11 @@ public class ForwardKinematics {
     SingularValueDecomposition svd = new SingularValueDecomposition(inverseKinematics);
     DecompositionSolver solver = svd.getSolver();
     forwardKinematics = solver.getInverse();
+    RealMatrixFormat TABLE_FORMAT = new RealMatrixFormat("", "", "", "\n", "", ", ");
+    System.out.println("inverseKinematics:");
+    System.out.println(TABLE_FORMAT.format(inverseKinematics));
+    System.out.println("forwardKinematics:");
+    System.out.println(TABLE_FORMAT.format(forwardKinematics));
   }
 
   /** Update the current robot pose. */
@@ -112,11 +119,15 @@ public class ForwardKinematics {
             .map(
                 (m) -> {
                   double wheelVelocity = m.getWheelVelocity();
-                  double azimuthPosition =
-                      wheelVelocity < 0
-                          ? -m.getAzimuthPosition().asDouble()
-                          : m.getAzimuthPosition().asDouble();
-                  return new ModuleState(azimuthPosition, Math.abs(wheelVelocity));
+                  WrappedAngle azimuthPosition = m.getAzimuthPosition();
+                  if (wheelVelocity < 0) {
+                    azimuthPosition = azimuthPosition.plus(180.0);
+                  }
+                  azimuthPosition =
+                      azimuthPosition.plus(
+                          180.0); // Wheel azimuth points in the opposite direction of travel
+                  wheelVelocity = Math.abs(wheelVelocity);
+                  return new ModuleState(azimuthPosition.asDouble(), wheelVelocity);
                 })
             .toArray(ModuleState[]::new);
     VelocityState velState = calculateChassisVector(currentModuleStates);
@@ -185,8 +196,8 @@ public class ForwardKinematics {
     double currentTime_s = RobotControllerWrapper.getInstance().getFPGATime() * 1E-6;
     double dt = currentTime_s - previousTime_s;
     previousTime_s = currentTime_s;
-    if (dt > kTimeJumpThreshold
-        || dt <= 0.) { // ignore cases where the clock jumps forward or backwards suddenly
+    // ignore cases where the clock jumps forward or backwards suddenly
+    if (dt > kTimeJumpThreshold || dt <= 0.) {
       return;
     }
 

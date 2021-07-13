@@ -291,7 +291,7 @@ public class SwerveModule {
    * @return The conversion factor.
    */
   private double getWheelRotationsToFeet() {
-    return (config.getWheelDiameter()) * Math.PI;
+    return config.getWheelDiameter() * Math.PI;
   }
 
   /**
