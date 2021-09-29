@@ -122,7 +122,7 @@ public class ForwardKinematics {
     VelocityState velState = calculateChassisVector(currentModuleStates);
     m_state.setVelocity(
         velState.getTranslationVector().getX(), velState.getTranslationVector().getY());
-    m_state.setThetaVelocity(velState.getRotationVelocity());
+    m_state.setThetaVelocity(Math.toDegrees(velState.getRotationVelocity()));
 
     estimatePoseExponential();
   }
