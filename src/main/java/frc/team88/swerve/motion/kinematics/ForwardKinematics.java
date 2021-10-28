@@ -115,7 +115,7 @@ public class ForwardKinematics {
                   double azimuthPosition =
                       wheelVelocity < 0
                           ? m.getAzimuthPosition().asDouble()
-                          : (m.getAzimuthPosition().asDouble() + 180.0);
+                          : (m.getAzimuthPosition().asDouble());
                   return new ModuleState(azimuthPosition, Math.abs(wheelVelocity));
                 })
             .toArray(ModuleState[]::new);
