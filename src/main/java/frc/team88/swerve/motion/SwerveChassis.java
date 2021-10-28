@@ -56,6 +56,65 @@ public class SwerveChassis {
   }
 
   /**
+   * Sets an individual module's motor velocity.
+   * If you use this method. Don't call update()
+   *
+   * @param moduleIndex Index of the module
+   * @param motorIndex Index of the motor within the module
+   * @param motorVelocity motor's velocity to set, in rotations per second.
+   */
+  public void setModuleMotor(int moduleIndex, int motorIndex, double motorVelocity)
+  {
+    SwerveModule module = this.config.getModules()[moduleIndex];
+    module.setModuleMotorVelocity(motorIndex, motorVelocity);
+  }
+
+  /**
+   * Sets an individual module's state.
+   * If you use this method. Don't call update()
+   *
+   * @param moduleIndex Index of the module
+   * @param moduleState Commanded state of the module
+   */
+  public void setModuleState(int moduleIndex, ModuleState moduleState) {
+    SwerveModule module = this.config.getModules()[moduleIndex];
+    module.set(
+      moduleState.getWheelVelocity(),
+      new WrappedAngle(moduleState.getAzimuthPosition()),
+      moduleState.getAzimuthVelocity()
+    );
+  }
+
+  /**
+   * Sets an individual module's velocity. The previous azimuth command is used
+   * If you use this method. Don't call update()
+   *
+   * @param moduleIndex Index of the module
+   * @param wheelVelocity Commanded wheel velocity of the module
+   */
+  public void setModuleVelocity(int moduleIndex, double wheelVelocity) {
+    SwerveModule module = this.config.getModules()[moduleIndex];
+    module.set(
+      wheelVelocity,
+      module.getAzimuthPosition()
+    );
+  }
+
+  /**
+   * Sets an individual module's azimuth. The previous wheel velocity command is used
+   * If you use this method. Don't call update()
+   *
+   * @param moduleIndex Index of the module
+   * @param azimuthPosition Commanded azimuth position of the module
+   */
+  public void setModuleAzimuth(int moduleIndex, double azimuthPosition) {
+    SwerveModule module = this.config.getModules()[moduleIndex];
+    module.set(
+      module.getWheelVelocity(),
+      new WrappedAngle(azimuthPosition));
+  }
+
+  /**
    * Gets the target velocity state.
    *
    * @return The target velocity state.
@@ -111,15 +170,12 @@ public class SwerveChassis {
     // Command the modules
     ModuleState moduleStates[] = this.inverseKinematics.calculate(constrainedState);
     for (int idx = 0; idx < moduleStates.length; idx++) {
-      SwerveModule module = this.config.getModules()[idx];
       if (this.holdMode
           && this.constrainedState.getTranslationSpeed() == 0
           && this.constrainedState.getRotationVelocity() == 0) {
-        module.set(0, module.getAzimuthPosition());
+          setModuleVelocity(idx, 0.0);
       } else {
-        module.set(
-            moduleStates[idx].getWheelSpeed(),
-            new WrappedAngle(moduleStates[idx].getAzimuthPosition()));
+        setModuleState(idx, moduleStates[idx]);
       }
     }
   }

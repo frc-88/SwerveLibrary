@@ -154,7 +154,7 @@ public class ForwardKinematics {
   public VelocityState calculateChassisVector(ModuleState[] moduleStates) {
     for (int idx = 0; idx < moduleStates.length; idx++) {
       double azimuth = moduleStates[idx].getAzimuthPosition();
-      double wheel_speed = moduleStates[idx].getWheelSpeed();
+      double wheel_speed = moduleStates[idx].getWheelVelocity();
 
       double azimuthRad = Math.toRadians(azimuth);
 

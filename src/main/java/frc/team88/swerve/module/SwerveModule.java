@@ -126,8 +126,18 @@ public class SwerveModule {
 
     double[] motorVelocities = this.getDifferentialInputs(rotationsPerSecondVelocities);
     for (int motorIndex = 0; motorIndex < this.motors.length; motorIndex++) {
-      motors[motorIndex].setVelocity(motorVelocities[motorIndex]);
+      setModuleMotorVelocity(motorIndex, motorVelocities[motorIndex]);
     }
+  }
+
+  /**
+   * Sets the an individual motor's velocity. Bypasses differential.
+   *
+   * @param motorIndex index of module motor
+   * @param motorVelocity motor's velocity to set, in rotations per second.
+   */
+  public void setModuleMotorVelocity(int motorIndex, double motorVelocity) {
+    motors[motorIndex].setVelocity(motorVelocity);
   }
 
   /** Sets both motors on this module to coast mode. */
