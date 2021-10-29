@@ -15,10 +15,10 @@ import java.util.Objects;
 /** The high-level API for controlling a swerve drive with this library. */
 public class SwerveController {
 
-  private final Configuration config;
-  private final SwerveChassis chassis;
-  private final TuningManager tuningManager;
-  private final DataManager dataManager;
+  public final Configuration config;
+  public final SwerveChassis chassis;
+  public final TuningManager tuningManager;
+  public final DataManager dataManager;
 
   /**
    * Constructs the SwerveController using the given toml config.

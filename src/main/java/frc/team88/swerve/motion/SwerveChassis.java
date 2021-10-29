@@ -126,6 +126,24 @@ public class SwerveChassis {
   }
 
   /**
+   * Calculates the chassis velocity state given module states
+   *
+   * @return The velocity state
+   */
+  public VelocityState calculateChassisVector(ModuleState[] moduleStates) {
+    return this.forwardKinematics.calculateChassisVector(moduleStates);
+  }
+
+  /**
+   * Calculates the module states given the chassis velocity state
+   *
+   * @return The module states
+   */
+  public ModuleState[] calculateModuleStates(VelocityState velocityState) {
+    return this.inverseKinematics.calculate(velocityState);
+  }
+
+  /**
    * Gets the chassis odometry state.
    *
    * @return The odometry state
