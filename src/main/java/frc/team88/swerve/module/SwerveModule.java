@@ -4,13 +4,13 @@ import edu.wpi.first.wpiutil.math.Pair;
 import frc.team88.swerve.configuration.subconfig.SwerveModuleConfiguration;
 import frc.team88.swerve.module.motor.SwerveMotor;
 import frc.team88.swerve.module.sensor.PositionSensor;
+import frc.team88.swerve.module.util.ModuleDoubleSupplier;
 import frc.team88.swerve.util.MathUtils;
 import frc.team88.swerve.util.SyncPIDController;
 import frc.team88.swerve.util.TrapezoidalProfileController;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
 import java.util.Objects;
-import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
 import org.apache.commons.math3.linear.RealMatrix;
 
@@ -402,6 +402,9 @@ public class SwerveModule {
 
   /**
    * Sets strategy for azimuth flipping for a module
+   *
+   * @param supplier A lambda function of type ModuleDoubleSupplier. Takes a module, returns bias as
+   *     double
    */
   public void setAzimuthWrapBiasStrategy(ModuleDoubleSupplier supplier) {
     this.azimuthWrapBiasStrategy = supplier;
@@ -409,9 +412,12 @@ public class SwerveModule {
 
   /**
    * The default strategy for azimuth flipping for a module (default behavior is always flip)
+   *
+   * @param module an object of type SwerveModule
+   * @return Azimuth flip bias
    */
   public double defaultAzimuthWrapBiasStrategy(SwerveModule module) {
-    return 90;  // 90 = always flip azimuth. 180 = never flip azimuth
+    return 90; // 90 = always flip azimuth. 180 = never flip azimuth
   }
 
   /**

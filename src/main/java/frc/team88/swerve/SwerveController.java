@@ -4,7 +4,7 @@ import com.ctre.phoenix.CANifier;
 import frc.team88.swerve.configuration.Configuration;
 import frc.team88.swerve.data.DataManager;
 import frc.team88.swerve.gyro.SwerveGyro;
-import frc.team88.swerve.module.ModuleDoubleSupplier;
+import frc.team88.swerve.module.util.ModuleDoubleSupplier;
 import frc.team88.swerve.motion.SwerveChassis;
 import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
@@ -200,18 +200,20 @@ public class SwerveController {
 
   /**
    * Sets strategy for azimuth flipping for all modules
-   * 
-   * @return
+   *
+   * @param supplier A lambda function of type ModuleDoubleSupplier. Takes a module, returns bias as
+   *     double
    */
   public void setAzimuthWrapBiasStrategy(ModuleDoubleSupplier supplier) {
     this.chassis.setAzimuthWrapBiasStrategy(supplier);
   }
 
-
   /**
    * Sets strategy for azimuth flipping for a single module
-   * 
-   * @return
+   *
+   * @param moduleIndex index of module to set
+   * @param supplier A lambda function of type ModuleDoubleSupplier. Takes a module, returns bias as
+   *     double
    */
   public void setAzimuthWrapBiasStrategy(int moduleIndex, ModuleDoubleSupplier supplier) {
     this.chassis.setAzimuthWrapBiasStrategy(moduleIndex, supplier);
