@@ -1,6 +1,7 @@
 package frc.team88.swerve.motion;
 
 import frc.team88.swerve.configuration.Configuration;
+import frc.team88.swerve.module.ModuleDoubleSupplier;
 import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.motion.kinematics.ForwardKinematics;
 import frc.team88.swerve.motion.kinematics.InverseKinematics;
@@ -177,6 +178,26 @@ public class SwerveChassis {
   public void setBrake() {
     Stream.of(this.config.getModules()).forEach(m -> m.setBrake());
   }
+
+  /**
+   * Sets strategy for azimuth flipping for all modules
+   * 
+   * @return
+   */
+  public void setAzimuthWrapBiasStrategy(ModuleDoubleSupplier supplier) {
+    Stream.of(this.config.getModules()).forEach(m -> m.setAzimuthWrapBiasStrategy(supplier));
+  }
+
+  /**
+   * Sets strategy for azimuth flipping for a single module
+   * 
+   * @return
+   */
+  public void setAzimuthWrapBiasStrategy(int moduleIndex, ModuleDoubleSupplier supplier) {
+      SwerveModule module = this.config.getModules()[moduleIndex];
+      module.setAzimuthWrapBiasStrategy(supplier);
+  }
+
 
   /**
    * Gets the maximum translation speed if the drive is doing nothing else.

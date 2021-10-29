@@ -10,6 +10,7 @@ import frc.team88.swerve.util.TrapezoidalProfileController;
 import frc.team88.swerve.util.Vector2D;
 import frc.team88.swerve.util.WrappedAngle;
 import java.util.Objects;
+import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
 import org.apache.commons.math3.linear.RealMatrix;
 
@@ -43,23 +44,11 @@ public class SwerveModule {
   // The last wheel velocity set as a target for the controller.
   private double targetWheelVelocity = 0;
 
-  // The switching mode being used.
-  private SwitchingMode switchingMode = SwitchingMode.kAlwaysSwitch;
-
   // True if the wheel is currently reversed, false otherwise.
   private boolean isWheelReversed = false;
 
-  public enum SwitchingMode {
-    /** Never switch wheel direction. */
-    kNeverSwitch,
-    /** Always switch wheel direction if it will reduce rotation. */
-    kAlwaysSwitch,
-    /**
-     * Choose when switch depending on how much rotation would be saved and how fast the wheel is
-     * moving.
-     */
-    kSmart
-  }
+  // Returns angle bias for azimuth flipping (see getAzimuthWrapBias's usage in set() for details)
+  private ModuleDoubleSupplier azimuthWrapBiasStrategy;
 
   /**
    * Constructor.
@@ -84,6 +73,8 @@ public class SwerveModule {
     this.azimuthPositionController.reset(this.getAzimuthPosition().asDouble());
 
     this.wheelVelocityController = new SyncPIDController(config.getWheelControllerConfig());
+
+    azimuthWrapBiasStrategy = (SwerveModule module) -> defaultAzimuthWrapBiasStrategy(module);
   }
 
   /**
@@ -108,8 +99,6 @@ public class SwerveModule {
     this.targetWheelVelocity = wheelVelocity;
 
     // Calculate the actual sensor value to target for the azimuth
-    // double distanceToAzimuth =
-    // this.getAzimuthPosition().getSmallestDifferenceWith(azimuthPosition);
     Pair<Double, Boolean> distanceAndFlip =
         this.getAzimuthPosition()
             .getSmallestDifferenceWithHalfAngle(azimuthPosition, this.getAzimuthWrapBias());
@@ -412,48 +401,26 @@ public class SwerveModule {
   }
 
   /**
-   * Sets the direction current switching mode.
-   *
-   * @param mode The mode to set
+   * Sets strategy for azimuth flipping for a module
    */
-  public void setSwitchingMode(SwitchingMode mode) {
-    this.switchingMode = mode;
+  public void setAzimuthWrapBiasStrategy(ModuleDoubleSupplier supplier) {
+    this.azimuthWrapBiasStrategy = supplier;
   }
 
   /**
-   * Gets the direction current switching mode.
-   *
-   * @return The switching mode
+   * The default strategy for azimuth flipping for a module (default behavior is always flip)
    */
-  public SwitchingMode getSwitchingMode() {
-    return this.switchingMode;
+  public double defaultAzimuthWrapBiasStrategy(SwerveModule module) {
+    return 90;  // 90 = always flip azimuth. 180 = never flip azimuth
   }
 
   /**
-   * Gets the curerent biasTo360 to use for determing how to get to the next angle, depending on the
+   * Gets the current biasTo360 to use for determing how to get to the next angle, depending on the
    * swithing mode.
    *
    * @return The bias to use
    */
   private double getAzimuthWrapBias() {
-    switch (getSwitchingMode()) {
-      case kAlwaysSwitch:
-        return 90;
-      case kNeverSwitch:
-        return 180;
-      case kSmart:
-        // TODO: This should be fully paramaterizable
-        double currentVelocity = getWheelVelocity();
-        if (this.getAzimuthVelocity() > 30) {
-          return 180;
-        } else if (currentVelocity < 2.5) {
-          return 90;
-        } else if (currentVelocity < 5.5) {
-          return 120;
-        } else {
-          return 180;
-        }
-    }
-    throw new IllegalStateException("Switching mode is not supported");
+    return this.azimuthWrapBiasStrategy.getAsDouble(this);
   }
 }
