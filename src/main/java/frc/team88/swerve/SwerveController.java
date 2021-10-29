@@ -4,6 +4,7 @@ import com.ctre.phoenix.CANifier;
 import frc.team88.swerve.configuration.Configuration;
 import frc.team88.swerve.data.DataManager;
 import frc.team88.swerve.gyro.SwerveGyro;
+import frc.team88.swerve.module.util.ModuleDoubleSupplier;
 import frc.team88.swerve.motion.SwerveChassis;
 import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.motion.state.VelocityState;
@@ -195,6 +196,27 @@ public class SwerveController {
   /** Sets all motors on the swerve drive to brake. This is the default behavior. */
   public void setBrake() {
     this.chassis.setBrake();
+  }
+
+  /**
+   * Sets strategy for azimuth flipping for all modules
+   *
+   * @param supplier A lambda function of type ModuleDoubleSupplier. Takes a module, returns bias as
+   *     double
+   */
+  public void setAzimuthWrapBiasStrategy(ModuleDoubleSupplier supplier) {
+    this.chassis.setAzimuthWrapBiasStrategy(supplier);
+  }
+
+  /**
+   * Sets strategy for azimuth flipping for a single module
+   *
+   * @param moduleIndex index of module to set
+   * @param supplier A lambda function of type ModuleDoubleSupplier. Takes a module, returns bias as
+   *     double
+   */
+  public void setAzimuthWrapBiasStrategy(int moduleIndex, ModuleDoubleSupplier supplier) {
+    this.chassis.setAzimuthWrapBiasStrategy(moduleIndex, supplier);
   }
 
   /**

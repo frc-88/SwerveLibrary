@@ -2,6 +2,7 @@ package frc.team88.swerve.motion;
 
 import frc.team88.swerve.configuration.Configuration;
 import frc.team88.swerve.module.SwerveModule;
+import frc.team88.swerve.module.util.ModuleDoubleSupplier;
 import frc.team88.swerve.motion.kinematics.ForwardKinematics;
 import frc.team88.swerve.motion.kinematics.InverseKinematics;
 import frc.team88.swerve.motion.state.ModuleState;
@@ -176,6 +177,28 @@ public class SwerveChassis {
   /** Sets all motors to brake mode. */
   public void setBrake() {
     Stream.of(this.config.getModules()).forEach(m -> m.setBrake());
+  }
+
+  /**
+   * Sets strategy for azimuth flipping for all modules
+   *
+   * @param supplier A lambda function of type ModuleDoubleSupplier. Takes a module, returns bias as
+   *     double
+   */
+  public void setAzimuthWrapBiasStrategy(ModuleDoubleSupplier supplier) {
+    Stream.of(this.config.getModules()).forEach(m -> m.setAzimuthWrapBiasStrategy(supplier));
+  }
+
+  /**
+   * Sets strategy for azimuth flipping for a single module
+   *
+   * @param moduleIndex index of module to set
+   * @param supplier A lambda function of type ModuleDoubleSupplier. Takes a module, returns bias as
+   *     double
+   */
+  public void setAzimuthWrapBiasStrategy(int moduleIndex, ModuleDoubleSupplier supplier) {
+    SwerveModule module = this.config.getModules()[moduleIndex];
+    module.setAzimuthWrapBiasStrategy(supplier);
   }
 
   /**

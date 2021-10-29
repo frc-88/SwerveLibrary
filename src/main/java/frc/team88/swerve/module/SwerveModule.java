@@ -1,8 +1,10 @@
 package frc.team88.swerve.module;
 
+import edu.wpi.first.wpiutil.math.Pair;
 import frc.team88.swerve.configuration.subconfig.SwerveModuleConfiguration;
 import frc.team88.swerve.module.motor.SwerveMotor;
 import frc.team88.swerve.module.sensor.PositionSensor;
+import frc.team88.swerve.module.util.ModuleDoubleSupplier;
 import frc.team88.swerve.util.MathUtils;
 import frc.team88.swerve.util.SyncPIDController;
 import frc.team88.swerve.util.TrapezoidalProfileController;
@@ -42,6 +44,12 @@ public class SwerveModule {
   // The last wheel velocity set as a target for the controller.
   private double targetWheelVelocity = 0;
 
+  // True if the wheel is currently reversed, false otherwise.
+  private boolean isWheelReversed = false;
+
+  // Returns angle bias for azimuth flipping (see getAzimuthWrapBias's usage in set() for details)
+  private ModuleDoubleSupplier azimuthWrapBiasStrategy;
+
   /**
    * Constructor.
    *
@@ -65,6 +73,8 @@ public class SwerveModule {
     this.azimuthPositionController.reset(this.getAzimuthPosition().asDouble());
 
     this.wheelVelocityController = new SyncPIDController(config.getWheelControllerConfig());
+
+    azimuthWrapBiasStrategy = (SwerveModule module) -> defaultAzimuthWrapBiasStrategy(module);
   }
 
   /**
@@ -89,8 +99,20 @@ public class SwerveModule {
     this.targetWheelVelocity = wheelVelocity;
 
     // Calculate the actual sensor value to target for the azimuth
-    double distanceToAzimuth = this.getAzimuthPosition().getSmallestDifferenceWith(azimuthPosition);
+    Pair<Double, Boolean> distanceAndFlip =
+        this.getAzimuthPosition()
+            .getSmallestDifferenceWithHalfAngle(azimuthPosition, this.getAzimuthWrapBias());
+    double distanceToAzimuth = distanceAndFlip.getFirst();
+    boolean shouldFlipWheelVelocity = distanceAndFlip.getSecond();
+
     double unwrappedAzimuthAngle = this.azimuthSensor.getPosition() + distanceToAzimuth;
+    if (shouldFlipWheelVelocity) {
+      this.isWheelReversed = !this.isWheelReversed;
+    }
+
+    if (this.isWheelReversed) {
+      this.targetWheelVelocity *= -1.0;
+    }
 
     // Get the azimuth velocity to command from the trapezoidal profile controller.
     this.azimuthPositionController.setTargetVelocity(azimuthVelocity);
@@ -157,7 +179,11 @@ public class SwerveModule {
    * @return The current azimuth position, in degrees.
    */
   public WrappedAngle getAzimuthPosition() {
-    return new WrappedAngle(this.azimuthSensor.getPosition());
+    WrappedAngle azimuth = new WrappedAngle(this.azimuthSensor.getPosition());
+    if (this.isWheelReversed) {
+      azimuth = azimuth.plus(180.0);
+    }
+    return azimuth;
   }
 
   /**
@@ -372,5 +398,35 @@ public class SwerveModule {
         w_m0_clamped,
         Math.min(w_m1_minimized, w_m1_maximized),
         Math.max(w_m1_minimized, w_m1_maximized));
+  }
+
+  /**
+   * Sets strategy for azimuth flipping for a module
+   *
+   * @param supplier A lambda function of type ModuleDoubleSupplier. Takes a module, returns bias as
+   *     double
+   */
+  public void setAzimuthWrapBiasStrategy(ModuleDoubleSupplier supplier) {
+    this.azimuthWrapBiasStrategy = supplier;
+  }
+
+  /**
+   * The default strategy for azimuth flipping for a module (default behavior is always flip)
+   *
+   * @param module an object of type SwerveModule
+   * @return Azimuth flip bias
+   */
+  public double defaultAzimuthWrapBiasStrategy(SwerveModule module) {
+    return 90; // 90 = always flip azimuth. 180 = never flip azimuth
+  }
+
+  /**
+   * Gets the current biasTo360 to use for determing how to get to the next angle, depending on the
+   * swithing mode.
+   *
+   * @return The bias to use
+   */
+  private double getAzimuthWrapBias() {
+    return this.azimuthWrapBiasStrategy.getAsDouble(this);
   }
 }
