@@ -62,6 +62,16 @@ public class SwerveController {
   /**
    * Sets the translation and rotation velocity of the robot.
    *
+   * @param velocityState Object containing the target velocity state
+   */
+  public void setVelocity(VelocityState velocityState) {
+    this.chassis.setTargetState(velocityState);
+    this.chassis.holdAzimuths(false);
+  }
+
+  /**
+   * Sets the translation and rotation velocity of the robot.
+   *
    * @param translationDirection The direction for the robot to move, in degrees counterclockwise
    *     from forwards.
    * @param translationSpeed The speed for the robot to move, in feet per second.

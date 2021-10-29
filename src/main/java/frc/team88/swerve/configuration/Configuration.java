@@ -572,13 +572,13 @@ public class Configuration implements NetworkTablePopulator {
     if (moduleConfigs.size() < 2) {
       throw new InvalidConfigValueException(
           String.format(
-              "Only %d modules foundd in config, at least 2 required.", moduleConfigs.size()));
+              "Only %d modules found in config, at least 2 required.", moduleConfigs.size()));
     }
     this.modules = new SwerveModule[moduleConfigs.size()];
 
     for (int moduleIndex = 0; moduleIndex < moduleConfigs.size(); moduleIndex++) {
       this.modules[moduleIndex] =
-          this.instantiateModule(moduleConfigs.get(moduleIndex), "/modules/" + moduleIndex);
+          this.instantiateModule(moduleConfigs.get(moduleIndex), "modules/" + moduleIndex);
     }
   }
 
