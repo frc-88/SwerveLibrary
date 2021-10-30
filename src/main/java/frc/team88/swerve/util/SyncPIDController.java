@@ -57,7 +57,7 @@ public class SyncPIDController {
    *
    * @return the feedforward gain.
    */
-  public double getkF() {
+  public double getKF() {
     return this.config.getKF();
   }
 
@@ -181,6 +181,6 @@ public class SyncPIDController {
    * @return The feedforward output
    */
   protected double calculateF(double setpoint) {
-    return getkF() * setpoint;
+    return getKF() * setpoint;
   }
 }
