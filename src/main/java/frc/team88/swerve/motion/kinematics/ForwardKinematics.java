@@ -107,24 +107,23 @@ public class ForwardKinematics {
 
   /** Update the current robot pose. */
   public void update() {
-    ModuleState[] currentModuleStates =
-        Stream.of(this.modules)
-            .map(
-                (m) -> {
-                  double wheelVelocity = m.getWheelVelocity();
-                  double azimuthPosition =
-                      wheelVelocity < 0
-                          ? m.getAzimuthPosition().asDouble()
-                          : (m.getAzimuthPosition().asDouble());
-                  return new ModuleState(azimuthPosition, Math.abs(wheelVelocity));
-                })
-            .toArray(ModuleState[]::new);
-    VelocityState velState = calculateChassisVector(currentModuleStates);
+    VelocityState velState = calculateChassisVector(getModuleStates());
     m_state.setVelocity(
         velState.getTranslationVector().getX(), velState.getTranslationVector().getY());
     m_state.setThetaVelocity(Math.toDegrees(velState.getRotationVelocity()));
 
     estimatePoseExponential();
+  }
+
+  public ModuleState[] getModuleStates() {
+    return Stream.of(this.modules)
+        .map(
+            (m) -> {
+              double wheelVelocity = m.getWheelVelocity();
+              double azimuthPosition = m.getAzimuthPosition().asDouble();
+              return new ModuleState(azimuthPosition, Math.abs(wheelVelocity));
+            })
+        .toArray(ModuleState[]::new);
   }
 
   /**

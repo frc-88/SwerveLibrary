@@ -49,7 +49,7 @@ public class SyncPIDController {
    * @return The differential gain.
    */
   public double getKD() {
-    return this.config.getKF();
+    return this.config.getKD();
   }
 
   /**
