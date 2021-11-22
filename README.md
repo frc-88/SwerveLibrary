@@ -17,7 +17,7 @@ To install, simply add the following line to the dependencies section of build.g
 dependencies {
     // WPILIB autofills this section with some code. Do not delete it.
     
-    compile "io.github.frc-88:swerve:0.2.0"
+    implementation "io.github.frc-88:swerve:0.2.0"
 }
 ```
 
