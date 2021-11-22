@@ -56,7 +56,7 @@ public class RobotContainer {
             new ConditionalCommand(
                 new InstantCommand(() -> m_drivetrain.setYaw(0), m_drivetrain),
                 new WaitCommand(0),
-                DriverStation.getInstance()::isDisabled) {
+                () -> DriverStation.isDisabled()) {
               @Override
               public boolean runsWhenDisabled() {
                 return true;

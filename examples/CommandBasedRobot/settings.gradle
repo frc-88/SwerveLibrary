@@ -1,13 +1,10 @@
-// NOTE: This file installs the SwerveLibrary package by reference to the code in this repository,
-//       and isn't intended and an example. Please see the README for installation instructions.
-
 import org.gradle.internal.os.OperatingSystem
 
 pluginManagement {
     repositories {
         mavenLocal()
         gradlePluginPortal()
-        String frcYear = '2021'
+        String frcYear = '2022'
         File frcHome
         if (OperatingSystem.current().isWindows()) {
             String publicFolder = System.getenv('PUBLIC')
@@ -27,7 +24,7 @@ pluginManagement {
             url frcHomeMaven
         }
     }
-}
 
-include 'SwerveLibrary'
-project(':SwerveLibrary').projectDir = new File('../../')
+    include 'SwerveLibrary'
+    project(':SwerveLibrary').projectDir = new File('../../')
+}

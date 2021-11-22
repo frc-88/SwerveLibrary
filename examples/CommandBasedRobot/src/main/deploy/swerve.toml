@@ -1,45 +1,37 @@
-# This is the configuration file for SwerveLibrary. See the README for more in-depth information
-# about how to fill this out.
-
-[gyro]
-template = "navx" # The type of gyro being used.
-port-type = "I2C" # The type of port the navx is plugged into.
-port = "kMXP" # The name of the port, as passed into the navx constructor.
-
 # To use a Pigeon IMU comment out the gyro above and uncomment this:
-# [gyro]
-# template = "pigeon" # The type of gyro being used.
-# port-type = "CAN" # Can be either TalonSRX or CAN.
-# id = "0" # This is either the CAN ID or TalonSRX CAN ID that it is connected to.
-
+[gyro]
+template = "pigeon" # The type of gyro being used.
+port-type = "TalonSRX" # Can be either TalonSRX or CAN.
+id = 0 # This is either the CAN ID or TalonSRX CAN ID that it is connected to.
+# This is module 1 the front left
 [[modules]]
 template = "team88.diff-swerve-2021.beta" # The template for the module.
-location-inches = { x = 10.991, y = 12.491 } # The location of the module.
-motors.lo.can-id = 0 # The CAN ID of the first motor.
-motors.hi.can-id = 1 # The CAN ID of the second motor.
-azimuth-sensor.can-id = 0 # The CAN ID of the CANCoder.
-azimuth-sensor.offset = 0 # The degrees to subtract from the read module angle.
-
-[[modules]]
-template = "team88.diff-swerve-2021.beta" # The template for the module.
-location-inches = { x = -10.991, y = 12.491 } # The location of the module.
-motors.lo.can-id = 2 # The CAN ID of the first motor.
-motors.hi.can-id = 3 # The CAN ID of the second motor.
-azimuth-sensor.can-id = 1 # The CAN ID of the CANCoder.
-azimuth-sensor.offset = 0 # The degrees to subtract from the read module angle.
-
-[[modules]]
-template = "team88.diff-swerve-2021.beta" # The template for the module.
-location-inches = { x = -10.991, y = -12.491 } # The location of the module.
+location-inches = { x = 11.575, y = 11.575 } # The location of the module.
 motors.lo.can-id = 12 # The CAN ID of the first motor.
-motors.hi.can-id = 13 # The CAN ID of the second motor.
-azimuth-sensor.can-id = 2 # The CAN ID of the CANCoder.
-azimuth-sensor.offset = 0 # The degrees to subtract from the read module angle.
-
+motors.hi.can-id = 11 # The CAN ID of the second motor.
+azimuth-sensor.can-id = 1 # The CAN ID of the CANCoder.
+azimuth-sensor.offset = -17.9324 # The degrees to subtract from the read module angle.
+# This is module 2 the front right
 [[modules]]
 template = "team88.diff-swerve-2021.beta" # The template for the module.
-location-inches = { x = 10.991, y = -12.491 } # The location of the module.
-motors.lo.can-id = 14 # The CAN ID of the first motor.
-motors.hi.can-id = 15 # The CAN ID of the second motor.
+location-inches = { x = 11.575, y = -11.575 } # The location of the module.
+motors.lo.can-id = 22 # The CAN ID of the first motor.
+motors.hi.can-id = 21 # The CAN ID of the second motor.
+azimuth-sensor.can-id = 2 # The CAN ID of the CANCoder.
+azimuth-sensor.offset = 175.8677 # The degrees to subtract from the read module angle.
+# This is module 3 the back right
+[[modules]]
+template = "team88.diff-swerve-2021.beta" # The template for the module.
+location-inches = { x = -11.575, y = -11.575 } # The location of the module.
+motors.lo.can-id = 32 # The CAN ID of the first motor.
+motors.hi.can-id = 31 # The CAN ID of the second motor.
 azimuth-sensor.can-id = 3 # The CAN ID of the CANCoder.
-azimuth-sensor.offset = 0 # The degrees to subtract from the read module angle.
+azimuth-sensor.offset = -109.3379 # The degrees to subtract from the read module angle.
+# this is module 4 the back left
+[[modules]]
+template = "team88.diff-swerve-2021.beta" # The template for the module.
+location-inches = { x = -11.575, y = 11.575 } # The location of the module.
+motors.lo.can-id = 42 # The CAN ID of the first motor.
+motors.hi.can-id = 41 # The CAN ID of the second motor.
+azimuth-sensor.can-id = 4 # The CAN ID of the CANCoder.
+azimuth-sensor.offset = -143.0876 # The degrees to subtract from the read module angle.

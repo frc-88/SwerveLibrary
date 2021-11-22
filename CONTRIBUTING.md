@@ -75,7 +75,7 @@ In build.gradle, you need to add the following line to the dependencies block.
 dependencies {
     // Other stuff
 
-    compile project(':SwerveLibrary')
+    implementation project(':SwerveLibrary')
 }
 ```
 

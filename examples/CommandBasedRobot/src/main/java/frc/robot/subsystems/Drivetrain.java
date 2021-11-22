@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -70,44 +69,42 @@ public class Drivetrain extends SubsystemBase {
     // Pass the correct joystick properties of whichever chooser option is selected.
     switch (oiChooser.getSelected()) {
       case TWO_JOYSTICK_GAS:
-        xDirection = m_gamepad.getX(Hand.kLeft);
-        yDirection = -m_gamepad.getY(Hand.kLeft);
-        rotationVelocity = applyDeadband(m_gamepad.getX(Hand.kRight));
-        translationSpeed = m_gamepad.getTriggerAxis(Hand.kRight);
+        xDirection = m_gamepad.getLeftX();
+        yDirection = -m_gamepad.getLeftY();
+        rotationVelocity = applyDeadband(m_gamepad.getRightX());
+        translationSpeed = m_gamepad.getRightTriggerAxis();
         isTranslationDirectionSet =
             Math.sqrt(xDirection * xDirection + yDirection * yDirection)
                 >= DriveConstants.CHANGE_DIRECTION_THRESHOLD;
         break;
 
       case SPLIT_TRIGGER:
-        xDirection = applyDeadband(m_gamepad.getX(Hand.kRight));
-        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        xDirection = applyDeadband(m_gamepad.getRightX());
+        yDirection = applyDeadband(-m_gamepad.getLeftY());
         translationSpeed = Math.max(Math.abs(xDirection), Math.abs(yDirection));
-        rotationVelocity =
-            m_gamepad.getTriggerAxis(Hand.kRight) - m_gamepad.getTriggerAxis(Hand.kLeft);
+        rotationVelocity = m_gamepad.getRightTriggerAxis() - m_gamepad.getLeftTriggerAxis();
         isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
         break;
 
       case SINGLE_TRIGGER:
-        xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
-        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        xDirection = applyDeadband(m_gamepad.getLeftX());
+        yDirection = applyDeadband(-m_gamepad.getLeftY());
         translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
-        rotationVelocity =
-            m_gamepad.getTriggerAxis(Hand.kRight) - m_gamepad.getTriggerAxis(Hand.kLeft);
+        rotationVelocity = m_gamepad.getRightTriggerAxis() - m_gamepad.getLeftTriggerAxis();
         isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
         break;
 
       case SINGLE_JOYSTICK:
-        xDirection = applyDeadband(m_gamepad.getX(Hand.kLeft));
-        yDirection = applyDeadband(-m_gamepad.getY(Hand.kLeft));
+        xDirection = applyDeadband(m_gamepad.getLeftX());
+        yDirection = applyDeadband(-m_gamepad.getLeftY());
         translationSpeed = Math.sqrt(xDirection * xDirection + yDirection * yDirection);
-        rotationVelocity = applyDeadband(m_gamepad.getX(Hand.kRight));
+        rotationVelocity = applyDeadband(m_gamepad.getRightX());
         isTranslationDirectionSet = translationSpeed >= OIConstants.JOYSTICK_DEADBAND;
         break;
     }
 
     // If left bumper is pressed go into "Turtle Mode" for fine control both scale from % to fps
-    if (m_gamepad.getBumper(Hand.kLeft)) {
+    if (m_gamepad.getLeftBumper()) {
       translationSpeed *= DriveConstants.TURTLE_SPEED;
     } else {
       translationSpeed *= DriveConstants.MAX_SPEED;
@@ -122,7 +119,7 @@ public class Drivetrain extends SubsystemBase {
     // If the driver is commanding a translation direction, set it
     if (isTranslationDirectionSet) {
       var translationDirection = calculateTranslationDirection(xDirection, yDirection);
-      setTranslationDirection(translationDirection, !m_gamepad.getBumper(Hand.kRight));
+      setTranslationDirection(translationDirection, !m_gamepad.getRightBumper());
     }
 
     // If neither a velocity or a direction is being set, hold the modules
